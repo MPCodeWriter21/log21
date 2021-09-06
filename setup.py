@@ -1,12 +1,12 @@
 # Setup.py
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open('README.md', 'r') as file:
     long_description = file.read()
 
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 
 setup(
     name='log21',
@@ -17,7 +17,7 @@ setup(
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    packages=find_packages(),
+    packages=['log21'],
     keywords=['python', 'log', 'colorize', 'color', 'logging'],
     classifiers=[
         "Intended Audience :: Developers",

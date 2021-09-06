@@ -1,5 +1,12 @@
 # Colors.py
 
+import re as _re
+
+__all__ = ['Colors', 'get_color', 'get_colors']
+
+ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
+
+
 class Colors:
     color_map = {
         'Reset': '\033[0m',
@@ -72,6 +79,17 @@ class Colors:
 
 
 def get_color(color: str, raise_exceptions: bool = False) -> str:
+    """
+    Gets a color name and returns it in ansi format
+
+    :param color: color name(Example: Blue)
+    :param raise_exceptions: bool = False:
+        False: It will return '' instead of raising exceptions when an error occurs.
+        True: It may raise TypeError or KeyError
+    :raises TypeError: `color` must be str
+    :raises KeyError: `color` not found!
+    :return: str: an ansi color
+    """
     if type(color) is not str:
         if raise_exceptions:
             raise TypeError('`color` must be str!')
@@ -82,8 +100,36 @@ def get_color(color: str, raise_exceptions: bool = False) -> str:
     color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
     if color in Colors.color_map_lower:
         return Colors.color_map_lower[color]
+    elif ansi_esc.match(color):
+        return ansi_esc.match(color).group()
     else:
         if raise_exceptions:
             raise KeyError(f'`{color}` not found!')
         else:
             return ''
+
+
+def get_colors(*colors: str, raise_exceptions: bool = False) -> str:
+    """
+    Gets a list of colors and combines them into one.
+
+    :param colors: Input colors
+    :param raise_exceptions: bool = False:
+        False: It will return '' instead of raising exceptions when an error occurs.
+        True: It may raise TypeError or KeyError
+    :raises TypeError: `color` must be str
+    :raises KeyError: `color` not found!
+    :return: str: a combined color
+    """
+    output = ''
+    for color in colors:
+        output += get_color(str(color), raise_exceptions=raise_exceptions)
+    parts = ansi_esc.split(output)
+    output = '\033['
+    for part in parts:
+        if part:
+            output += part + ';'
+    if output.endswith(';'):
+        output = output[:-1] + 'm'
+        return output
+    return ''

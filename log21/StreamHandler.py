@@ -21,8 +21,8 @@ class ColorizingStreamHandler(_StreamHandler):
         try:
             msg = self.format(record)
             if IS_WINDOWS:
-                self.write_and_convert(msg)
-                self.write_and_convert(self.terminator)
+                self.convert_and_write(msg)
+                self.convert_and_write(self.terminator)
             else:
                 self.write(msg)
                 self.write(self.terminator)
@@ -31,7 +31,7 @@ class ColorizingStreamHandler(_StreamHandler):
             self.handleError(record)
 
     # Writes colorized text to the Windows console.
-    def write_and_convert(self, message):
+    def convert_and_write(self, message):
         # Regex pattern to find ansi colors in message
         ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
 
