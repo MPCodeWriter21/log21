@@ -5,10 +5,11 @@ from typing import Union as _Union
 from log21.Levels import *
 from log21.StreamHandler import ColorizingStreamHandler
 from log21.Logger import Logger
+from log21.Colors import Colors, get_color
 
-__version__ = "1.0.0"
-__all__ = ['ColorizingStreamHandler', 'get_logger', 'Logger', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO',
-           'DEBUG', 'NOTSET', '__version__']
+__version__ = "1.1.0"
+__all__ = ['ColorizingStreamHandler', 'get_logger', 'Logger', 'Colors', 'get_color', 'CRITICAL', 'FATAL', 'ERROR',
+           'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET', '__version__']
 
 
 def get_logger(name: str = None, level: _Union[int, str] = NOTSET, show_time: bool = True,

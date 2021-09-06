@@ -13,7 +13,7 @@ To install log21 you can simply use the `pip install log21` command:
 python -m pip install log21
 ```
 
-or you can clone [the repository](https://github.com/MPCodeWriter21/log21) and run:
+Or you can clone [the repository](https://github.com/MPCodeWriter21/log21) and run:
 
 ```commandline
 python setup.py install
@@ -60,3 +60,13 @@ logger.log(ERROR, '%sAn', '%serror', '%soccurred!', args=('\033[31m', '\033[91m'
 ```
 
 ![Example3](https://i.imgur.com/BGdZyY2.png)
+
+About
+-----
+Author: CodeWriter21 (Mehrad Pooryoussof)
+
+GitHub: [MPCodeWriter21](https://github.com/MPCodeWriter21)
+
+Telegram Channel: [@CodeWriter21](https://t.me/CodeWriter21)
+
+Aparat Channel: [CodeWriter21](https://www.aparat.com/CodeWriter21)
