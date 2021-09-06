@@ -8,7 +8,7 @@ from log21.Formatter import ColorizingFormatter
 from log21.Logger import Logger
 from log21.Colors import Colors, get_color, get_colors
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __all__ = ['ColorizingStreamHandler', 'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR',
            'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET', '__version__']
 

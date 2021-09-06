@@ -23,15 +23,15 @@ Examples:
 ---------
 
 ```python
-from log21 import get_logger
+from log21 import get_logger, get_colors
 
 logger = get_logger()
 
-logger.warning('\x1b[91mBe careful!')
+logger.warning(get_colors('light red', 'background-white'), 'careful!')
 # [21:21:21] [warning] Be careful!
 ```
 
-![Example1](https://i.imgur.com/oDb6G6U.png)
+![Example1](https://i.imgur.com/TM6DK0e.png)
 
 ---------
 
@@ -40,11 +40,11 @@ import log21
 
 logger = log21.get_logger(name='Logger21', level=log21.DEBUG, show_level=False)
 
-logger.debug('\u001b[34mHere we are!')
+logger.debug(log21.get_color('blue') + 'Here we are!')
 # [21:21:21] Here we are!
 ```
 
-![Example2](https://i.imgur.com/frIW7RJ.png)
+![Example2](https://i.imgur.com/45fFs7F.png)
 
 ---------
 
@@ -55,11 +55,11 @@ logger = Logger('MyLogger')
 streamHandler = ColorizingStreamHandler()
 logger.addHandler(streamHandler)
 
-logger.log(ERROR, '%sAn', '%serror', '%soccurred!', args=('\033[31m', '\033[91m', '\033[31m'))
+logger.log(ERROR, '%sAn', '%serror', '%soccurred!', args=('\u001b[31m', '\x1b[91m', '\033[31m'))
 # An error occurred!
 ```
 
-![Example3](https://i.imgur.com/BGdZyY2.png)
+![Example3](https://i.imgur.com/S06PPKx.png)
 
 About
 -----
