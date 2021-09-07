@@ -1,8 +1,8 @@
 # StreamHandler.py
 
 import os as _os
-import re as _re
 from logging import StreamHandler as _StreamHandler
+from log21.Colors import ansi_esc
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler']
 
@@ -32,9 +32,6 @@ class ColorizingStreamHandler(_StreamHandler):
 
     # Writes colorized text to the Windows console.
     def convert_and_write(self, message):
-        # Regex pattern to find ansi colors in message
-        ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
-
         nt_color_map = {
             30: 0,  # foreground: black   - 0b00000000
             31: 4,  # foreground: red     - 0b00000100

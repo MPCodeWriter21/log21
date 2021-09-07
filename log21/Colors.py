@@ -2,8 +2,9 @@
 
 import re as _re
 
-__all__ = ['Colors', 'get_color', 'get_colors']
+__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_esc']
 
+# Regex pattern to find ansi colors in message
 ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
 
 
@@ -43,39 +44,74 @@ class Colors:
         'BackLightCyan': '\033[106m',
         'BackLightWhite': '\033[107m'
     }
-    color_map_lower = {'reset': '\x1b[0m',
-                       'black': '\x1b[30m',
-                       'red': '\x1b[31m',
-                       'green': '\x1b[32m',
-                       'yellow': '\x1b[33m',
-                       'blue': '\x1b[34m',
-                       'magenta': '\x1b[35m',
-                       'cyan': '\x1b[36m',
-                       'white': '\x1b[37m',
-                       'backblack': '\x1b[40m',
-                       'backred': '\x1b[41m',
-                       'backgreen': '\x1b[42m',
-                       'backyellow': '\x1b[43m',
-                       'backblue': '\x1b[44m',
-                       'backmagenta': '\x1b[45m',
-                       'backcyan': '\x1b[46m',
-                       'backwhite': '\x1b[47m',
-                       'grey': '\x1b[90m',
-                       'lightred': '\x1b[91m',
-                       'lightgreen': '\x1b[92m',
-                       'lightyellow': '\x1b[93m',
-                       'lightblue': '\x1b[94m',
-                       'lightmagenta': '\x1b[95m',
-                       'lightcyan': '\x1b[96m',
-                       'lightwhite': '\x1b[97m',
-                       'backgrey': '\x1b[100m',
-                       'backlightred': '\x1b[101m',
-                       'backlightgreen': '\x1b[102m',
-                       'backlightyellow': '\x1b[103m',
-                       'backlightblue': '\x1b[104m',
-                       'backlightmagenta': '\x1b[105m',
-                       'backlightcyan': '\x1b[106m',
-                       'backlightwhite': '\x1b[107m'}
+    color_map_ = {
+        'reset': '\x1b[0m',
+        'black': '\x1b[30m',
+        'red': '\x1b[31m',
+        'green': '\x1b[32m',
+        'yellow': '\x1b[33m',
+        'blue': '\x1b[34m',
+        'magenta': '\x1b[35m',
+        'cyan': '\x1b[36m',
+        'white': '\x1b[37m',
+        'backblack': '\x1b[40m',
+        'backred': '\x1b[41m',
+        'backgreen': '\x1b[42m',
+        'backyellow': '\x1b[43m',
+        'backblue': '\x1b[44m',
+        'backmagenta': '\x1b[45m',
+        'backcyan': '\x1b[46m',
+        'backwhite': '\x1b[47m',
+        'grey': '\x1b[90m',
+        'lightred': '\x1b[91m',
+        'lightgreen': '\x1b[92m',
+        'lightyellow': '\x1b[93m',
+        'lightblue': '\x1b[94m',
+        'lightmagenta': '\x1b[95m',
+        'lightcyan': '\x1b[96m',
+        'lightwhite': '\x1b[97m',
+        'backgrey': '\x1b[100m',
+        'backlightred': '\x1b[101m',
+        'backlightgreen': '\x1b[102m',
+        'backlightyellow': '\x1b[103m',
+        'backlightblue': '\x1b[104m',
+        'backlightmagenta': '\x1b[105m',
+        'backlightcyan': '\x1b[106m',
+        'backlightwhite': '\x1b[107m',
+        'rst': '\x1b[0m',
+        'bk': '\x1b[30m',
+        'r': '\x1b[31m',
+        'g': '\x1b[32m',
+        'y': '\x1b[33m',
+        'b': '\x1b[34m',
+        'm': '\x1b[35m',
+        'c': '\x1b[36m',
+        'w': '\x1b[37m',
+        'bbk': '\x1b[40m',
+        'br': '\x1b[41m',
+        'bg': '\x1b[42m',
+        'by': '\x1b[43m',
+        'bb': '\x1b[44m',
+        'bm': '\x1b[45m',
+        'bc': '\x1b[46m',
+        'bw': '\x1b[47m',
+        'gr': '\x1b[90m',
+        'lr': '\x1b[91m',
+        'lg': '\x1b[92m',
+        'ly': '\x1b[93m',
+        'lb': '\x1b[94m',
+        'lm': '\x1b[95m',
+        'lc': '\x1b[96m',
+        'lw': '\x1b[97m',
+        'bgr': '\x1b[100m',
+        'blr': '\x1b[101m',
+        'blg': '\x1b[102m',
+        'bly': '\x1b[103m',
+        'blb': '\x1b[104m',
+        'blm': '\x1b[105m',
+        'blc': '\x1b[106m',
+        'blw': '\x1b[107m',
+    }
 
 
 def get_color(color: str, raise_exceptions: bool = False) -> str:
@@ -98,8 +134,8 @@ def get_color(color: str, raise_exceptions: bool = False) -> str:
     color = color.lower()
     color = color.replace(' ', '').replace('_', '').replace('-', '')
     color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
-    if color in Colors.color_map_lower:
-        return Colors.color_map_lower[color]
+    if color in Colors.color_map_:
+        return Colors.color_map_[color]
     elif ansi_esc.match(color):
         return ansi_esc.match(color).group()
     else:

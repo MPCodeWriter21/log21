@@ -2,10 +2,10 @@
 
 from logging import Formatter as _Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
-from log21.Colors import get_colors
+from log21.Colors import get_colors, ansi_esc
 from log21.Levels import *
 
-__all__ = ['ColorizingFormatter']
+__all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
 class ColorizingFormatter(_Formatter):
@@ -22,7 +22,8 @@ class ColorizingFormatter(_Formatter):
         created_color = msecs_color = relative_created_color = thread_color = thread_name_color = \
         process_color = message_color = tuple()
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_colors: _Dict[int, _Tuple[str]] = None,
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%',
+                 level_colors: _Dict[int, _Tuple[str]] = None,
                  time_color: _Tuple[str, ...] = None, name_color: _Tuple[str, ...] = None,
                  pathname_color: _Tuple[str, ...] = None, filename_color: _Tuple[str, ...] = None,
                  module_color: _Tuple[str, ...] = None, lineno_color: _Tuple[str, ...] = None,
@@ -96,7 +97,7 @@ class ColorizingFormatter(_Formatter):
 
     def format(self, record) -> str:
         """
-        Colorizes the the record and returns the formatted message.
+        Colorizes the record and returns the formatted message.
 
         :param record:
         :return: str
@@ -133,8 +134,8 @@ class ColorizingFormatter(_Formatter):
         reset = '\033[0m'
 
         record.asctime = get_colors(*self.time_color) + record.asctime + reset
-        record.levelname = get_colors(*self.level_colors[record.levelno]) + record.levelname + reset
-        record.levelno = get_colors(*self.level_colors[record.levelno]) + str(record.levelno) + reset
+        record.levelname = get_colors(*self.level_colors[int(record.levelno)]) + record.levelname + reset
+        record.levelno = get_colors(*self.level_colors[int(record.levelno)]) + str(record.levelno) + reset
         record.name = get_colors(*self.name_color) + str(record.name) + reset
         record.pathname = get_colors(*self.pathname_color) + record.pathname + reset
         record.filename = get_colors(*self.filename_color) + record.filename + reset
@@ -150,3 +151,25 @@ class ColorizingFormatter(_Formatter):
         record.message = get_colors(*self.message_color) + record.message + reset
 
         return record
+
+
+class DecolorizingFormatter(_Formatter):
+    def format(self, record) -> str:
+        """
+        Decolorizes the record and returns the formatted message.
+
+        :param record:
+        :return: str
+        """
+        return self.decolorize(super().format(record))
+
+    @staticmethod
+    def decolorize(text: str):
+        """
+        Removes all ansi colors in the text.
+
+        :param text: str: Input text
+        :return: str: decolorized text
+        """
+
+        return ansi_esc.subn('', text)[0]

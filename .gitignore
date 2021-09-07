@@ -2,4 +2,4 @@
 __pycache__/
 build/
 dist/
-log21.egg-info/
+log21.egg-*/

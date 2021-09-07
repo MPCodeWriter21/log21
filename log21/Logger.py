@@ -8,6 +8,13 @@ __all__ = ['Logger']
 
 
 class Logger(_logging.Logger):
+    def isEnabledFor(self, level):
+        """
+        Is this logger enabled for level 'level'?
+        """
+
+        return self.level <= level
+
     def log(self, level: int, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
@@ -46,7 +53,7 @@ class Logger(_logging.Logger):
         To pass exception information, use the keyword argument exc_info with
         a true value, e.g.
 
-        logger.info("Houston, we have a %s", args=("interesting problem",), exc_info=1)
+        logger.info("Houston, we have an %s", args=("interesting problem",), exc_info=1)
         """
         if self.isEnabledFor(INFO):
             msg = ' '.join([*(str(m) for m in msg), end])
