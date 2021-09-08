@@ -135,7 +135,6 @@ class ColorizingFormatter(_Formatter):
 
         record.asctime = get_colors(*self.time_color) + record.asctime + reset
         record.levelname = get_colors(*self.level_colors[int(record.levelno)]) + record.levelname + reset
-        record.levelno = get_colors(*self.level_colors[int(record.levelno)]) + str(record.levelno) + reset
         record.name = get_colors(*self.name_color) + str(record.name) + reset
         record.pathname = get_colors(*self.pathname_color) + record.pathname + reset
         record.filename = get_colors(*self.filename_color) + record.filename + reset
