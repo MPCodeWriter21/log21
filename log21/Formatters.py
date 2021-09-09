@@ -1,5 +1,6 @@
 # Formatter.py
 
+import time as _time
 from logging import Formatter as _Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
 from log21.Colors import get_colors, ansi_esc
@@ -119,6 +120,15 @@ class ColorizingFormatter(_Formatter):
 
 
 class DecolorizingFormatter(_Formatter):
+    def formatTime(self, record, datefmt=None):
+        ct = self.converter(int(record.created))
+        if datefmt:
+            s = _time.strftime(datefmt, ct)
+        else:
+            t = _time.strftime(self.default_time_format, ct)
+            s = self.default_msec_format % (t, record.msecs)
+        return s
+
     def format(self, record) -> str:
         """
         Decolorizes the record and returns the formatted message.
