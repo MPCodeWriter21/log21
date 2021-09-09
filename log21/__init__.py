@@ -3,18 +3,18 @@
 import logging as _logging
 from typing import Union as _Union
 from log21.Levels import *
-from log21.StreamHandler import ColorizingStreamHandler
+from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.FileHandler import DecolorizingFileHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Logger import Logger
 from log21.Colors import Colors, get_color, get_colors, ansi_esc
 
-__version__ = "1.3.3"
+__version__ = "1.4.0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
            'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN',
-           'INFO', 'DEBUG', 'NOTSET']
+           'INFO', 'DEBUG', 'NOTSET', 'StreamHandler']
 
 
 def get_logger(name: str = None, level: _Union[int, str] = NOTSET, show_time: bool = True,

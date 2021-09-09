@@ -1,10 +1,11 @@
 # StreamHandler.py
 
 import os as _os
+import re as _re
 from logging import StreamHandler as _StreamHandler
-from log21.Colors import ansi_esc
+from log21.Colors import ansi_esc, get_colors
 
-__all__ = ['IS_WINDOWS', 'ColorizingStreamHandler']
+__all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
 
 IS_WINDOWS = _os.name == 'nt'
 
@@ -12,13 +13,35 @@ if IS_WINDOWS:
     import ctypes
 
 
-# A stream handler that supports colorizing.
-class ColorizingStreamHandler(_StreamHandler):
+class StreamHandler(_StreamHandler):
     terminator = ''
 
+    def __init__(self, handle_carriage_return: bool = True, **kwargs):
+        self.HandleCR = handle_carriage_return
+        super().__init__(**kwargs)
+
+    def check_cr(self, record):
+        if '\r' in record.msg:
+            file_descriptor = getattr(self.stream, 'fileno', None)
+            if file_descriptor:
+                file_descriptor = file_descriptor()
+                if file_descriptor in (1, 2):  # stdout or stderr
+                    self.stream.write('\r' + (' ' * (_os.get_terminal_size(file_descriptor)[0] - 1)) + '\r')
+                    index = record.msg.rfind('\r')
+                    find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
+                    record.msg = get_colors(*find.split(record.msg[:index])) + record.msg[index + 1:]
+
+    def emit(self, record):
+        self.check_cr(record)
+        super().emit(record)
+
+
+# A stream handler that supports colorizing.
+class ColorizingStreamHandler(StreamHandler):
     # logging.StreamHandler's emit function overload
     def emit(self, record):
         try:
+            self.check_cr(record)
             msg = self.format(record)
             if IS_WINDOWS:
                 self.convert_and_write(msg)
@@ -73,7 +96,7 @@ class ColorizingStreamHandler(_StreamHandler):
         win_handle = None
         file_descriptor = getattr(self.stream, 'fileno', None)
 
-        if file_descriptor is not None:
+        if file_descriptor:
             file_descriptor = file_descriptor()
 
             if file_descriptor in (1, 2):  # stdout or stderr

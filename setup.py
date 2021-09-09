@@ -7,7 +7,7 @@ with open('README.md', 'r') as file:
     long_description = file.read()
 
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '1.3.3'
+VERSION = '1.4.0'
 
 setup(
     name='log21',
