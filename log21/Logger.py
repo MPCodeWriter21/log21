@@ -24,7 +24,7 @@ class Logger(_logging.Logger):
 
         logger.log(level, "We have a %s", args=("mysterious problem",), exc_info=1)
         """
-        msg = ' '.join([*(str(m) for m in msg), end])
+        msg = ' '.join([str(m) for m in msg]) + end
         if not isinstance(level, int):
             if _raiseExceptions:
                 raise TypeError("level must be an integer")
@@ -43,7 +43,7 @@ class Logger(_logging.Logger):
         logger.debug("Houston, we have a %s", args=("thorny problem",), exc_info=1)
         """
         if self.isEnabledFor(DEBUG):
-            msg = ' '.join([*(str(m) for m in msg), end])
+            msg = ' '.join([str(m) for m in msg]) + end
             self._log(DEBUG, msg, args, **kwargs)
 
     def info(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
@@ -56,7 +56,7 @@ class Logger(_logging.Logger):
         logger.info("Houston, we have an %s", args=("interesting problem",), exc_info=1)
         """
         if self.isEnabledFor(INFO):
-            msg = ' '.join([*(str(m) for m in msg), end])
+            msg = ' '.join([str(m) for m in msg]) + end
             self._log(INFO, msg, args, **kwargs)
 
     def warning(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
@@ -69,7 +69,7 @@ class Logger(_logging.Logger):
         logger.warning("Houston, we have a %s", args=("bit of a problem",), exc_info=1)
         """
         if self.isEnabledFor(WARNING):
-            msg = ' '.join([*(str(m) for m in msg), end])
+            msg = ' '.join([str(m) for m in msg]) + end
             self._log(WARNING, msg, args, **kwargs)
 
     warn = warning
@@ -84,7 +84,7 @@ class Logger(_logging.Logger):
         logger.error("Houston, we have a %s", args=("major problem",), exc_info=1)
         """
         if self.isEnabledFor(ERROR):
-            msg = ' '.join([*(str(m) for m in msg), end])
+            msg = ' '.join([str(m) for m in msg]) + end
             self._log(ERROR, msg, args, **kwargs)
 
     def exception(self, *msg, args, exc_info=True, **kwargs):
@@ -103,7 +103,7 @@ class Logger(_logging.Logger):
         logger.critical("Houston, we have a %s", args=("major disaster",), exc_info=1)
         """
         if self.isEnabledFor(CRITICAL):
-            msg = ' '.join([*(str(m) for m in msg), end])
+            msg = ' '.join([str(m) for m in msg]) + end
             self._log(CRITICAL, msg, args, **kwargs)
 
     fatal = critical
