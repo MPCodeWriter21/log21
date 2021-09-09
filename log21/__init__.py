@@ -9,7 +9,7 @@ from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Logger import Logger
 from log21.Colors import Colors, get_color, get_colors, ansi_esc
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',

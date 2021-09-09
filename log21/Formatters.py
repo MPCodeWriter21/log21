@@ -18,19 +18,15 @@ class ColorizingFormatter(_Formatter):
         CRITICAL: ('background red', 'white')
     }
     time_color = ('lightblue',)
-    name_color = pathname_color = filename_color = module_color = lineno_color = func_name_color = \
-        created_color = msecs_color = relative_created_color = thread_color = thread_name_color = \
-        process_color = message_color = tuple()
+    name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \
+        message_color = tuple()
 
     def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%',
                  level_colors: _Dict[int, _Tuple[str]] = None,
                  time_color: _Tuple[str, ...] = None, name_color: _Tuple[str, ...] = None,
                  pathname_color: _Tuple[str, ...] = None, filename_color: _Tuple[str, ...] = None,
-                 module_color: _Tuple[str, ...] = None, lineno_color: _Tuple[str, ...] = None,
-                 func_name_color: _Tuple[str, ...] = None, created_color: _Tuple[str, ...] = None,
-                 msecs_color: _Tuple[str, ...] = None, relative_created_color: _Tuple[str, ...] = None,
-                 thread_color: _Tuple[str, ...] = None, thread_name_color: _Tuple[str, ...] = None,
-                 process_color: _Tuple[str, ...] = None, message_color: _Tuple[str, ...] = None):
+                 module_color: _Tuple[str, ...] = None, func_name_color: _Tuple[str, ...] = None,
+                 thread_name_color: _Tuple[str, ...] = None, message_color: _Tuple[str, ...] = None):
         super().__init__(fmt=fmt, datefmt=datefmt, style=style)
         # Checks and sets colors
         if level_colors:
@@ -58,38 +54,14 @@ class ColorizingFormatter(_Formatter):
             if type(module_color) is not tuple:
                 raise TypeError('`module_color` must be a tuple!')
             self.module_color = module_color
-        if lineno_color:
-            if type(lineno_color) is not tuple:
-                raise TypeError('`lineno_color` must be a tuple!')
-            self.lineno_color = lineno_color
         if func_name_color:
             if type(func_name_color) is not tuple:
                 raise TypeError('`func_name_color` must be a tuple!')
             self.func_name_color = func_name_color
-        if created_color:
-            if type(created_color) is not tuple:
-                raise TypeError('`created_color` must be a tuple!')
-            self.created_color = created_color
-        if msecs_color:
-            if type(msecs_color) is not tuple:
-                raise TypeError('`msecs_color` must be a tuple!')
-            self.msecs_color = msecs_color
-        if relative_created_color:
-            if type(relative_created_color) is not tuple:
-                raise TypeError('`relative_created_color` must be a tuple!')
-            self.relative_created_color = relative_created_color
-        if thread_color:
-            if type(thread_color) is not tuple:
-                raise TypeError('`thread_color` must be a tuple!')
-            self.thread_color = thread_color
         if thread_name_color:
             if type(thread_name_color) is not tuple:
                 raise TypeError('`thread_name_color` must be a tuple!')
             self.thread_name_color = thread_name_color
-        if process_color:
-            if type(process_color) is not tuple:
-                raise TypeError('`process_color` must be a tuple!')
-            self.process_color = process_color
         if message_color:
             if type(message_color) is not tuple:
                 raise TypeError('`message_color` must be a tuple!')
@@ -140,13 +112,7 @@ class ColorizingFormatter(_Formatter):
         record.filename = get_colors(*self.filename_color) + record.filename + reset
         record.module = get_colors(*self.module_color) + record.module + reset
         record.funcName = get_colors(*self.func_name_color) + record.funcName + reset
-        record.lineno = get_colors(*self.lineno_color) + str(record.lineno) + reset
-        record.created = get_colors(*self.created_color) + str(record.created) + reset
-        record.msecs = get_colors(*self.msecs_color) + str(record.msecs) + reset
-        record.relativeCreated = get_colors(*self.relative_created_color) + str(record.relativeCreated) + reset
-        record.thread = get_colors(*self.thread_color) + str(record.thread) + reset
         record.threadName = get_colors(*self.thread_name_color) + record.threadName + reset
-        record.process = get_colors(*self.process_color) + str(record.process) + reset
         record.message = get_colors(*self.message_color) + record.message + reset
 
         return record
