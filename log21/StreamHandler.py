@@ -21,15 +21,16 @@ class StreamHandler(_StreamHandler):
         super().__init__(**kwargs)
 
     def check_cr(self, record):
-        if '\r' in record.msg:
-            file_descriptor = getattr(self.stream, 'fileno', None)
-            if file_descriptor:
-                file_descriptor = file_descriptor()
-                if file_descriptor in (1, 2):  # stdout or stderr
-                    self.stream.write('\r' + (' ' * (_os.get_terminal_size(file_descriptor)[0] - 1)) + '\r')
-                    index = record.msg.rfind('\r')
-                    find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
-                    record.msg = get_colors(*find.split(record.msg[:index])) + record.msg[index + 1:]
+        if record.msg:
+            if '\r' in record.msg[:-1]:
+                file_descriptor = getattr(self.stream, 'fileno', None)
+                if file_descriptor:
+                    file_descriptor = file_descriptor()
+                    if file_descriptor in (1, 2):  # stdout or stderr
+                        self.stream.write('\r' + (' ' * (_os.get_terminal_size(file_descriptor)[0] - 1)) + '\r')
+                        index = record.msg.rfind('\r')
+                        find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
+                        record.msg = get_colors(*find.split(record.msg[:index])) + record.msg[index + 1:]
 
     def emit(self, record):
         self.check_cr(record)

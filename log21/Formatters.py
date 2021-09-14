@@ -106,15 +106,24 @@ class ColorizingFormatter(_Formatter):
         """
         reset = '\033[0m'
 
-        record.asctime = get_colors(*self.time_color) + record.asctime + reset
-        record.levelname = get_colors(*self.level_colors[int(record.levelno)]) + record.levelname + reset
-        record.name = get_colors(*self.name_color) + str(record.name) + reset
-        record.pathname = get_colors(*self.pathname_color) + record.pathname + reset
-        record.filename = get_colors(*self.filename_color) + record.filename + reset
-        record.module = get_colors(*self.module_color) + record.module + reset
-        record.funcName = get_colors(*self.func_name_color) + record.funcName + reset
-        record.threadName = get_colors(*self.thread_name_color) + record.threadName + reset
-        record.message = get_colors(*self.message_color) + record.message + reset
+        if hasattr(record, 'asctime'):
+            record.asctime = get_colors(*self.time_color) + record.asctime + reset
+        if hasattr(record, 'levelno'):
+            record.levelname = get_colors(*self.level_colors[int(record.levelno)]) + record.levelname + reset
+        if hasattr(record, 'name'):
+            record.name = get_colors(*self.name_color) + str(record.name) + reset
+        if hasattr(record, 'pathname'):
+            record.pathname = get_colors(*self.pathname_color) + record.pathname + reset
+        if hasattr(record, 'filename'):
+            record.filename = get_colors(*self.filename_color) + record.filename + reset
+        if hasattr(record, 'module'):
+            record.module = get_colors(*self.module_color) + record.module + reset
+        if hasattr(record, 'funcName'):
+            record.funcName = get_colors(*self.func_name_color) + record.funcName + reset
+        if hasattr(record, 'threadName'):
+            record.threadName = get_colors(*self.thread_name_color) + record.threadName + reset
+        if hasattr(record, 'message'):
+            record.message = get_colors(*self.message_color) + record.message + reset
 
         return record
 

@@ -27,7 +27,7 @@ from log21 import get_logger, get_colors
 
 logger = get_logger()
 
-logger.warning(get_colors('light red', 'background-white'), 'careful!')
+logger.warning(get_colors('light red', 'background-white'), 'Be careful!')
 # [21:21:21] [warning] Be careful!
 ```
 

@@ -15,7 +15,7 @@ class Logger(_logging.Logger):
 
         return self.level <= level
 
-    def log(self, level: int, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def log(self, level: int, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with the integer severity 'level'.
 
@@ -33,7 +33,7 @@ class Logger(_logging.Logger):
         if self.isEnabledFor(level):
             self._log(level, msg, args, **kwargs)
 
-    def debug(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def debug(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with severity 'DEBUG'.
 
@@ -46,7 +46,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(DEBUG, msg, args, **kwargs)
 
-    def info(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def info(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with severity 'INFO'.
 
@@ -59,7 +59,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(INFO, msg, args, **kwargs)
 
-    def warning(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def warning(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with severity 'WARNING'.
 
@@ -74,7 +74,7 @@ class Logger(_logging.Logger):
 
     warn = warning
 
-    def error(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def error(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with severity 'ERROR'.
 
@@ -93,7 +93,7 @@ class Logger(_logging.Logger):
         """
         self.error(*msg, args=args, exc_info=exc_info, **kwargs)
 
-    def critical(self, *msg, args: tuple = (), end='\n\033[0m', **kwargs):
+    def critical(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
         Log 'msg % args' with severity 'CRITICAL'.
 
