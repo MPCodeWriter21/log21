@@ -26,6 +26,10 @@ Changes
 
 `get_color` function now supports hexadecimal and decimal RGB values.
 
+### 1.4.5
+
+`StreamHandler` can handle new-line characters at the beginning of the message.
+
 Examples:
 ---------
 
@@ -83,7 +87,35 @@ logger.info('This is', get_colors('#00efef') + 'Light Cyan', get_colors('rst') +
 # This is Cyan and this is Light Green with Light White Background!
 ```
 
-![Example4](https://imgur.com/weVPxt3)
+![Example4](https://i.imgur.com/weVPxt3.png)
+
+---------
+
+```python
+from log21 import ColorizingStreamHandler, Logger, ColorizingFormatter
+
+logger1 = Logger('Logger1')
+logger2 = Logger('Logger2')
+streamHandler1 = ColorizingStreamHandler(handle_new_line=True)
+streamHandler2 = ColorizingStreamHandler(handle_new_line=False)
+formatter = ColorizingFormatter('[{levelname}] {message}', style='{')
+streamHandler1.setFormatter(formatter)
+streamHandler2.setFormatter(formatter)
+logger1.addHandler(streamHandler1)
+logger2.addHandler(streamHandler2)
+
+logger1.info('\n\n1: Hello World!')
+# 
+# 
+# [INFO] 1: Hello World!
+logger2.info('\n\n2: Hello World!')
+# [INFO] 
+# 
+# 2: Hello World!
+# 
+```
+
+![Example5](https://i.imgur.com/2Z1KHQl.png)
 
 About
 -----

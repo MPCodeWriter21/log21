@@ -16,8 +16,9 @@ if IS_WINDOWS:
 class StreamHandler(_StreamHandler):
     terminator = ''
 
-    def __init__(self, handle_carriage_return: bool = True, **kwargs):
+    def __init__(self, handle_carriage_return: bool = True, handle_new_line: bool = True, **kwargs):
         self.HandleCR = handle_carriage_return
+        self.HandleNL = handle_new_line
         super().__init__(**kwargs)
 
     def check_cr(self, record):
@@ -32,17 +33,32 @@ class StreamHandler(_StreamHandler):
                         find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
                         record.msg = get_colors(*find.split(record.msg[:index])) + record.msg[index + 1:]
 
+    def check_nl(self, record):
+        if record.msg:
+            while record.msg[0] == '\n':
+                file_descriptor = getattr(self.stream, 'fileno', None)
+                if file_descriptor:
+                    file_descriptor = file_descriptor()
+                    if file_descriptor in (1, 2):  # stdout or stderr
+                        self.stream.write('\n')
+                        record.msg = record.msg[1:]
+
     def emit(self, record):
-        self.check_cr(record)
+        if self.HandleCR:
+            self.check_cr(record)
+        if self.HandleNL:
+            self.check_nl(record)
         super().emit(record)
 
 
 # A stream handler that supports colorizing.
 class ColorizingStreamHandler(StreamHandler):
-    # logging.StreamHandler's emit function overload
     def emit(self, record):
         try:
-            self.check_cr(record)
+            if self.HandleCR:
+                self.check_cr(record)
+            if self.HandleNL:
+                self.check_nl(record)
             msg = self.format(record)
             if IS_WINDOWS:
                 self.convert_and_write(msg)
