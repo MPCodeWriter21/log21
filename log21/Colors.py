@@ -1,8 +1,10 @@
 # Colors.py
 
 import re as _re
+import webcolors as _webcolors
+from typing import Union as _Union, Tuple as _Tuple
 
-__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_esc']
+__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_esc', 'get_color_name', 'closest_color']
 
 # Regex pattern to find ansi colors in message
 ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
@@ -112,6 +114,71 @@ class Colors:
         'blc': '\x1b[106m',
         'blw': '\x1b[107m',
     }
+    change_map = {
+        'aqua': 'LightCyan',
+        'blue': 'LightBlue',
+        'fuchsia': 'LightMagenta',
+        'lime': 'LightGreen',
+        'maroon': 'Red',
+        'navy': 'Blue',
+        'olive': 'Yellow',
+        'purple': 'Magenta',
+        'red': 'LightRed',
+        'silver': 'Grey',
+        'teal': 'Cyan',
+        'white': 'LightWhite',
+        'yellow': 'LightYellow',
+    }
+
+
+def closest_color(requested_color):
+    min_colors = {}
+    for key, name in _webcolors.CSS2_HEX_TO_NAMES.items():
+        r_c, g_c, b_c = _webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_color[0]) ** 2
+        gd = (g_c - requested_color[1]) ** 2
+        bd = (b_c - requested_color[2]) ** 2
+        min_colors[(rd + gd + bd)] = name
+    return min_colors[min(min_colors.keys())]
+
+
+def get_color_name(color: _Union[str, _Tuple[int, int, int], _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor],
+                   raise_exceptions: bool = False) -> str:
+    if not isinstance(color, (str, tuple, _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor)):
+        if raise_exceptions:
+            raise TypeError('Input color must be a str or Tuple[int, int, int] or webcolors.IntegerRGB or ' +
+                            'webcolors.HTML5SimpleColor')
+        else:
+            return ''
+    if isinstance(color, str):
+        if color.startswith('#') and len(color) == 7:
+            color = _webcolors.hex_to_rgb(color)
+        elif color.isdigit() and len(color) == 9:
+            color = (int(color[:3]), int(color[3:6]), int(color[6:9]))
+        else:
+            if raise_exceptions:
+                raise TypeError('String color format must be `#0021ff` or `000033255`!')
+            else:
+                return ''
+    if isinstance(color, tuple):
+        if len(color) == 3:
+            if not (isinstance(color[0], int) and isinstance(color[1], int) and isinstance(color[2], int)):
+                if raise_exceptions:
+                    raise TypeError('Tuple color format must be (int, int, int)!')
+                else:
+                    return ''
+        else:
+            if raise_exceptions:
+                raise TypeError('Tuple color format must be (int, int, int)!')
+            else:
+                return ''
+    try:
+        closest_name = _webcolors.rgb_to_name(color)
+    except ValueError:
+        closest_name = closest_color(color)
+    if closest_name in Colors.change_map:
+        closest_name = Colors.change_map[closest_name]
+    return closest_name
 
 
 def get_color(color: str, raise_exceptions: bool = False) -> str:
@@ -134,10 +201,15 @@ def get_color(color: str, raise_exceptions: bool = False) -> str:
     color = color.lower()
     color = color.replace(' ', '').replace('_', '').replace('-', '')
     color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
-    if color in Colors.color_map_:
+    if (color.startswith('#') and len(color) == 7) or (color.isdigit() and len(color) == 9):
+        color = get_color_name(color)
+        return get_color(color)
+    elif color in Colors.color_map_:
         return Colors.color_map_[color]
     elif ansi_esc.match(color):
         return ansi_esc.match(color).group()
+    elif color in Colors.change_map:
+        return get_color(Colors.change_map[color])
     else:
         if raise_exceptions:
             raise KeyError(f'`{color}` not found!')

@@ -7,7 +7,7 @@ with open('README.md', 'r') as file:
     long_description = file.read()
 
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '1.4.3'
+VERSION = '1.4.4'
 
 setup(
     name='log21',
@@ -18,6 +18,7 @@ setup(
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
+    install_requires=['webcolors'],
     packages=['log21'],
     keywords=['python', 'log', 'colorize', 'color', 'logging'],
     classifiers=[
