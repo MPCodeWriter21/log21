@@ -1,4 +1,5 @@
-# StreamHandler.py
+# log21.StreamHandler.py
+# CodeWriter21
 
 import os as _os
 import re as _re

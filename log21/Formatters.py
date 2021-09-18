@@ -1,4 +1,5 @@
-# Formatter.py
+# log21.Formatter.py
+# CodeWriter21
 
 import time as _time
 from logging import Formatter as _Formatter
@@ -156,4 +157,4 @@ class DecolorizingFormatter(_Formatter):
         :return: str: decolorized text
         """
 
-        return ansi_esc.subn('', text)[0]
+        return ansi_esc.sub('', text)

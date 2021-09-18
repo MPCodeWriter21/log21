@@ -1,4 +1,5 @@
-# Logger.py
+# log21.Logger.py
+# CodeWriter21
 
 import logging as _logging
 from logging import raiseExceptions as _raiseExceptions

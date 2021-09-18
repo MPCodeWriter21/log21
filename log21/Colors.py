@@ -1,4 +1,5 @@
-# Colors.py
+# log21.Colors.py
+# CodeWriter21
 
 import re as _re
 import webcolors as _webcolors

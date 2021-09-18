@@ -1,4 +1,5 @@
-# FileHandler.py
+# log21.FileHandler.py
+# CodeWriter21
 
 from logging import FileHandler as _FileHandler
 from log21.Formatters import DecolorizingFormatter as _DecolorizingFormatter

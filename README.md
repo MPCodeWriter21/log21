@@ -30,6 +30,11 @@ Changes
 
 `StreamHandler` can handle new-line characters at the beginning of the message.
 
+### 1.4.6
+
+`ColorizingArgumentParser` added.
+You can use `ColorizingArgumentParser` to have a colorful ArgumentParser.
+
 Examples:
 ---------
 

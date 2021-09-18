@@ -6,8 +6,11 @@ from setuptools import setup
 with open('README.md', 'r') as file:
     long_description = file.read()
 
+with open('LICENSE.txt', 'r') as file:
+    LICENSE = file.read()
+
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '1.4.5'
+VERSION = '1.4.6'
 
 setup(
     name='log21',
@@ -15,6 +18,7 @@ setup(
     url='https://github.com/MPCodeWriter21/log21',
     author='CodeWriter21(Mehrad Pooryoussof)',
     author_email='<CodeWriter21@gmail.com>',
+    license=LICENSE,
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
