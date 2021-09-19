@@ -11,7 +11,7 @@ from log21.Argparse import ColorizingArgumentParser
 from log21.Logger import Logger
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.4.6"
+__version__ = "1.4.7"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',

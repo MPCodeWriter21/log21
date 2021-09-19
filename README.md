@@ -33,7 +33,16 @@ Changes
 ### 1.4.6
 
 `ColorizingArgumentParser` added.
+
 You can use `ColorizingArgumentParser` to have a colorful ArgumentParser.
+
+### 1.4.7
+
+`Logger.print` added.
+
+You can use `Logger.print` to print a message using the current level of the logger class.
+
+*It gets printed with any level.*
 
 Examples:
 ---------
@@ -88,7 +97,8 @@ logger.info('This is', get_colors('#008888') + 'Cyan', get_colors('rst') + 'and 
             get_colors('000128000', 'BackWhite') + 'Green with White Background' + get_colors('reset') + '!')
 # This is Cyan and this is Green with White Background!
 logger.info('This is', get_colors('#00efef') + 'Light Cyan', get_colors('rst') + 'and this is',
-            get_colors('000255000', 'BackLightWhite') + 'Light Green with Light White Background' + get_colors('reset') + '!')
+            get_colors('000255000', 'BackLightWhite') + 'Light Green with Light White Background' + get_colors(
+                'reset') + '!')
 # This is Cyan and this is Light Green with Light White Background!
 ```
 

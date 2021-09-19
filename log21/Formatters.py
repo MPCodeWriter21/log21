@@ -110,7 +110,8 @@ class ColorizingFormatter(_Formatter):
         if hasattr(record, 'asctime'):
             record.asctime = get_colors(*self.time_color) + record.asctime + reset
         if hasattr(record, 'levelno'):
-            record.levelname = get_colors(*self.level_colors[int(record.levelno)]) + record.levelname + reset
+            record.levelname = get_colors(
+                *self.level_colors.get(int(record.levelno), ('lw',))) + getattr(record, 'levelname', 'NOTSET') + reset
         if hasattr(record, 'name'):
             record.name = get_colors(*self.name_color) + str(record.name) + reset
         if hasattr(record, 'pathname'):

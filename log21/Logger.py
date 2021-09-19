@@ -108,3 +108,15 @@ class Logger(_logging.Logger):
             self._log(CRITICAL, msg, args, **kwargs)
 
     fatal = critical
+
+    def print(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
+        """
+        Log 'msg % args'.
+
+        To pass exception information, use the keyword argument exc_info with
+        a true value, e.g.
+
+        logger.print("Houston, we have a %s", args=("major disaster",), exc_info=1)
+        """
+        msg = ' '.join([str(m) for m in msg]) + end
+        self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
