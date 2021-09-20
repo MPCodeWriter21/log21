@@ -22,19 +22,9 @@ python setup.py install
 Changes
 -------
 
-### 1.4.4
+### 1.4.8
 
-`get_color` function now supports hexadecimal and decimal RGB values.
-
-### 1.4.5
-
-`StreamHandler` can handle new-line characters at the beginning of the message.
-
-### 1.4.6
-
-`ColorizingArgumentParser` added.
-
-You can use `ColorizingArgumentParser` to have a colorful ArgumentParser.
+`get_logger` improved.
 
 ### 1.4.7
 
@@ -43,6 +33,20 @@ You can use `ColorizingArgumentParser` to have a colorful ArgumentParser.
 You can use `Logger.print` to print a message using the current level of the logger class.
 
 *It gets printed with any level.*
+
+### 1.4.6
+
+`ColorizingArgumentParser` added.
+
+You can use `ColorizingArgumentParser` to have a colorful ArgumentParser.
+
+### 1.4.5
+
+`StreamHandler` can handle new-line characters at the beginning of the message.
+
+### 1.4.4
+
+`get_color` function now supports hexadecimal and decimal RGB values.
 
 Examples:
 ---------
