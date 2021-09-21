@@ -10,7 +10,7 @@ with open('LICENSE.txt', 'r') as file:
     LICENSE = file.read()
 
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '1.4.8'
+VERSION = '1.4.9'
 
 setup(
     name='log21',

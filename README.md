@@ -22,6 +22,19 @@ python setup.py install
 Changes
 -------
 
+### 1.4.9
+
+Bug fixed:
+
+```
+>>> log21.get_logger()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "C:\...\Python37-32\lib\site-packages\log21\__init__.py", line 44, in get_logger
+    raise TypeError('A logger name must be a string')
+TypeError: A logger name must be a string
+```
+
 ### 1.4.8
 
 `get_logger` improved.

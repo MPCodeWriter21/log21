@@ -12,7 +12,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.4.8"
+__version__ = "1.4.9"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -22,7 +22,7 @@ __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingForm
 _manager = Manager()
 
 
-def get_logger(name: str = None, level: _Union[int, str] = NOTSET, show_time: bool = True,
+def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
                show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
                handle_carriage_return: bool = True, handle_new_line: bool = True, override=False) -> Logger:
     """
