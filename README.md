@@ -22,6 +22,10 @@ python setup.py install
 Changes
 -------
 
+### 1.4.11
+
+`Logger.write` edited. It's same as `Logger.warning` but its default `end` argument value is an empty string.
+
 ### 1.4.10
 
 `Logger.write` added. It's same as `Logger.warning`

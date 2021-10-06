@@ -74,7 +74,19 @@ class Logger(_logging.Logger):
             self._log(WARNING, msg, args, **kwargs)
 
     warn = warning
-    write = warning
+
+    def write(self, *msg, args: tuple = (), end='', **kwargs):
+        """
+        Log 'msg % args' with severity 'WARNING'.
+
+        To pass exception information, use the keyword argument exc_info with
+        a true value, e.g.
+
+        logger.write("Houston, we have a %s", args=("bit of a problem",), exc_info=1)
+        """
+        if self.isEnabledFor(WARNING):
+            msg = ' '.join([str(m) for m in msg]) + end
+            self._log(WARNING, msg, args, **kwargs)
 
     def error(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """
