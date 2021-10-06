@@ -74,6 +74,7 @@ class Logger(_logging.Logger):
             self._log(WARNING, msg, args, **kwargs)
 
     warn = warning
+    write = warning
 
     def error(self, *msg, args: tuple = (), end='\033[0m\n', **kwargs):
         """

@@ -22,6 +22,10 @@ python setup.py install
 Changes
 -------
 
+### 1.4.10
+
+`Logger.write` added. It's same as `Logger.warning`
+
 ### 1.4.9
 
 Bug fixed:
