@@ -12,7 +12,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.4.11"
+__version__ = "1.4.12"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -24,7 +24,8 @@ _manager = Manager()
 
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
                show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
-               handle_carriage_return: bool = True, handle_new_line: bool = True, override=False) -> Logger:
+               datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
+               handle_new_line: bool = True, override=False) -> Logger:
     """
     Returns a logging.Logger with colorizing support.
 
@@ -33,6 +34,9 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
     :param show_time: bool = True: Show the time in the log
     :param show_level: bool = True: Show the level of logging in the log
     :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
+    :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of %-formatting,
+        :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format string.
     :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
     :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
     :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
@@ -57,9 +61,9 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
             fmt = '\r' + fmt
         # Defines the formatter
         if colorize_time_and_level:
-            formatter = ColorizingFormatter(fmt, "%H:%M:%S")
+            formatter = ColorizingFormatter(fmt, datefmt, style=style)
         else:
-            formatter = _logging.Formatter(fmt, "%H:%M:%S")
+            formatter = _logging.Formatter(fmt, datefmt, style=style)
         # Defines the handler
         handler = ColorizingStreamHandler(handle_carriage_return=handle_carriage_return,
                                           handle_new_line=handle_new_line)

@@ -22,6 +22,10 @@ python setup.py install
 Changes
 -------
 
+### 1.4.12
+
+Setting custom formatting style and custom date-time formatting added to `log21.get_logger` function.
+
 ### 1.4.11
 
 `Logger.write` edited. It's same as `Logger.warning` but its default `end` argument value is an empty string.
