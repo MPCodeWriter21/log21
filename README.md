@@ -22,6 +22,11 @@ python setup.py install
 Changes
 -------
 
+### 1.5.0
+
+`ColorizingArgumentParser` improvements.
+
+
 ### 1.4.12
 
 Setting custom formatting style and custom date-time formatting added to `log21.get_logger` function.
