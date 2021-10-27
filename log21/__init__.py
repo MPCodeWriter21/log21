@@ -12,7 +12,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -28,6 +28,46 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
                handle_new_line: bool = True, override=False) -> Logger:
     """
     Returns a logging.Logger with colorizing support.
+    >>>
+    >>> import log21
+    >>>
+    >>> l = log21.get_logger()
+    >>> l.warning('Pretty basic, huh?')
+    [14:49:41] [WARNING] Pretty basic, huh?
+    >>> l.critical('CONTINUE READING!! please...')
+    [14:50:08] [CRITICAL] CONTINUE READING!! please...
+    >>>
+    >>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO, fmt='{asctime} -> [{levelname}]: {message}',
+    ... style='{', override=True)
+    >>>
+    >>> my_logger.info('FYI: My name is Mehrad.')
+    14:56:12 -> [INFO]: FYI: My name is Mehrad.
+    >>> my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
+    14:56:29 -> [ERROR]: Oh no! Something went wrong D:
+    >>>
+    >>> my_logger.debug(1 ,2 ,3)
+    >>> # It prints Nothing because our logger level is INFO and DEBUG level is less than INFO.
+    >>> # So let's modify the my_logger's level
+    >>> my_logger.setLevel(log21.DEBUG)
+    >>> # Now we try again...
+    >>> my_logger.debug(1, 2, 3)
+    14:57:34 -> [DEBUG]: 1 2 3
+    >>> # Well Done. Right?
+    >>> # Let's see more
+    >>> my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n')
+    15:01:43 -> [DEBUG]: I like 21 number!
+
+
+    >>> # Well, I've got a question...
+    >>> # Do you know the name of this color?
+    >>> # #888888
+    >>> # Oh ya! I can use get_color_name
+    >>> log21.get_color_name('#888888')
+    'gray'
+    >>> # Oh thank you dear!
+    >>> # Yes I knew that was grey -_- But I wanted to introduce my little friend ☺
+    >>> # See you soon!
+    >>>
 
     :param name: Optional[str]: The name of the logger
     :param level: Union[int, str] = logging.NOTSET: The logging level of the logger

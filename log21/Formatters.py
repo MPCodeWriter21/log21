@@ -132,6 +132,9 @@ class ColorizingFormatter(_Formatter):
 
 class DecolorizingFormatter(_Formatter):
     def formatTime(self, record, datefmt=None):
+        """
+        Returns the creation time of the specified LogRecord as formatted text.
+        """
         ct = self.converter(int(record.created))
         if datefmt:
             s = _time.strftime(datefmt, ct)

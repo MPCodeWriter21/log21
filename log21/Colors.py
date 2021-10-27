@@ -3,7 +3,7 @@
 
 import re as _re
 import webcolors as _webcolors
-from typing import Union as _Union, Tuple as _Tuple
+from typing import Union as _Union, Sequence as _Sequence
 
 __all__ = ['Colors', 'get_color', 'get_colors', 'ansi_esc', 'get_color_name', 'closest_color']
 
@@ -132,7 +132,14 @@ class Colors:
     }
 
 
-def closest_color(requested_color):
+def closest_color(requested_color: _Sequence[int]):
+    """
+    Takes a color in RGB and returns the name of the closest color to the value.
+    Uses the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
+
+    :param requested_color: Sequence[int, int, int]: The input color in RGB.
+    :return: str: The name of the closest color.
+    """
     min_colors = {}
     for key, name in _webcolors.CSS2_HEX_TO_NAMES.items():
         r_c, g_c, b_c = _webcolors.hex_to_rgb(key)
@@ -143,8 +150,24 @@ def closest_color(requested_color):
     return min_colors[min(min_colors.keys())]
 
 
-def get_color_name(color: _Union[str, _Tuple[int, int, int], _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor],
+def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor],
                    raise_exceptions: bool = False) -> str:
+    """
+    Takes a color in RGB format and returns a color name close to the RGB value.
+    >>>
+    >>> get_color_name('#00FF00')
+    'LightGreen'
+    >>>
+    >>> get_color_name((128, 0, 128))
+    'Magenta'
+    >>>
+
+    :param color: Union[str, Sequence[int]: The input color. Example: '#00FF00', (128, 0, 128)
+    :param raise_exceptions: bool = False: Returns empty string when raise_exceptions is False and an error occurs.
+    :raises TypeError
+    :return: str: The color name.
+    """
+    # Makes sure that the input parameters has valid values.
     if not isinstance(color, (str, tuple, _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor)):
         if raise_exceptions:
             raise TypeError('Input color must be a str or Tuple[int, int, int] or webcolors.IntegerRGB or ' +
@@ -161,20 +184,22 @@ def get_color_name(color: _Union[str, _Tuple[int, int, int], _webcolors.IntegerR
                 raise TypeError('String color format must be `#0021ff` or `000033255`!')
             else:
                 return ''
-    if isinstance(color, tuple):
+    if isinstance(color, _Sequence):
         if len(color) == 3:
             if not (isinstance(color[0], int) and isinstance(color[1], int) and isinstance(color[2], int)):
                 if raise_exceptions:
-                    raise TypeError('Tuple color format must be (int, int, int)!')
+                    raise TypeError('Color sequence format must be (int, int, int)!')
                 else:
                     return ''
         else:
             if raise_exceptions:
-                raise TypeError('Tuple color format must be (int, int, int)!')
+                raise TypeError('Color sequence format must be (int, int, int)!')
             else:
                 return ''
+
+    # Looks for the name of the input RGB color.
     try:
-        closest_name = _webcolors.rgb_to_name(color)
+        closest_name = _webcolors.rgb_to_name(tuple(color))
     except ValueError:
         closest_name = closest_color(color)
     if closest_name in Colors.change_map:
@@ -185,6 +210,15 @@ def get_color_name(color: _Union[str, _Tuple[int, int, int], _webcolors.IntegerR
 def get_color(color: str, raise_exceptions: bool = False) -> str:
     """
     Gets a color name and returns it in ansi format
+    >>>
+    >>> get_color('LightRed')
+    '\x1b[91m'
+    >>>
+    >>> import log21
+    >>> log21.get_logger().info(log21.get_color('Blue') + 'Hello World!')
+    [21:21:21] [INFO] Hello World!
+    >>> # Note that you must run it yourself to see the colorful result ;D
+    >>>
 
     :param color: color name(Example: Blue)
     :param raise_exceptions: bool = False:
@@ -221,6 +255,15 @@ def get_color(color: str, raise_exceptions: bool = False) -> str:
 def get_colors(*colors: str, raise_exceptions: bool = False) -> str:
     """
     Gets a list of colors and combines them into one.
+    >>>
+    >>> get_colors('LightCyan')
+    '\x1b[96m'
+    >>>
+    >>> import log21
+    >>> log21.get_logger().info(log21.get_colors('Green', 'Background White') + 'Hello World!')
+    [21:21:21] [INFO] Hello World!
+    >>> # Note that you must run it yourself to see the colorful result ;D
+    >>>
 
     :param colors: Input colors
     :param raise_exceptions: bool = False:

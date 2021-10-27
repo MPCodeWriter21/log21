@@ -2,9 +2,9 @@
 # CodeWriter21
 
 import logging as _logging
+from typing import Union as _Union
 from log21.Logger import Logger as _loggerClass
 from log21.Levels import INFO as _INFO
-from typing import Optional as _Optional, Type as _Type
 
 root = _logging.RootLogger(_INFO)
 
@@ -18,7 +18,15 @@ class Manager(_logging.Manager):
         self.loggerClass = None
         self.logRecordFactory = None
 
-    def getLogger(self, name):
+    def getLogger(self, name: str) -> _Union[_logging.Logger, _loggerClass, None]:
+        """
+        Takes the name of a logger and if there was a logger with that name in the loggerDict it will return the logger
+        otherwise it'll return None.
+
+        :param name: The name of the logger.
+        :raises TypeError: A logger name must be a string
+        :return:
+        """
         if not isinstance(name, str):
             raise TypeError('A logger name must be a string')
         try:
@@ -34,7 +42,15 @@ class Manager(_logging.Manager):
             rv = None
         return rv
 
-    def addLogger(self, name: str, logger):
+    def addLogger(self, name: str, logger) -> None:
+        """
+        Adds a logger to the loggerDict dictionary.
+
+        :param name: str: The name of the logger.
+        :param logger: The logger to save.
+        :raises TypeError: A logger name must be a string
+        :return: None
+        """
         if not isinstance(name, str):
             raise TypeError('A logger name must be a string')
         self.loggerDict[name] = logger

@@ -91,21 +91,16 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         action_width = help_position - self._current_indent - 2
         action_header = _gc('rst') + self._format_action_invocation(action)
 
+        indent_first = 0
         # no help; start on same line and add a final newline
         if not action.help:
-            tup = self._current_indent, '', action_header
-            action_header = '%*s%s\n' % tup
-
+            action_header = self._current_indent * ' ' + action_header + '\n'
         # short action name; start on the same line and pad two spaces
         elif len(action_header) <= action_width:
-            tup = self._current_indent, '', action_width, action_header
-            action_header = '%*s%-*s  ' % tup
-            indent_first = 0
-
+            action_header = '%*s%-*s  ' % (self._current_indent, '', action_width, action_header)
         # long action name; start on the next line
         else:
-            tup = self._current_indent, '', action_header
-            action_header = '%*s%s\n' % tup
+            action_header = self._current_indent * ' ' + action_header + '\n'
             indent_first = help_position
 
         # collect the pieces of the action help
@@ -221,9 +216,9 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 usage = '\n'.join(lines)
 
         # prefix with 'usage:'
-        return '%s%s\n\n' % (prefix, usage)
+        return prefix + usage + '\n\n'
 
-    def _format_actions_usage(self, actions, groups):
+    def _format_actions_usage(self, actions: list, groups):
         # find group indices and identify actions in groups
         group_actions = set()
         inserts = {}
@@ -420,7 +415,7 @@ class ColorizingTextWrapper(_TextWrapper):
             # Maximum width for this line.
             width = self.width - len(indent)
 
-            # First chunk on line is whitespace -- drop it, unless this
+            # First chunk on the line is whitespace -- drop it, unless this
             # is the very beginning of the text (i.e. no lines started yet).
             if self.drop_whitespace and _Formatter.decolorize(chunks[-1]).strip() == '' and lines:
                 del chunks[-1]
@@ -434,7 +429,6 @@ class ColorizingTextWrapper(_TextWrapper):
                 if cur_len + l <= width:  # noqa: E741
                     cur_line.append(chunks.pop())
                     cur_len += l
-
                 # Nope, this line is full.
                 else:
                     break
