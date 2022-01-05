@@ -67,7 +67,7 @@ class ColorizingFormatter(_Formatter):
         if message_color:
             if type(message_color) is not tuple:
                 raise TypeError('`message_color` must be a tuple!')
-            self.funcName_color = message_color
+            self.message_color = message_color
 
     def format(self, record) -> str:
         """
