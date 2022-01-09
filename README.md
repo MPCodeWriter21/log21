@@ -22,6 +22,10 @@ python setup.py install
 Changes
 -------
 
+### 1.5.3
+
+Minor changes.
+
 ### 1.5.2
 
 `log21.print` function added!
