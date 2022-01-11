@@ -22,7 +22,7 @@ python setup.py install
 Changes
 -------
 
-### 1.5.3
+### 1.5.3-4
 
 Minor changes.
 
