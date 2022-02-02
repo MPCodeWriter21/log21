@@ -2,7 +2,7 @@
 # CodeWriter21
 
 import time as _time
-from logging import Formatter as _Formatter
+from logging import Formatter as __Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
 from log21.Colors import get_colors, ansi_esc
 from log21.Levels import *
@@ -10,26 +10,88 @@ from log21.Levels import *
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
+class _Formatter(__Formatter):
+    level_names: _Dict[int, str] = {
+        DEBUG: 'DEBUG',
+        INFO: 'INFO',
+        WARNING: 'WARNING',
+        ERROR: 'ERROR',
+        CRITICAL: 'CRITICAL'
+    }
+
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Dict[int, str] = None):
+        """
+        `level_names` usage:
+        >>> import log21
+        >>> logger = log21.Logger('MyLogger', log21.DEBUG)
+        >>> stream_handler = log21.ColorizingStreamHandler()
+        >>> formatter = log21.ColorizingFormatter(fmt='[%(levelname)s] %(message)s',
+        ...             level_names={log21.DEBUG: ' ', log21.INFO: '+', log21.WARNING: '-', log21.ERROR: '!',
+        ...                          log21.CRITICAL: 'X'})
+        >>> stream_handler.setFormatter(formatter)
+        >>> logger.addHandler(stream_handler)
+        >>>
+        >>> logger.debug('Just wanna see if this works...')
+        [ ] Just wanna see if this works...
+        >>> logger.info("FYI: I'm glad somebody read this 8)")
+        [+] FYI: I'm glad somebody read this 8)
+        >>> logger.warning("Oh no! Something's gonna happen!")
+        [-] Oh no! something's gonna happen!
+        >>> logger.error('AN ERROR OCCURRED! (told ya ;))')
+        [!] AN ERROR OCCURRED! (told ya ;))
+        >>> logger.critical('Crashed....')
+        [X] Crashed....
+        >>>
+        >>> # Hope you've enjoyed
+        >>>
+        """
+        super().__init__(fmt=fmt, datefmt=datefmt, style=style)
+        if level_names:
+            for level, name in level_names.items():
+                self.level_names[level] = name
+
+    def format(self, record) -> str:
+        record.message = record.getMessage()
+        if self.usesTime():
+            record.asctime = self.formatTime(record, self.datefmt)
+
+        record.levelname = self.level_names.get(record.levelno, 'NOTSET')
+
+        s = self.formatMessage(record)
+        if record.exc_info:
+            if not record.exc_text:
+                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_text:
+            if s[-1:] != "\n":
+                s = s + "\n"
+            s = s + record.exc_text
+        if record.stack_info:
+            if s[-1:] != "\n":
+                s = s + "\n"
+            s = s + self.formatStack(record.stack_info)
+        return s
+
+
 class ColorizingFormatter(_Formatter):
     # Default color values
-    level_colors = {
+    level_colors: _Dict[int, _Tuple[str, ...]] = {
         DEBUG: ('lightblue',),
         INFO: ('green',),
         WARNING: ('lightyellow',),
         ERROR: ('light red',),
         CRITICAL: ('background red', 'white')
     }
-    time_color = ('lightblue',)
+    time_color: _Tuple[str, ...] = ('lightblue',)
     name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \
         message_color = tuple()
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%',
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Dict[int, str] = None,
                  level_colors: _Dict[int, _Tuple[str]] = None,
                  time_color: _Tuple[str, ...] = None, name_color: _Tuple[str, ...] = None,
                  pathname_color: _Tuple[str, ...] = None, filename_color: _Tuple[str, ...] = None,
                  module_color: _Tuple[str, ...] = None, func_name_color: _Tuple[str, ...] = None,
                  thread_name_color: _Tuple[str, ...] = None, message_color: _Tuple[str, ...] = None):
-        super().__init__(fmt=fmt, datefmt=datefmt, style=style)
+        super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
         # Checks and sets colors
         if level_colors:
             if type(level_colors) is not dict:
@@ -80,6 +142,8 @@ class ColorizingFormatter(_Formatter):
         if self.usesTime():
             record.asctime = self.formatTime(record, self.datefmt)
 
+        record.levelname = self.level_names.get(record.levelno, 'NOTSET')
+
         record = self.colorize(record)
 
         s = self.formatMessage(record)
@@ -110,8 +174,8 @@ class ColorizingFormatter(_Formatter):
         if hasattr(record, 'asctime'):
             record.asctime = get_colors(*self.time_color) + record.asctime + reset
         if hasattr(record, 'levelno'):
-            record.levelname = get_colors(
-                *self.level_colors.get(int(record.levelno), ('lw',))) + getattr(record, 'levelname', 'NOTSET') + reset
+            record.levelname = get_colors(*self.level_colors.get(int(record.levelno), ('lw',))) + \
+                               getattr(record, 'levelname', 'NOTSET') + reset
         if hasattr(record, 'name'):
             record.name = get_colors(*self.name_color) + str(record.name) + reset
         if hasattr(record, 'pathname'):
