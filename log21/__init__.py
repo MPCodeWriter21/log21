@@ -2,22 +2,26 @@
 # CodeWriter21
 
 import logging as _logging
-from typing import Union as _Union
+
+from typing import Union as _Union, Dict as _Dict
+
 from log21.Levels import *
 from log21.Logger import Logger
 from log21.Manager import Manager
+from log21.Pprint import PrettyPrinter, pformat
 from log21.Argparse import ColorizingArgumentParser
 from log21.FileHandler import DecolorizingFileHandler
 from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.5.5"
+__version__ = "1.5.6"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
            'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN',
-           'INFO', 'DEBUG', 'NOTSET', 'StreamHandler', 'ColorizingArgumentParser']
+           'INFO', 'DEBUG', 'NOTSET', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
+           'pprint', 'pretty_print']
 
 _manager = Manager()
 
@@ -116,3 +120,13 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
 def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
     logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
     logger.print(*msg, args=args, end=end, **kwargs)
+
+
+def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False, sort_dicts=True,
+           underscore_numbers=False, end='\033[0m\n', **kwargs):
+    logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
+    logger.print(pformat(obj=obj, indent=indent, width=width, depth=depth, signs_colors=signs_colors, compact=compact,
+                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers), end=end, **kwargs)
+
+
+pretty_print = pprint

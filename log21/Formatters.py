@@ -4,7 +4,7 @@
 import time as _time
 from logging import Formatter as __Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
-from log21.Colors import get_colors, ansi_esc
+from log21.Colors import get_colors as _gc, ansi_esc
 from log21.Levels import *
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
@@ -96,8 +96,8 @@ class ColorizingFormatter(_Formatter):
         if level_colors:
             if type(level_colors) is not dict:
                 raise TypeError('`level_colors` must be a dictionary!')
-            for key in level_colors:
-                self.level_colors[key] = level_colors[key]
+            for level, color in level_colors.items():
+                self.level_colors[level] = (_gc(*color),)
         if time_color:
             if type(time_color) is not tuple:
                 raise TypeError('`time_color` must be a tuple!')
@@ -172,24 +172,24 @@ class ColorizingFormatter(_Formatter):
         reset = '\033[0m'
 
         if hasattr(record, 'asctime'):
-            record.asctime = get_colors(*self.time_color) + record.asctime + reset
+            record.asctime = _gc(*self.time_color) + record.asctime + reset
         if hasattr(record, 'levelno'):
-            record.levelname = get_colors(*self.level_colors.get(int(record.levelno), ('lw',))) + \
+            record.levelname = _gc(*self.level_colors.get(int(record.levelno), ('lw',))) + \
                                getattr(record, 'levelname', 'NOTSET') + reset
         if hasattr(record, 'name'):
-            record.name = get_colors(*self.name_color) + str(record.name) + reset
+            record.name = _gc(*self.name_color) + str(record.name) + reset
         if hasattr(record, 'pathname'):
-            record.pathname = get_colors(*self.pathname_color) + record.pathname + reset
+            record.pathname = _gc(*self.pathname_color) + record.pathname + reset
         if hasattr(record, 'filename'):
-            record.filename = get_colors(*self.filename_color) + record.filename + reset
+            record.filename = _gc(*self.filename_color) + record.filename + reset
         if hasattr(record, 'module'):
-            record.module = get_colors(*self.module_color) + record.module + reset
+            record.module = _gc(*self.module_color) + record.module + reset
         if hasattr(record, 'funcName'):
-            record.funcName = get_colors(*self.func_name_color) + record.funcName + reset
+            record.funcName = _gc(*self.func_name_color) + record.funcName + reset
         if hasattr(record, 'threadName'):
-            record.threadName = get_colors(*self.thread_name_color) + record.threadName + reset
+            record.threadName = _gc(*self.thread_name_color) + record.threadName + reset
         if hasattr(record, 'message'):
-            record.message = get_colors(*self.message_color) + record.message + reset
+            record.message = _gc(*self.message_color) + record.message + reset
 
         return record
 
