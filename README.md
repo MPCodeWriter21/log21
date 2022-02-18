@@ -40,15 +40,15 @@ python setup.py install
 Changes
 -------
 
-### 1.5.8
+### 1.5.9
 
-Added `log21.log`, `log21.debug`, `log21.info`, `log21.warning`, `log21.error` and some other functions.
+Minor changes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
 
 Usage Examples:
----------
+---------------
 
 ```python3
 import log21
