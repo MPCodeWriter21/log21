@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 1.5.8
+
+Added `log21.log`, `log21.debug`, `log21.info`, `log21.warning`, `log21.error` and some other functions.
+
 ### 1.5.7
 
 Added `log21.tree_print()` function.

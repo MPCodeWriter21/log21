@@ -40,9 +40,9 @@ python setup.py install
 Changes
 -------
 
-### 1.5.7
+### 1.5.8
 
-Added `log21.tree_print()` function.
+Added `log21.log`, `log21.debug`, `log21.info`, `log21.warning`, `log21.error` and some other functions.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
@@ -126,7 +126,7 @@ import log21
 
 data = json.load(open('json.json', 'r'))
 
-# Prints data using python's print function
+# Prints data using python's built-in print function
 print(data)
 
 # Uses `log21.pprint` to print the data
