@@ -207,7 +207,7 @@ def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _we
     return closest_name
 
 
-def get_color(color: str, raise_exceptions: bool = False) -> str:
+def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> str:
     """
     Gets a color name and returns it in ansi format
     >>>
@@ -228,28 +228,32 @@ def get_color(color: str, raise_exceptions: bool = False) -> str:
     :raises KeyError: `color` not found!
     :return: str: an ansi color
     """
-    if type(color) is not str:
+    if not isinstance(color, (str, _Sequence)):
         if raise_exceptions:
-            raise TypeError('`color` must be str!')
+            raise TypeError('`color` must be str or Sequence!')
         else:
             return ''
-    color = color.lower()
-    color = color.replace(' ', '').replace('_', '').replace('-', '')
-    color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
-    if (color.startswith('#') and len(color) == 7) or (color.isdigit() and len(color) == 9):
+    if isinstance(color, _Sequence) and not isinstance(color, str):
         color = get_color_name(color)
         return get_color(color)
-    elif color in Colors.color_map_:
-        return Colors.color_map_[color]
-    elif ansi_esc.match(color):
-        return ansi_esc.match(color).group()
-    elif color in Colors.change_map:
-        return get_color(Colors.change_map[color])
     else:
-        if raise_exceptions:
-            raise KeyError(f'`{color}` not found!')
+        color = color.lower()
+        color = color.replace(' ', '').replace('_', '').replace('-', '')
+        color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
+        if (color.startswith('#') and len(color) == 7) or (color.isdigit() and len(color) == 9):
+            color = get_color_name(color)
+            return get_color(color)
+        elif color in Colors.color_map_:
+            return Colors.color_map_[color]
+        elif ansi_esc.match(color):
+            return ansi_esc.match(color).group()
+        elif color in Colors.change_map:
+            return get_color(Colors.change_map[color])
         else:
-            return ''
+            if raise_exceptions:
+                raise KeyError(f'`{color}` not found!')
+            else:
+                return ''
 
 
 def get_colors(*colors: str, raise_exceptions: bool = False) -> str:

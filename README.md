@@ -3,162 +3,145 @@ log21
 
 A simple logging package that helps you log colorized messages in Windows console and other operating systems.
 
+Features
+--------
 
-Install
--------
++ Colors : Main reason for this package was to have a simple logging package that can be used in Windows console and
+  supports ANSI colors.
++ Argument parsing : log21's argument parser can be used like python's argparse but it also colorizes the output.
++ Logging : A similar logger to logging.Logger but with colorized output and other options such as levelname
+  modifications. It can also decolorize the output if you want to log to a file.
++ Pretty printing : Have you ever wanted to colorize the output of the pprint module? log21's pretty printer can do
+  that.
++ Tree printing : You can pass a dict or list to log21.tree_print function and it will print it in a tree like
+  structure. Its also colorized XD.
++ Any idea? Feel free to open an issue or submit a pull request.
 
-To install log21 you can simply use the `pip install log21` command:
+Installation
+------------
 
-```commandline
-python -m pip install log21
+Well, this is a python package so the first thing you need is python.
+
+If you don't have python installed, please visit [Python.org](https://python.org) and install the latest version of
+python.
+
+Then you can install log21 using pip module:
+
+```shell
+python -m pip install log21 -U
 ```
 
 Or you can clone [the repository](https://github.com/MPCodeWriter21/log21) and run:
 
-```commandline
+```shell
 python setup.py install
 ```
 
 Changes
 -------
 
-### 1.5.6
+### 1.5.7
 
-Added `log21.pprint()` function. It is similar to `pprint.pprint()` function.
+Added `log21.tree_print()` function.
 
-[Full Changes Log](/CHANGES-LOG.md)
+[Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
 
-Examples:
+Usage Examples:
 ---------
 
-```python
-from log21 import get_logger, get_colors
-
-logger = get_logger()
-
-logger.warning(get_colors('light red', 'background-white'), 'careful!')
-# [21:21:21] [warning] careful!
-```
-
-![Example1](https://i.imgur.com/TM6DK0e.png)
-
----------
-
-```python
+```python3
 import log21
 
-logger = log21.get_logger(name='Logger21', level=log21.DEBUG, show_level=False)
+log21.print(log21.get_color('#FF0000') + 'This' + log21.get_color((0, 255, 0)) + ' is' + log21.get_color('Blue') +
+            ' Blue' + log21.get_colors('BackgroundWhite', 'Black') + ' 8)')
 
-logger.debug(log21.get_color('blue') + 'Here we are!')
-# [21:21:21] Here we are!
+logger = log21.get_logger('My Logger', level_names={21: 'SpecialInfo', log21.WARNING: ' ! ', log21.ERROR: '!!!'})
+logger.info('You are reading the README.md file...')
+
+logger.log(21, 'Here', '%s', 'GO!', args=('we',))
+
+logger.setLevel(log21.WARNING)
+logger.warning("We can't log messages with a level less than 30 anymore!")
+
+logger.debug("You won't see this!")
+logger.info("Am I visible?")
+
+logger.error(log21.get_colors('LightRed') + "I'm still here ;1")
 ```
 
-![Example2](https://i.imgur.com/45fFs7F.png)
+![Basic Logging](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-1.png)
 
----------
+----------------
 
-```python
-from log21 import ColorizingStreamHandler, Logger, ERROR
+```python3
+import log21
+from log21 import ColorizingArgumentParser, get_logger, get_colors as gc
 
-logger = Logger('MyLogger')
-streamHandler = ColorizingStreamHandler()
-logger.addHandler(streamHandler)
+parser = ColorizingArgumentParser(description="This is a simple example of a ColorizingArgumentParser.",
+                                  colors={'help': 'LightCyan'})
+parser.add_argument('test1', action='store', help='Test 1')
+parser.add_argument('test2', action='store', help='Test 2')
+parser.add_argument('--optional-arg', '-o', action='store', type=int, help='An optional integer')
+parser.add_argument('--verbose', '-v', action='store_true', help='Increase verbosity.')
 
-logger.log(ERROR, '%sAn', '%serror', '%soccurred!', args=('\u001b[31m', '\x1b[91m', '\033[31m'))
-# An error occurred!
+args = parser.parse_args()
+
+logger = get_logger('My Logger', level_names={log21.DEBUG: ' ? ', log21.INFO: ' + ', log21.WARNING: ' ! ',
+                                              log21.ERROR: '!!!'})
+
+if args.verbose:
+    logger.setLevel(log21.DEBUG)
+else:
+    logger.setLevel(log21.INFO)
+
+logger.debug(gc('LightBlue') + 'Verbose mode on!')
+
+logger.debug('Arguments:\n'
+             '\tTest 1: %s\n'
+             '\tTest 2: %s\n'
+             '\tOptional: %s', args=(args.test1, args.test2, args.optional_arg))
+
+logger.info(gc('LightGreen') + args.test1)
+
+logger.info(gc('LightWhite') + 'Done!')
+
 ```
 
-![Example3](https://i.imgur.com/S06PPKx.png)
+![No argument](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-2.1.png)
 
----------
+![Help](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-2.2.png)
 
-```python
-from log21 import get_logger, get_colors
+![Valid example 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-2.3.png)
 
-logger = get_logger("LOG21", show_time=False)
+![Valid example 2](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-2.4.png)
 
-logger.info('This is', get_colors('#008888') + 'Cyan', get_colors('rst') + 'and this is',
-            get_colors('000128000', 'BackWhite') + 'Green with White Background' + get_colors('reset') + '!')
-# This is Cyan and this is Green with White Background!
-logger.info('This is', get_colors('#00efef') + 'Light Cyan', get_colors('rst') + 'and this is',
-            get_colors('000255000', 'BackLightWhite') + 'Light Green with Light White Background' + get_colors(
-                'reset') + '!')
-# This is Cyan and this is Light Green with Light White Background!
+![Valid example 3](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-2.5.png)
+
+------------------
+
+```python3
+import json
+import log21
+
+data = json.load(open('json.json', 'r'))
+
+# Prints data using python's print function
+print(data)
+
+# Uses `log21.pprint` to print the data
+log21.pprint(data)
+
+# Uses `log21.tree_print` to print the data
+log21.tree_print(data)
 ```
 
-![Example4](https://i.imgur.com/weVPxt3.png)
+![Python print](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-3.1.png)
+![log21 pretty print](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-3.2.png)
+![log21 tree print 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-3.3.1.png)
+![log21 tree print 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-3.3.2.png)
 
----------
-
-```python
-from log21 import ColorizingStreamHandler, Logger, ColorizingFormatter
-
-logger1 = Logger('Logger1')
-logger2 = Logger('Logger2')
-streamHandler1 = ColorizingStreamHandler(handle_new_line=True)
-streamHandler2 = ColorizingStreamHandler(handle_new_line=False)
-formatter = ColorizingFormatter('[{levelname}] {message}', style='{')
-streamHandler1.setFormatter(formatter)
-streamHandler2.setFormatter(formatter)
-logger1.addHandler(streamHandler1)
-logger2.addHandler(streamHandler2)
-
-logger1.info('\n\n1: Hello World!')
-# 
-# 
-# [INFO] 1: Hello World!
-logger2.info('\n\n2: Hello World!')
-# [INFO] 
-# 
-# 2: Hello World!
-# 
-```
-
-![Example5](https://i.imgur.com/2Z1KHQl.png)
-
-```python
->>>
->>> import log21
->>>
->>> l = log21.get_logger()
->>> l.warning('Pretty basic, huh?')
-[14:49:41] [WARNING] Pretty basic, huh?
->>> l.critical('CONTINUE READING!! please...')
-[14:50:08] [CRITICAL] CONTINUE READING!! please...
->>>
->>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO, fmt='{asctime} -> [{levelname}]: {message}',
-... style='{', override=True)
->>>
->>> my_logger.info('FYI: My name is Mehrad.')
-14:56:12 -> [INFO]: FYI: My name is Mehrad.
->>> my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
-14:56:29 -> [ERROR]: Oh no! Something went wrong D:
->>>
->>> my_logger.debug(1 ,2 ,3)
->>> # It prints Nothing because our logger level is INFO and DEBUG level is less than INFO.
->>> # So let's modify the my_logger's level
->>> my_logger.setLevel(log21.DEBUG)
->>> # Now we try again...
->>> my_logger.debug(1, 2, 3)
-14:57:34 -> [DEBUG]: 1 2 3
->>> # Well Done. Right?
->>> # Let's see more
->>> my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n')
-15:01:43 -> [DEBUG]: I like 21 number!
-
-
->>> # Well, I've got a question...
->>> # Do you know the name of this color?
->>> # #888888
->>> # Oh ya! I can use get_color_name
->>> log21.get_color_name('#888888')
-'gray'
->>> # Oh thank you dear!
->>> # Yes I knew that was grey -_- But I wanted to introduce my little friend ☺
->>> # See you soon!
->>>
-```
+------------------
 
 About
 -----
@@ -169,3 +152,14 @@ GitHub: [MPCodeWriter21](https://github.com/MPCodeWriter21)
 Telegram Channel: [@CodeWriter21](https://t.me/CodeWriter21)
 
 Aparat Channel: [CodeWriter21](https://www.aparat.com/CodeWriter21)
+
+### License
+
+[apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+### Donate
+
+In order to support this project you can donate some crypto of your choice 8D
+
+[Donate Addresses](https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md)
+

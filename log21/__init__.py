@@ -1,21 +1,20 @@
 # log21.__init__.py
 # CodeWriter21
 
-import logging as _logging
-
 from typing import Union as _Union, Dict as _Dict
 
 from log21.Levels import *
 from log21.Logger import Logger
 from log21.Manager import Manager
-from log21.Pprint import PrettyPrinter, pformat
+from log21.PPrint import PrettyPrinter, pformat
+from log21.TreePrint import TreePrint, tree_format
 from log21.Argparse import ColorizingArgumentParser
 from log21.FileHandler import DecolorizingFileHandler
 from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.5.6"
+__version__ = "1.5.7"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -29,7 +28,7 @@ _manager = Manager()
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
                show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
                datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-               handle_new_line: bool = True, override=False) -> Logger:
+               handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None) -> Logger:
     """
     Returns a logging.Logger with colorizing support.
     >>>
@@ -85,6 +84,7 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
     :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
     :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
     :param override: bool = True: Overrides the logger attributes even if it already exists
+    :param level_names: Dict[int, str] = None: You can specify custom level names.
     :return: logging.Logger
 
     """
@@ -104,10 +104,12 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
                 fmt = "[%(asctime)s] " + fmt
             fmt = '\r' + fmt
         # Defines the formatter
-        if colorize_time_and_level:
-            formatter = ColorizingFormatter(fmt, datefmt, style=style)
-        else:
-            formatter = _logging.Formatter(fmt, datefmt, style=style)
+        formatter = ColorizingFormatter(fmt, datefmt, style=style, level_names=level_names)
+        if not colorize_time_and_level:
+            for key in formatter.level_colors:
+                formatter.level_colors[key] = tuple()
+            formatter.time_color = tuple()
+
         # Defines the handler
         handler = ColorizingStreamHandler(handle_carriage_return=handle_carriage_return,
                                           handle_new_line=handle_new_line)
@@ -130,3 +132,11 @@ def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = 
 
 
 pretty_print = pprint
+
+
+def tree_print(obj, indent: int = 4, mode='-', colors: _Dict[str, str] = None, end='\033[0m\n', **kwargs):
+    logger = get_logger('log21.tree_print', level=DEBUG, show_time=False, show_level=False)
+    logger.print(tree_format(obj, indent=indent, mode=mode, colors=colors), end=end, **kwargs)
+
+
+tprint = tree_print

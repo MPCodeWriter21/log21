@@ -1,13 +1,18 @@
 log21
 =====
 
+Help this project by [Donation](DONATE.md)
+
 Changes log
 -----------
 
+### 1.5.7
+
+Added `log21.tree_print()` function.
+
 ### 1.5.6
 
-Added `log21.pprint()` function.
-It is similar to `pprint.pprint()` function.
+Added `log21.pprint()` function. It is similar to `pprint.pprint()` function.
 
 ### 1.5.5
 

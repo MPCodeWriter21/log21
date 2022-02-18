@@ -1,4 +1,5 @@
-# log21.Pprint.py
+# log21.PPrint.py
+# CodeWriter21
 
 import re as _re
 import sys as _sys
@@ -6,7 +7,7 @@ import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
 
-from typing import Dict as _Dict
+from typing import Dict as _Dict, Union as _Union
 from pprint import PrettyPrinter as _PrettyPrinter
 
 from log21.Colors import get_colors as _gc
@@ -567,3 +568,4 @@ def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] =
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,
                          sort_dicts=sort_dicts, underscore_numbers=underscore_numbers).pformat(obj)
+
