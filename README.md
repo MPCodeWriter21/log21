@@ -15,7 +15,8 @@ Features
   that.
 + Tree printing : You can pass a dict or list to log21.tree_print function and it will print it in a tree like
   structure. Its also colorized XD.
-+ Any idea? Feel free to open an issue or submit a pull request.
++ ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
++ Any idea? Feel free to [open an issue](https://github.com/MPCodeWriter21/log21/issues) or submit a pull request.
 
 Installation
 ------------
@@ -40,9 +41,19 @@ python setup.py install
 Changes
 -------
 
-### 1.5.9
+### 1.5.10
 
-Minor changes.
+Added `ProgressBar` class!
+
+You can directly print a progress bar to the console using `print_progress` method of `log21.Logger` class.
+
+OR
+
+Use `log21.ProgressBar` class witch is specifically designed for this purpose.
+
+OR
+
+Use `log21.progress_bar` function (I don't recommend it!).
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

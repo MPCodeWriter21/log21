@@ -1,6 +1,7 @@
 # log21.Logger.py
 # CodeWriter21
 
+import log21 as _log21
 import logging as _logging
 from logging import raiseExceptions as _raiseExceptions
 from log21.Levels import *
@@ -9,6 +10,11 @@ __all__ = ['Logger']
 
 
 class Logger(_logging.Logger):
+    def __init__(self, name, level=NOTSET):
+        super().__init__(name, level)
+        self.setLevel(level)
+        self._progress_bar = None
+
     def isEnabledFor(self, level):
         """
         Is this logger enabled for level 'level'?
@@ -133,3 +139,20 @@ class Logger(_logging.Logger):
         """
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
+
+    def print_progress(self, progress: float, total: float):
+        """
+        Log progress.
+        """
+        self.progress_bar(progress, total)
+
+    @property
+    def progress_bar(self):
+        if not self._progress_bar:
+            from log21.ProgressBar import ProgressBar
+            self._progress_bar = ProgressBar(logger=self)
+        return self._progress_bar
+
+    @progress_bar.setter
+    def progress_bar(self, value: '_log21.ProgressBar'):
+        self._progress_bar = value

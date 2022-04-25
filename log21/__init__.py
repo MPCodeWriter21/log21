@@ -2,12 +2,14 @@
 # CodeWriter21
 
 import io as _io
+import logging as _logging
 
 from typing import Union as _Union, Dict as _Dict
 
 from log21.Levels import *
 from log21.Logger import Logger
 from log21.Manager import Manager
+from log21.ProgressBar import ProgressBar
 from log21.PPrint import PrettyPrinter, pformat
 from log21.TreePrint import TreePrint, tree_format
 from log21.Argparse import ColorizingArgumentParser
@@ -16,7 +18,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
 
-__version__ = "1.5.9"
+__version__ = "1.5.10"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -24,9 +26,10 @@ __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingForm
            'INFO', 'DEBUG', 'NOTSET', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
            'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager', 'get_color_name', 'closest_color',
            'ansi_esc', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
-           'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig']
+           'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar']
 
 _manager = Manager()
+_logging.setLoggerClass(Logger)
 
 
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
@@ -331,3 +334,14 @@ def log(level, *msg, args=(), **kwargs):
     if len(root.handlers) == 0:
         basic_config()
     root.log(level, *msg, args=args, **kwargs)
+
+
+def progress_bar(progress: float, total: float, width: int = None, prefix: str = '|', suffix: str = '|',
+                 show_percentage: bool = True):
+    """
+    Print a progress bar to the console.
+    """
+
+    bar = ProgressBar(width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage)
+
+    print(bar.get_bar(progress, total))

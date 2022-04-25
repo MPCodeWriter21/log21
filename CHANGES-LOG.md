@@ -6,6 +6,20 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 1.5.10
+
+Added `ProgressBar` class!
+
+You can directly print a progress bar to the console using `print_progress` method of `log21.Logger` class.
+
+OR
+
+Use `log21.ProgressBar` class witch is specifically designed for this purpose.
+
+OR
+
+Use `log21.progress_bar` function (I don't recommend it!).
+
 ### 1.5.9
 
 Minor changes.
