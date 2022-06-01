@@ -2,6 +2,7 @@
 # CodeWriter21
 import re as _re
 import tkinter as _tkinter
+import subprocess as _subprocess
 
 from uuid import uuid4 as _uuid4
 from typing import Union as _Union
@@ -148,9 +149,9 @@ class LoggingWindowHandler(_StreamHandler):
 
 
 class LoggingWindow(_Logger):
-    # TODO: Add an example in the README.md file
     def __init__(self, name, level=_NOTSET, width: int = 80, height: int = 20, default_foreground_color='white',
-                 default_background_color='black', font=('Courier', 10)):
+                 default_background_color='black', font=('Courier', 10), allow_python: bool = False,
+                 allow_shell: bool = False, command_history_buffer_size: int = 100):
         """
         Creates a new LoggingWindow object.
 
@@ -201,10 +202,32 @@ class LoggingWindow(_Logger):
         self.window.title(name)
         # Hides window instead of closing it
         self.window.protocol("WM_DELETE_WINDOW", self.hide)
+
+        self.window.resizable(False, False)
+
         self.logs = _tkinter.Text(self.window)
-        self.logs.pack()
+        self.logs.grid(row=0, column=0, sticky='nsew')
         self.logs.config(state=_tkinter.DISABLED)
         self.logs.config(wrap=_tkinter.NONE)
+
+        # Commands entry
+        self.command_entry = _tkinter.Entry(self.window)
+        self.command_entry.grid(row=1, column=0, sticky='nsew')
+        self.command_entry.bind('<Return>', self.execute_command)
+        self.command_entry.bind('<Up>', self.history_up)
+        self.command_entry.bind('<Down>', self.history_down)
+        self.command_history = []
+        self.command_history_index = 0
+        if not isinstance(command_history_buffer_size, (int, float)):
+            raise TypeError('command_history_buffer_size must be a number')
+        self.command_history_buffer_size = command_history_buffer_size if command_history_buffer_size > 0 else 0
+        # Hides the command entry if allow_python and allow_shell are False
+        if not allow_python and not allow_shell:
+            self.command_entry.grid_remove()
+        if allow_python:
+            raise NotImplementedError('Python commands are not supported yet!')
+        self.__allow_shell = allow_shell
+
         # Scroll bars
         self.logs.config(xscrollcommand=_tkinter.Scrollbar(self.window, orient=_tkinter.HORIZONTAL).set)
         self.logs.config(yscrollcommand=_tkinter.Scrollbar(self.window).set)
@@ -319,6 +342,91 @@ class LoggingWindow(_Logger):
                 self.logs.insert(_tkinter.END, self.input_text)
                 self.logs.config(state=_tkinter.DISABLED)
                 self.cursor_position += 1
+
+    def execute_command(self, event):
+        """
+        Executes the command in self.command_entry.
+        """
+        command = self.command_entry.get()
+        self.command_entry.delete(0, _tkinter.END)
+        self.command_history.append(command)
+        self.command_history = self.command_history[-self.command_history_buffer_size:]
+        # FIXME: It doesn't support multiline commands yet
+        # Shell commands:
+        if command.startswith('!'):
+            if self.allow_shell:
+                try:
+                    # TODO: Add the support of interactive programmes such as python shell and bash
+                    output = _subprocess.check_output(command[1:].strip(), shell=True)
+                    self.print(output.decode('utf-8').strip('\r\n'))
+                except _subprocess.CalledProcessError as e:
+                    self.error('Error code:', e.returncode, e.output.decode('utf-8').strip('\r\n'))
+            else:
+                self.error('Shell commands are not allowed!')
+        # Python commands:
+        else:
+            if self.allow_python:
+                try:
+                    # TODO: Add the support of python commands
+                    raise NotImplementedError
+                except Exception as e:
+                    self.error(e)
+            else:
+                try:
+                    output = _subprocess.check_output(command.strip(), shell=True)
+                    self.print(output.decode('utf-8').strip('\r\n'))
+                except _subprocess.CalledProcessError as e:
+                    self.error('Error code:', e.returncode, e.output.decode('utf-8').strip('\r\n'))
+        self.command_history_index = len(self.command_history)
+
+    def history_up(self, event):
+        """
+        Moves up the command history.
+        """
+        if self.command_history_index > 0:
+            self.command_history_index -= 1
+            self.command_entry.delete(0, _tkinter.END)
+            self.command_entry.insert(0, self.command_history[self.command_history_index])
+
+    def history_down(self, event):
+        """
+        Moves down the command history.
+        """
+        if self.command_history_index < len(self.command_history) - 1:
+            self.command_history_index += 1
+            self.command_entry.delete(0, _tkinter.END)
+            self.command_entry.insert(0, self.command_history[self.command_history_index])
+        else:
+            self.command_entry.delete(0, _tkinter.END)
+
+    @property
+    def allow_python(self):
+        return self.__allow_python
+
+    @allow_python.setter
+    def allow_python(self, value):
+        raise NotImplementedError('Python commands are not supported yet!')
+        self.__allow_python = value
+        # Hides the command entry if allow_python and allow_shell are False
+        if not self.__allow_python and not self.__allow_shell:
+            self.command_entry.grid_remove()
+        # Shows the command entry if allow_python or allow_shell are True
+        else:
+            self.command_entry.grid(row=1, column=0, sticky='nsew')
+
+    @property
+    def allow_shell(self):
+        return self.__allow_shell
+
+    @allow_shell.setter
+    def allow_shell(self, value):
+        self.__allow_shell = value
+        # Hides the command entry if allow_python and allow_shell are False
+        if not self.__allow_python and not self.__allow_shell:
+            self.command_entry.grid_remove()
+        # Shows the command entry if allow_python or allow_shell are True
+        else:
+            self.command_entry.grid(row=1, column=0, sticky='nsew')
 
     @property
     def cursor_position(self):

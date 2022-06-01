@@ -51,9 +51,9 @@ python setup.py install
 Changes
 -------
 
-### 2.0.0
+### 2.1.0
 
-Added LoggingWindow!
+Added optional shell support to the LoggingWindow.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
@@ -153,6 +153,85 @@ log21.tree_print(data)
 ![log21 tree print 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-3.3.2.png)
 
 ------------------
+
+```python3
+import log21
+
+window = log21.get_logging_window('My Logging Window', width=80)
+window.font = ('Courier New', 9)
+
+# Basic logging
+window.info('This is a basic logging message.')
+
+# Using ANSI and HEX colors
+# List of ANSI colors: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+# ANSI color format: \033[<attribute>m
+window.info('\033[91mThis is RED message.')
+window.info('\033[102mThis is message with GREEN background.')
+# HEX color format: \033#<HEX-COLOR>hf (where f represents the foreground color) and
+# \033#<HEX-COLOR>hb (where b represents the background color)
+window.info('\x1b#009900hbThis is a text with GREEN background.')
+window.info('\033#0000FFhf\033[103mThis is message with BLUE foreground and YELLOW background.')
+
+import random, string
+
+# And here is a text with random colors
+text = 'I have random colors XD'
+colored_text = ''
+for character in text:
+    color = '\033#' + ''.join(random.choice(string.hexdigits) for _ in range(6)) + 'hf'
+    colored_text += color + character
+
+window.error(colored_text)
+
+# See more examples in 
+# https://github.com/MPCodeWriter21/log21/blob/066efc1e72542531012d36974bbf6cd4c5941378/log21/LoggingWindow.py#L155
+# and
+# https://github.com/MPCodeWriter21/log21/blob/066efc1e72542531012d36974bbf6cd4c5941378/log21/__init__.py#L144
+
+```
+
+![The LoggingWindow](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-4.png)
+
+------------------
+
+```python3
+# Example 1
+import log21, time
+
+# Define a very simple log21 progress bar
+progress_bar = log21.ProgressBar()
+
+# And here is a simple loop that will print the progress bar
+for i in range(100):
+    progress_bar(i + 1, 100)
+    time.sleep(0.08)
+
+# Example 2
+import time, random
+from log21 import ProgressBar, get_colors as gc
+
+# Let's customize the progress bar a little bit this time
+progress_bar = ProgressBar(
+    width=50,
+    fill='#',
+    empty='-',
+    prefix='[',
+    suffix=']',
+    colors={'progress in-progress': gc('Bright Red'), 'progress complete': gc('Bright Cyan'),
+            'percentage in-progress': gc('Green'), 'percentage complete': gc('Bright Cyan'),
+            'prefix-color in-progress': gc('Bright White'), 'prefix-color complete': gc('Bright White'),
+            'prefix-color failed': gc('Bright White'), 'suffix-color in-progress': gc('Bright White'),
+            'suffix-color complete': gc('Bright White'), 'suffix-color failed': gc('Bright White')})
+
+for i in range(84):
+    progress_bar(i + 1, 84)
+    time.sleep(random.uniform(0.05, 0.21))
+
+```
+
+![ProgressBar - Example 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.1.gif)
+![ProgressBar - Example 2](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.2.gif)
 
 About
 -----

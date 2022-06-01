@@ -15,23 +15,6 @@ __all__ = ['ProgressBar']
 
 
 class ProgressBar:
-    # TODO: Add an example in the README.md file
-    colors = {
-        'progress in-progress': _gc('LightYellow'),
-        'progress complete': _gc('LightGreen'),
-        'progress failed': _gc('LightRed'),
-        'percentage in-progress': _gc('LightBlue'),
-        'percentage complete': _gc('LightCyan'),
-        'percentage failed': _gc('LightRed'),
-        'prefix-color in-progress': _gc('Yellow'),
-        'prefix-color complete': _gc('Green'),
-        'prefix-color failed': _gc('Red'),
-        'suffix-color in-progress': _gc('Yellow'),
-        'suffix-color complete': _gc('Green'),
-        'suffix-color failed': _gc('Red'),
-        'reset-color': _gc('Reset'),
-    }
-    spinner = ['|', '/', '-', '\\']
 
     def __init__(self, *args, width: int = None, show_percentage: bool = True, prefix: str = '|', suffix: str = '|',
                  fill: str = '█', empty: str = ' ', colors: dict = None, logger: '_log21.Logger' = _logger):
@@ -80,6 +63,23 @@ class ProgressBar:
             raise ValueError('`fill` must be a single character')
         if len(empty) != 1:
             raise ValueError('`empty` must be a single character')
+
+        self.colors = {
+            'progress in-progress': _gc('LightYellow'),
+            'progress complete': _gc('LightGreen'),
+            'progress failed': _gc('LightRed'),
+            'percentage in-progress': _gc('LightBlue'),
+            'percentage complete': _gc('LightCyan'),
+            'percentage failed': _gc('LightRed'),
+            'prefix-color in-progress': _gc('Yellow'),
+            'prefix-color complete': _gc('Green'),
+            'prefix-color failed': _gc('Red'),
+            'suffix-color in-progress': _gc('Yellow'),
+            'suffix-color complete': _gc('Green'),
+            'suffix-color failed': _gc('Red'),
+            'reset-color': _gc('Reset'),
+        }
+        self.spinner = ['|', '/', '-', '\\']
 
         self.fill = fill
         self.empty = empty

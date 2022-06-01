@@ -19,7 +19,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -139,7 +139,8 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
 def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
                        show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
                        datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-                       handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None):
+                       handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None,
+                       width: int = 80, height: int = 20, allow_shell: bool = False) -> LoggingWindow:
     """
     Returns a logging window.
 
@@ -185,6 +186,9 @@ def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_ti
     :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
     :param override: bool = True: Overrides the logger attributes even if it already exists
     :param level_names: Dict[int, str] = None: You can specify custom level names.
+    :param width: int = 80: The width of the window
+    :param height: int = 20: The height of the window
+    :param allow_shell: bool = False: Allow the user to use the shell
     :return: log21.LoggingWindow
     """
     if not isinstance(name, str):
@@ -193,7 +197,7 @@ def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_ti
     if name:
         logging_window = _manager.getLogger(name)
     if (not logging_window) or override:
-        logging_window = LoggingWindow(name, level=level)
+        logging_window = LoggingWindow(name, level=level, width=width, height=height, allow_shell=allow_shell)
         formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, colorize_time_and_level, level_names)
 
         # Defines the handler
