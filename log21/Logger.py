@@ -140,6 +140,19 @@ class Logger(_logging.Logger):
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
 
+    def input(self, *msg, args: tuple = (), end='\033[0m', **kwargs):
+        """
+        Log 'msg % args'.
+
+        To pass exception information, use the keyword argument exc_info with
+        a true value, e.g.
+
+        age = logger.input("Enter your age: ")
+        """
+        msg = ' '.join([str(m) for m in msg]) + end
+        self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
+        return input()
+
     def print_progress(self, progress: float, total: float):
         """
         Log progress.

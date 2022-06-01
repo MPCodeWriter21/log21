@@ -4,7 +4,7 @@
 import time as _time
 from logging import Formatter as __Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
-from log21.Colors import get_colors as _gc, ansi_esc
+from log21.Colors import get_colors as _gc, ansi_escape
 from log21.Levels import *
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
@@ -16,7 +16,8 @@ class _Formatter(__Formatter):
         INFO: 'INFO',
         WARNING: 'WARNING',
         ERROR: 'ERROR',
-        CRITICAL: 'CRITICAL'
+        CRITICAL: 'CRITICAL',
+        INPUT: 'INPUT'
     }
 
     def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Dict[int, str] = None):
@@ -225,4 +226,4 @@ class DecolorizingFormatter(_Formatter):
         :return: str: decolorized text
         """
 
-        return ansi_esc.sub('', text)
+        return ansi_escape.sub('', text)

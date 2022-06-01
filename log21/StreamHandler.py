@@ -3,8 +3,9 @@
 
 import os as _os
 import re as _re
+
 from logging import StreamHandler as _StreamHandler
-from log21.Colors import ansi_esc, get_colors
+from log21.Colors import ansi_escape as _ansi_escape, get_colors as _gc, hex_escape as _hex_escape
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
 
@@ -24,7 +25,8 @@ class StreamHandler(_StreamHandler):
 
     def check_cr(self, record):
         if record.msg:
-            if '\r' in record.msg[:-1]:
+            msg = _hex_escape.sub('', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c')))
+            if '\r' in msg[1:-1]:
                 file_descriptor = getattr(self.stream, 'fileno', None)
                 if file_descriptor:
                     file_descriptor = file_descriptor()
@@ -32,7 +34,7 @@ class StreamHandler(_StreamHandler):
                         self.stream.write('\r' + (' ' * (_os.get_terminal_size(file_descriptor)[0] - 1)) + '\r')
                         index = record.msg.rfind('\r')
                         find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
-                        record.msg = get_colors(*find.split(record.msg[:index])) + record.msg[index + 1:]
+                        record.msg = _gc(*find.split(record.msg[:index])) + record.msg[index + 1:]
 
     def check_nl(self, record):
         if record.msg:
@@ -110,7 +112,7 @@ class ColorizingStreamHandler(StreamHandler):
             0: 7
         }
 
-        parts = ansi_esc.split(message)
+        parts = _ansi_escape.split(message)
         win_handle = None
         file_descriptor = getattr(self.stream, 'fileno', None)
 

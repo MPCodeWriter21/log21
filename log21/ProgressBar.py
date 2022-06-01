@@ -15,6 +15,7 @@ __all__ = ['ProgressBar']
 
 
 class ProgressBar:
+    # TODO: Add an example in the README.md file
     colors = {
         'progress in-progress': _gc('LightYellow'),
         'progress complete': _gc('LightGreen'),

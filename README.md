@@ -1,6 +1,11 @@
 log21
 =====
 
+![version](https://img.shields.io/pypi/v/log21)
+![stars](https://img.shields.io/github/stars/MPCodeWriter21/log21)
+![forks](https://img.shields.io/github/forks/MPCodeWriter21/log21)
+![repo size](https://img.shields.io/github/repo-size/MPCodeWriter21/log21)
+
 A simple logging package that helps you log colorized messages in Windows console and other operating systems.
 
 Features
@@ -16,7 +21,12 @@ Features
 + Tree printing : You can pass a dict or list to log21.tree_print function and it will print it in a tree like
   structure. Its also colorized XD.
 + ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
++ LoggingWindow : Helps you to log messages and debug your code in a window other than the
+  console. (<span style="color:red"> !! New Feature !!</span> - More features soon)
 + Any idea? Feel free to [open an issue](https://github.com/MPCodeWriter21/log21/issues) or submit a pull request.
+
+![issues](https://img.shields.io/github/issues/MPCodeWriter21/log21)
+![contributors](https://img.shields.io/github/contributors/MPCodeWriter21/log21)
 
 Installation
 ------------
@@ -41,19 +51,9 @@ python setup.py install
 Changes
 -------
 
-### 1.5.10
+### 2.0.0
 
-Added `ProgressBar` class!
-
-You can directly print a progress bar to the console using `print_progress` method of `log21.Logger` class.
-
-OR
-
-Use `log21.ProgressBar` class witch is specifically designed for this purpose.
-
-OR
-
-Use `log21.progress_bar` function (I don't recommend it!).
+Added LoggingWindow!
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
@@ -165,6 +165,8 @@ Telegram Channel: [@CodeWriter21](https://t.me/CodeWriter21)
 Aparat Channel: [CodeWriter21](https://www.aparat.com/CodeWriter21)
 
 ### License
+
+![License](https://img.shields.io/github/license/MPCodeWriter21/log21)
 
 [apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 

@@ -14,22 +14,46 @@ from log21.PPrint import PrettyPrinter, pformat
 from log21.TreePrint import TreePrint, tree_format
 from log21.Argparse import ColorizingArgumentParser
 from log21.FileHandler import DecolorizingFileHandler
+from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
-from log21.Colors import Colors, get_color, get_colors, ansi_esc, get_color_name, closest_color
+from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "1.5.10"
+__version__ = "2.0.0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
            'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN',
            'INFO', 'DEBUG', 'NOTSET', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
            'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager', 'get_color_name', 'closest_color',
-           'ansi_esc', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
-           'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar']
+           'ansi_escape', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
+           'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
+           'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window']
 
 _manager = Manager()
 _logging.setLoggerClass(Logger)
+
+
+def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:%S", show_level: bool = True,
+                       show_time: bool = True, colorize_time_and_level: bool = True,
+                       level_names: _Dict[int, str] = None):
+    # Prepares a formatting if the fmt was None
+    if not fmt:
+        style = '%'
+        fmt = "%(message)s"
+        if show_level:
+            fmt = "[%(levelname)s] " + fmt
+        if show_time:
+            fmt = "[%(asctime)s] " + fmt
+        fmt = '\r' + fmt
+    # Defines the formatter
+    formatter = ColorizingFormatter(fmt, datefmt, style=style, level_names=level_names)
+    if not colorize_time_and_level:
+        for key in formatter.level_colors:
+            formatter.level_colors[key] = tuple()
+        formatter.time_color = tuple()
+
+    return formatter
 
 
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
@@ -92,8 +116,7 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
     :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
     :param override: bool = True: Overrides the logger attributes even if it already exists
     :param level_names: Dict[int, str] = None: You can specify custom level names.
-    :return: logging.Logger
-
+    :return: log21.Logger
     """
     if not isinstance(name, str):
         raise TypeError('A logger name must be a string')
@@ -102,20 +125,7 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
         logger = _manager.getLogger(name)
     if (not logger) or override:
         logger = Logger(name, level)
-        # Prepares a formatting if the fmt was None
-        if not fmt:
-            fmt = "%(message)s"
-            if show_level:
-                fmt = "[%(levelname)s] " + fmt
-            if show_time:
-                fmt = "[%(asctime)s] " + fmt
-            fmt = '\r' + fmt
-        # Defines the formatter
-        formatter = ColorizingFormatter(fmt, datefmt, style=style, level_names=level_names)
-        if not colorize_time_and_level:
-            for key in formatter.level_colors:
-                formatter.level_colors[key] = tuple()
-            formatter.time_color = tuple()
+        formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, colorize_time_and_level, level_names)
 
         # Defines the handler
         handler = ColorizingStreamHandler(handle_carriage_return=handle_carriage_return,
@@ -124,6 +134,75 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
         logger.addHandler(handler)
         _manager.addLogger(name, logger)
     return logger
+
+
+def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
+                       show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
+                       datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
+                       handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None):
+    """
+    Returns a logging window.
+
+    >>> # Let's see how it works
+    >>> # Imports log21 and time modules
+    >>> import log21, time
+    >>> # Creates a new LoggingWindow object
+    >>> window = log21.get_logging_window('Test Window')
+    >>> # Now use it without any additional steps to add handlers and formatters!
+    >>> # It works just like a normal logger but with some extra features
+    >>>
+    >>> window.info('This works properly!')
+    >>>
+    >>> # You can use HEX colors as well as the ANSI colors which are supported by normal loggers
+    >>> # ANSI colors usage:
+    >>> window.info('This is a \033[91mred\033[0m message.')
+    >>> window.info('\033[102mThis is a message with green background.')
+    >>> # HEX colors usage:
+    >>> window.info('\033#00FFFFhfThis is a message with cyan foreground.')
+    >>> window.info('\033#0000FFhbThis is a message with blue background.')
+    >>>
+    >>> # Progressbar usage:
+    >>> for i in range(100):
+    >>>     window.print_progress(i + 1, 100)
+    >>>     time.sleep(0.1)
+    >>>
+    >>> # Gettig input from the user:
+    >>> name: str = window.input('Enter your name: ')
+    >>> window.print('Hello, ' + name + '!')
+    >>> # Run these lines to see the messages in the window
+    >>>
+
+    :param name: Optional[str]: The name of the logger
+    :param level: Union[int, str] = logging.NOTSET: The logging level of the logger
+    :param show_time: bool = True: Show the time in the log
+    :param show_level: bool = True: Show the level of logging in the log
+    :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
+    :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of %-formatting,
+        :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format string.
+    :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
+    :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
+    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
+    :param override: bool = True: Overrides the logger attributes even if it already exists
+    :param level_names: Dict[int, str] = None: You can specify custom level names.
+    :return: log21.LoggingWindow
+    """
+    if not isinstance(name, str):
+        raise TypeError('A logger name must be a string')
+    logging_window = None
+    if name:
+        logging_window = _manager.getLogger(name)
+    if (not logging_window) or override:
+        logging_window = LoggingWindow(name, level=level)
+        formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, colorize_time_and_level, level_names)
+
+        # Defines the handler
+        handler = LoggingWindowHandler(logging_window, handle_carriage_return=handle_carriage_return,
+                                       handle_new_line=handle_new_line)
+        handler.setFormatter(formatter)
+        logging_window.addHandler(handler)
+        _manager.addLogger(name, logging_window)
+    return logging_window
 
 
 getLogger = get_logger

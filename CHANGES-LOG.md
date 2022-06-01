@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.0.0
+
+Added LoggingWindow!
+
 ### 1.5.10
 
 Added `ProgressBar` class!

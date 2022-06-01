@@ -5,10 +5,11 @@ import re as _re
 import webcolors as _webcolors
 from typing import Union as _Union, Sequence as _Sequence
 
-__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_esc', 'get_color_name', 'closest_color']
+__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name', 'closest_color', 'hex_escape']
 
 # Regex pattern to find ansi colors in message
-ansi_esc = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
+ansi_escape = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
+hex_escape = _re.compile(r'\x1b(#[0-9a-fA-F]{6})h([f|b])')
 
 
 class Colors:
@@ -66,6 +67,7 @@ class Colors:
         'backcyan': '\x1b[46m',
         'backwhite': '\x1b[47m',
         'grey': '\x1b[90m',
+        'gray': '\x1b[90m',
         'lightred': '\x1b[91m',
         'lightgreen': '\x1b[92m',
         'lightyellow': '\x1b[93m',
@@ -81,6 +83,22 @@ class Colors:
         'backlightmagenta': '\x1b[105m',
         'backlightcyan': '\x1b[106m',
         'backlightwhite': '\x1b[107m',
+        'brightblack': '\x1b[90m',
+        'brightred': '\x1b[91m',
+        'brightgreen': '\x1b[92m',
+        'brightyellow': '\x1b[93m',
+        'brightblue': '\x1b[94m',
+        'brightmagenta': '\x1b[95m',
+        'brightcyan': '\x1b[96m',
+        'brightwhite': '\x1b[97m',
+        'backbrightblack': '\x1b[100m',
+        'backbrightred': '\x1b[101m',
+        'backbrightgreen': '\x1b[102m',
+        'backbrightyellow': '\x1b[103m',
+        'backbrightblue': '\x1b[104m',
+        'backbrightmagenta': '\x1b[105m',
+        'backbrightcyan': '\x1b[106m',
+        'backbrightwhite': '\x1b[107m',
         'rst': '\x1b[0m',
         'bk': '\x1b[30m',
         'r': '\x1b[31m',
@@ -127,7 +145,7 @@ class Colors:
         'red': 'LightRed',
         'silver': 'Grey',
         'teal': 'Cyan',
-        'white': 'LightWhite',
+        'white': 'BrightWhite',
         'yellow': 'LightYellow',
     }
 
@@ -245,8 +263,8 @@ def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> 
             return get_color(color)
         elif color in Colors.color_map_:
             return Colors.color_map_[color]
-        elif ansi_esc.match(color):
-            return ansi_esc.match(color).group()
+        elif ansi_escape.match(color):
+            return ansi_escape.match(color).group()
         elif color in Colors.change_map:
             return get_color(Colors.change_map[color])
         else:
@@ -280,7 +298,7 @@ def get_colors(*colors: str, raise_exceptions: bool = False) -> str:
     output = ''
     for color in colors:
         output += get_color(str(color), raise_exceptions=raise_exceptions)
-    parts = ansi_esc.split(output)
+    parts = ansi_escape.split(output)
     output = '\033['
     for part in parts:
         if part:
