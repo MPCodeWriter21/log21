@@ -14,6 +14,43 @@ from log21.Logger import Logger as _Logger
 from log21.StreamHandler import StreamHandler as _StreamHandler
 from log21.Colors import ansi_escape as _ansi_escape, hex_escape as _hex_escape
 
+__all__ = ['LoggingWindow', 'LoggingWindowHandler']
+
+ansi_to_hex_color_map = {  # https://chrisyeh96.github.io/2020/03/28/terminal-colors.html
+    '30': ('#000000', 'foreground'),  # Black foreground
+    '31': ('#cc0000', 'foreground'),  # Red foreground
+    '32': ('#4e9a06', 'foreground'),  # Green foreground
+    '33': ('#c4a000', 'foreground'),  # Yellow foreground
+    '34': ('#729fcf', 'foreground'),  # Blue foreground
+    '35': ('#75507b', 'foreground'),  # Magenta foreground
+    '36': ('#06989a', 'foreground'),  # Cyan foreground
+    '37': ('#d3d7cf', 'foreground'),  # White foreground
+    '90': ('#555753', 'foreground'),  # Bright black foreground
+    '91': ('#ef2929', 'foreground'),  # Bright red foreground
+    '92': ('#8ae234', 'foreground'),  # Bright green foreground
+    '93': ('#fce94f', 'foreground'),  # Bright yellow foreground
+    '94': ('#32afff', 'foreground'),  # Bright blue foreground
+    '95': ('#ad7fa8', 'foreground'),  # Bright magenta foreground
+    '96': ('#34e2e2', 'foreground'),  # Bright cyan foreground
+    '97': ('#ffffff', 'foreground'),  # Bright white foreground
+    '40': ('#000000', 'background'),  # Black background
+    '41': ('#cc0000', 'background'),  # Red background
+    '42': ('#4e9a06', 'background'),  # Green background
+    '43': ('#c4a000', 'background'),  # Yellow background
+    '44': ('#729fcf', 'background'),  # Blue background
+    '45': ('#75507b', 'background'),  # Magenta background
+    '46': ('#06989a', 'background'),  # Cyan background
+    '47': ('#d3d7cf', 'background'),  # White background
+    '100': ('#555753', 'background'),  # Bright black background
+    '101': ('#ef2929', 'background'),  # Bright red background
+    '102': ('#8ae234', 'background'),  # Bright green background
+    '103': ('#fce94f', 'background'),  # Bright yellow background
+    '104': ('#32afff', 'background'),  # Bright blue background
+    '105': ('#ad7fa8', 'background'),  # Bright magenta background
+    '106': ('#34e2e2', 'background'),  # Bright cyan background
+    '107': ('#ffffff', 'background'),  # Bright white background
+}
+
 
 class LoggingWindowHandler(_StreamHandler):
     def __init__(self, logging_window: 'LoggingWindow', handle_carriage_return: bool = True,
@@ -38,41 +75,7 @@ class LoggingWindowHandler(_StreamHandler):
 
     def write(self, message):
         if self.LoggingWindow is not None:
-            ansi_to_hex_color_map = {  # https://chrisyeh96.github.io/2020/03/28/terminal-colors.html
-                '30': ('#000000', 'foreground'),  # Black foreground
-                '31': ('#cc0000', 'foreground'),  # Red foreground
-                '32': ('#4e9a06', 'foreground'),  # Green foreground
-                '33': ('#c4a000', 'foreground'),  # Yellow foreground
-                '34': ('#729fcf', 'foreground'),  # Blue foreground
-                '35': ('#75507b', 'foreground'),  # Magenta foreground
-                '36': ('#06989a', 'foreground'),  # Cyan foreground
-                '37': ('#d3d7cf', 'foreground'),  # White foreground
-                '90': ('#555753', 'foreground'),  # Bright black foreground
-                '91': ('#ef2929', 'foreground'),  # Bright red foreground
-                '92': ('#8ae234', 'foreground'),  # Bright green foreground
-                '93': ('#fce94f', 'foreground'),  # Bright yellow foreground
-                '94': ('#32afff', 'foreground'),  # Bright blue foreground
-                '95': ('#ad7fa8', 'foreground'),  # Bright magenta foreground
-                '96': ('#34e2e2', 'foreground'),  # Bright cyan foreground
-                '97': ('#ffffff', 'foreground'),  # Bright white foreground
-                '40': ('#000000', 'background'),  # Black background
-                '41': ('#cc0000', 'background'),  # Red background
-                '42': ('#4e9a06', 'background'),  # Green background
-                '43': ('#c4a000', 'background'),  # Yellow background
-                '44': ('#729fcf', 'background'),  # Blue background
-                '45': ('#75507b', 'background'),  # Magenta background
-                '46': ('#06989a', 'background'),  # Cyan background
-                '47': ('#d3d7cf', 'background'),  # White background
-                '100': ('#555753', 'background'),  # Bright black background
-                '101': ('#ef2929', 'background'),  # Bright red background
-                '102': ('#8ae234', 'background'),  # Bright green background
-                '103': ('#fce94f', 'background'),  # Bright yellow background
-                '104': ('#32afff', 'background'),  # Bright blue background
-                '105': ('#ad7fa8', 'background'),  # Bright magenta background
-                '106': ('#34e2e2', 'background'),  # Bright cyan background
-                '107': ('#ffffff', 'background'),  # Bright white background
-            }
-
+            # Sets the element's state to normal so that it can be modified.
             self.LoggingWindow.logs.config(state=_tkinter.NORMAL)
 
             # Handles carriage return
@@ -226,6 +229,7 @@ class LoggingWindow(_Logger):
             self.command_entry.grid_remove()
         if allow_python:
             raise NotImplementedError('Python commands are not supported yet!')
+        self.__allow_python = False
         self.__allow_shell = allow_shell
 
         # Scroll bars
@@ -357,10 +361,14 @@ class LoggingWindow(_Logger):
             if self.allow_shell:
                 try:
                     # TODO: Add the support of interactive programmes such as python shell and bash
-                    output = _subprocess.check_output(command[1:].strip(), shell=True)
+                    output = _subprocess.check_output(command[1:].strip(), shell=False)
                     self.print(output.decode('utf-8').strip('\r\n'))
                 except _subprocess.CalledProcessError as e:
                     self.error('Error code:', e.returncode, e.output.decode('utf-8').strip('\r\n'))
+                except FileNotFoundError:
+                    self.error('File not found: Unrecognized command.')
+                except Exception as e:
+                    self.error(e)
             else:
                 self.error('Shell commands are not allowed!')
         # Python commands:
@@ -373,10 +381,14 @@ class LoggingWindow(_Logger):
                     self.error(e)
             else:
                 try:
-                    output = _subprocess.check_output(command.strip(), shell=True)
+                    output = _subprocess.check_output(command.strip(), shell=False)
                     self.print(output.decode('utf-8').strip('\r\n'))
                 except _subprocess.CalledProcessError as e:
                     self.error('Error code:', e.returncode, e.output.decode('utf-8').strip('\r\n'))
+                except FileNotFoundError:
+                    self.error('File not found: Unrecognized command.')
+                except Exception as e:
+                    self.error(e)
         self.command_history_index = len(self.command_history)
 
     def history_up(self, event):

@@ -38,8 +38,8 @@ class Manager(_logging.Manager):
                     self.loggerDict[name] = rv
             else:
                 return None
-        except:
-            rv = None
+        except Exception:
+            return None
         return rv
 
     def addLogger(self, name: str, logger) -> None:

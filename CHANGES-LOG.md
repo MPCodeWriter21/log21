@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.1.1
+
+Minor changes.
+
 ### 2.1.0
 
 Added optional shell support to the LoggingWindow.

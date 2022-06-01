@@ -138,40 +138,40 @@ class PrettyPrinter(_PrettyPrinter):
             self._recursive = True
         return repr
 
-    def _safe_repr(self, obj, context, max_levels, level):
+    def _safe_repr(self, object_, context, max_levels, level):
         # Return triple (repr_string, isreadable, isrecursive).
-        typ = type(obj)
-        if typ in _builtin_scalars:
-            return repr(obj), True, False
+        type_ = type(object_)
+        if type_ in _builtin_scalars:
+            return repr(object_), True, False
 
-        r = getattr(typ, "__repr__", None)
+        representation = getattr(type_, "__repr__", None)
 
-        if issubclass(typ, int) and r is int.__repr__:
+        if issubclass(type_, int) and representation is int.__repr__:
             if self._underscore_numbers:
-                return f"{obj:_d}", True, False
+                return f"{object_:_d}", True, False
             else:
-                return repr(obj), True, False
+                return repr(object_), True, False
 
-        if issubclass(typ, dict) and r is dict.__repr__:
-            if not obj:
+        if issubclass(type_, dict) and representation is dict.__repr__:
+            if not object_:
                 return self.signs_colors.get('curly-braces') + "{}" + self.signs_colors.get('data'), True, False
-            objid = id(obj)
+            object_id = id(object_)
             if max_levels and level >= max_levels:
                 return self.signs_colors.get('curly-braces') + "{" + self.signs_colors.get('...') + "..." + \
                        self.signs_colors.get('curly-braces') + "}" + self.signs_colors.get('data'), \
-                       False, objid in context
-            if objid in context:
-                return _recursion(obj), False, True
-            context[objid] = 1
+                       False, object_id in context
+            if object_id in context:
+                return _recursion(object_), False, True
+            context[object_id] = 1
             readable = True
             recursive = False
             components = []
             append = components.append
             level += 1
             if self._sort_dicts:
-                items = sorted(obj.items(), key=_safe_tuple)
+                items = sorted(object_.items(), key=_safe_tuple)
             else:
-                items = obj.items()
+                items = object_.items()
             for k, v in items:
                 krepr, kreadable, krecur = self.format(k, context, max_levels, level)
                 vrepr, vreadable, vrecur = self.format(v, context, max_levels, level)
@@ -179,50 +179,50 @@ class PrettyPrinter(_PrettyPrinter):
                 readable = readable and kreadable and vreadable
                 if krecur or vrecur:
                     recursive = True
-            del context[objid]
+            del context[object_id]
             return self.signs_colors.get('curly-braces') + "{" + self.signs_colors.get('data') + \
                    (self.signs_colors.get('comma') + ", " + self.signs_colors.get('data')).join(components) + \
                    self.signs_colors.get('data'), readable, recursive
 
-        if (issubclass(typ, list) and r is list.__repr__) or \
-                (issubclass(typ, tuple) and r is tuple.__repr__):
-            if issubclass(typ, list):
-                if not obj:
+        if (issubclass(type_, list) and representation is list.__repr__) or \
+                (issubclass(type_, tuple) and representation is tuple.__repr__):
+            if issubclass(type_, list):
+                if not object_:
                     return self.signs_colors.get('square-brackets') + "[]" + self.signs_colors.get('data'), True, False
                 format_ = self.signs_colors.get('square-brackets') + "[" + self.signs_colors.get('data') + "%s" + \
                           self.signs_colors.get('square-brackets') + "]" + self.signs_colors.get('data')
-            elif len(obj) == 1:
+            elif len(object_) == 1:
                 format_ = self.signs_colors.get('parenthesis') + "(" + self.signs_colors.get('data') + "%s" + \
                           self.signs_colors.get('comma') + "," + self.signs_colors.get('parenthesis') + ")" + \
                           self.signs_colors.get('data')
             else:
-                if not obj:
+                if not object_:
                     return self.signs_colors.get('parenthesis') + "()" + self.signs_colors.get('data'), True, False
                 format_ = self.signs_colors.get('parenthesis') + "(" + self.signs_colors.get('data') + "%s" + \
                           self.signs_colors.get('parenthesis') + ")" + self.signs_colors.get('data')
-            objid = id(obj)
+            object_id = id(object_)
             if max_levels and level >= max_levels:
-                return format_ % self.signs_colors.get('...') + "...", False, objid in context
-            if objid in context:
-                return _recursion(obj), False, True
-            context[objid] = 1
+                return format_ % self.signs_colors.get('...') + "...", False, object_id in context
+            if object_id in context:
+                return _recursion(object_), False, True
+            context[object_id] = 1
             readable = True
             recursive = False
             components = []
             append = components.append
             level += 1
-            for o in obj:
+            for o in object_:
                 orepr, oreadable, orecur = self.format(o, context, max_levels, level)
                 append(orepr)
                 if not oreadable:
                     readable = False
                 if orecur:
                     recursive = True
-            del context[objid]
+            del context[object_id]
             return format_ % (self.signs_colors.get('comma') + ", " + self.signs_colors.get('data')).join(components), \
                    readable, recursive
 
-        rep = repr(obj)
+        rep = repr(object_)
         return rep, (rep and not rep.startswith('<')), False
 
     _dispatch = {}
@@ -298,24 +298,24 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[set.__repr__] = _pprint_set
     _dispatch[frozenset.__repr__] = _pprint_set
 
-    def _pprint_str(self, obj, stream, indent, allowance, context, level):
+    def _pprint_str(self, object_, stream, indent, allowance, context, level):
         write = stream.write
-        if not len(obj):
-            write(repr(obj))
+        if not len(object_):
+            write(repr(object_))
             return
         chunks = []
-        lines = obj.splitlines(True)
+        lines = object_.splitlines(True)
         if level == 1:
             indent += 1
             allowance += 1
         max_width1 = max_width = self._width - indent
-        rep = ''
+        representation = ''
         for i, line in enumerate(lines):
-            rep = repr(line)
+            representation = repr(line)
             if i == len(lines) - 1:
                 max_width1 -= allowance
-            if len(rep) <= max_width1:
-                chunks.append(rep)
+            if len(representation) <= max_width1:
+                chunks.append(representation)
             else:
                 # A list of alternating (non-space, space) strings
                 parts = _re.findall(r'\S*\s*', line)
@@ -337,14 +337,14 @@ class PrettyPrinter(_PrettyPrinter):
                 if current:
                     chunks.append(repr(current))
         if len(chunks) == 1:
-            write(rep)
+            write(representation)
             return
         if level == 1:
             write(self.signs_colors.get('parenthesis') + '(' + self.signs_colors.get('data'))
-        for i, rep in enumerate(chunks):
+        for i, representation in enumerate(chunks):
             if i > 0:
                 write('\n' + ' ' * indent)
-            write(rep)
+            write(representation)
         if level == 1:
             write(self.signs_colors.get('parenthesis') + ')' + self.signs_colors.get('data'))
 
@@ -568,4 +568,3 @@ def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] =
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,
                          sort_dicts=sort_dicts, underscore_numbers=underscore_numbers).pformat(obj)
-

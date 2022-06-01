@@ -19,7 +19,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -237,7 +237,9 @@ tprint = tree_print
 root = Logger('root-logger', INFO)
 
 
-def basic_config(**kwargs):
+def basic_config(force: bool = False, encoding: str = None, errors: str = 'backslashreplace', handlers=None,
+                 stream=None, filename=None, filemode: str = 'a', date_format: str = "%H:%M:%S", style: str = '%',
+                 format_: str = None, level: int = None):
     """
     Do basic configuration for the logging system.
 
@@ -289,52 +291,42 @@ def basic_config(**kwargs):
     using sys.stdout or sys.stderr), whereas FileHandler closes its stream
     when the handler is closed.
     """
-    force = kwargs.pop('force', False)
-    encoding = kwargs.pop('encoding', None)
-    errors = kwargs.pop('errors', 'backslashreplace')
     if force:
         for handler in root.handlers[:]:
             root.removeHandler(handler)
             handler.close()
     if len(root.handlers) == 0:
-        handlers = kwargs.pop("handlers", None)
         if handlers is None:
-            if "stream" in kwargs and "filename" in kwargs:
+            if stream and filename:
                 raise ValueError("'stream' and 'filename' should not be specified together")
         else:
-            if "stream" in kwargs or "filename" in kwargs:
+            if stream or filename:
                 raise ValueError("'stream' or 'filename' should not be specified together with 'handlers'")
         if handlers is None:
-            filename = kwargs.pop("filename", None)
-            mode = kwargs.pop("filemode", 'a')
             if filename:
-                if 'b' in mode:
+                if 'b' in filemode:
                     errors = None
                 else:
                     encoding = _io.text_encoding(encoding)
-                handler = DecolorizingFileHandler(filename, mode, encoding=encoding, errors=errors)
+                handler = DecolorizingFileHandler(filename, filemode, encoding=encoding, errors=errors)
             else:
-                stream = kwargs.pop("stream", None)
                 handler = ColorizingStreamHandler(stream=stream)
             handlers = [handler]
-        date_format = kwargs.pop("datefmt", "%H:%M:%S")
-        style = kwargs.pop("style", '%')
         if style not in '%{$':
             raise ValueError('Style must be one of: %, {, $')
-        format_ = kwargs.pop("format", {'%': '[%(asctime)s] [%(levelname)s] %(message)s',
-                                        '{': '[{asctime}] [{levelname}] {message}',
-                                        '$': '[${asctime}] [${levelname}] ${message}'}[style])
+        if not format_:
+            format_ = {'%': '[%(asctime)s] [%(levelname)s] %(message)s',
+                       '{': '[{asctime}] [{levelname}] {message}',
+                       '$': '[${asctime}] [${levelname}] ${message}'}[style]
+        else:
+            format_ = format_
         formatter = ColorizingFormatter(format_, date_format, style=style)
         for handler in handlers:
             if handler.formatter is None:
                 handler.setFormatter(formatter)
             root.addHandler(handler)
-        level = kwargs.pop("level", None)
         if level is not None:
             root.setLevel(level)
-        if kwargs:
-            keys = ', '.join(kwargs.keys())
-            raise ValueError('Unrecognised argument(s): %s' % keys)
 
 
 basicConfig = basic_config

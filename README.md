@@ -5,6 +5,7 @@ log21
 ![stars](https://img.shields.io/github/stars/MPCodeWriter21/log21)
 ![forks](https://img.shields.io/github/forks/MPCodeWriter21/log21)
 ![repo size](https://img.shields.io/github/repo-size/MPCodeWriter21/log21)
+[![CodeFactor](https://www.codefactor.io/repository/github/mpcodewriter21/log21/badge)](https://www.codefactor.io/repository/github/mpcodewriter21/log21)
 
 A simple logging package that helps you log colorized messages in Windows console and other operating systems.
 
@@ -51,9 +52,9 @@ python setup.py install
 Changes
 -------
 
-### 2.1.0
+### 2.1.1
 
-Added optional shell support to the LoggingWindow.
+Minor changes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

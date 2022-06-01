@@ -422,13 +422,13 @@ class ColorizingTextWrapper(_TextWrapper):
 
             while chunks:
                 # modified upstream code, not going to refactor for ambiguous variable name.
-                l = len(_Formatter.decolorize(chunks[-1]))  # noqa: E741
+                length = len(_Formatter.decolorize(chunks[-1]))  # noqa: E741
 
                 # Can at least squeeze this chunk onto the current line.
                 # Modified upstream code, not going to refactor for ambiguous variable name.
-                if cur_len + l <= width:  # noqa: E741
+                if cur_len + length <= width:  # noqa: E741
                     cur_line.append(chunks.pop())
-                    cur_len += l
+                    cur_len += length
                 # Nope, this line is full.
                 else:
                     break
