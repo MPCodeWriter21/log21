@@ -52,9 +52,9 @@ python setup.py install
 Changes
 -------
 
-### 2.1.1
+### 2.1.2
 
-Minor changes.
+Fixed import error in tkinter-less environments.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
@@ -255,4 +255,7 @@ Aparat Channel: [CodeWriter21](https://www.aparat.com/CodeWriter21)
 In order to support this project you can donate some crypto of your choice 8D
 
 [Donate Addresses](https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md)
+
+Or if you can't, give [this project](https://github.com/MPCodeWriter21/log21) a star on GitHub :)
+
 

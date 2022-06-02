@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.1.2
+
+Fixed import error in tkinter-less environments.
+
 ### 2.1.1
 
 Minor changes.

@@ -402,9 +402,9 @@ class ColorizingTextWrapper(_TextWrapper):
         while chunks:
 
             # Start the list of chunks that will make up the current line.
-            # cur_len is just the length of all the chunks in cur_line.
-            cur_line = []
-            cur_len = 0
+            # current_len is just the length of all the chunks in current_line.
+            current_line = []
+            current_len = 0
 
             # Figure out which static string will prefix this line.
             if lines:
@@ -426,9 +426,9 @@ class ColorizingTextWrapper(_TextWrapper):
 
                 # Can at least squeeze this chunk onto the current line.
                 # Modified upstream code, not going to refactor for ambiguous variable name.
-                if cur_len + length <= width:  # noqa: E741
-                    cur_line.append(chunks.pop())
-                    cur_len += length
+                if current_len + length <= width:  # noqa: E741
+                    current_line.append(chunks.pop())
+                    current_len += length
                 # Nope, this line is full.
                 else:
                     break
@@ -436,33 +436,33 @@ class ColorizingTextWrapper(_TextWrapper):
             # The current line is full, and the next chunk is too big to
             # fit on *any* line (not just this one).
             if chunks and len(_Formatter.decolorize(chunks[-1])) > width:
-                self._handle_long_word(chunks, cur_line, cur_len, width)
-                cur_len = sum(map(len, cur_line))
+                self._handle_long_word(chunks, current_line, current_len, width)
+                current_len = sum(map(len, current_line))
 
             # If the last chunk on this line is all whitespace, drop it.
-            if self.drop_whitespace and cur_line and _Formatter.decolorize(cur_line[-1]).strip() == '':
-                cur_len -= len(_Formatter.decolorize(cur_line[-1]))
-                del cur_line[-1]
+            if self.drop_whitespace and current_line and _Formatter.decolorize(current_line[-1]).strip() == '':
+                current_len -= len(_Formatter.decolorize(current_line[-1]))
+                del current_line[-1]
 
-            if cur_line:
+            if current_line:
                 if (self.max_lines is None or
                         len(lines) + 1 < self.max_lines or
                         (not chunks or
                          self.drop_whitespace and
                          len(chunks) == 1 and
-                         not chunks[0].strip()) and cur_len <= width):
+                         not chunks[0].strip()) and current_len <= width):
                     # Convert current line back to a string and store it in
                     # list of all lines (return value).
-                    lines.append(indent + ''.join(cur_line))
+                    lines.append(indent + ''.join(current_line))
                 else:
-                    while cur_line:
-                        if _Formatter.decolorize(cur_line[-1]).strip() and cur_len + len(
+                    while current_line:
+                        if _Formatter.decolorize(current_line[-1]).strip() and current_len + len(
                                 self.placeholder) <= width:
-                            cur_line.append(self.placeholder)
-                            lines.append(indent + ''.join(cur_line))
+                            current_line.append(self.placeholder)
+                            lines.append(indent + ''.join(current_line))
                             break
-                        cur_len -= len(_Formatter.decolorize(cur_line[-1]))
-                        del cur_line[-1]
+                        current_len -= len(_Formatter.decolorize(current_line[-1]))
+                        del current_line[-1]
                     else:
                         if lines:
                             prev_line = lines[-1].rstrip()

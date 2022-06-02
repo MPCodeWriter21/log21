@@ -172,6 +172,7 @@ def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _we
                    raise_exceptions: bool = False) -> str:
     """
     Takes a color in RGB format and returns a color name close to the RGB value.
+
     >>>
     >>> get_color_name('#00FF00')
     'LightGreen'
