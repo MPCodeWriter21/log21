@@ -50,10 +50,6 @@ python setup.py install
 Changes
 -------
 
-### 2.1.2
-
-Fixed import error in tkinter-less environments.
-
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
 

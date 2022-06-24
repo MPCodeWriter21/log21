@@ -7,58 +7,56 @@ log21
 ![repo size](https://img.shields.io/github/repo-size/MPCodeWriter21/log21)
 [![CodeFactor](https://www.codefactor.io/repository/github/mpcodewriter21/log21/badge)](https://www.codefactor.io/repository/github/mpcodewriter21/log21)
 
-A simple logging package that helps you log colorized messages in Windows console and other operating systems.
+<div style="direction: rtl">
+log21 یک پکیج ساده پایتون است که به شما کمک می کند مطالب مختلف را به صورت رنگی در کنسول ویندوز یا سیستم عامل های دیگر به
+سادگی چاپ کنید.
+</div>
 
-Features
---------
+<div style="direction: rtl">
+<h2>امکانات</h2>
 
-+ Colors : The main reason for this package was to log text in the Windows console with the support of ANSI colors.
-+ Argument parsing : log21's argument parser can be used like python's argparse but it also colorizes the output.
-+ Logging : A similar logger to logging.Logger but with colorized output and other options such as levelname
-  modifications. It can also decolorize the output if you want to log into a file.
-+ Pretty printing : Have you ever wanted to colorize the output of the pprint module? log21's pretty printer can do
-  that.
-+ Tree printing : You can pass a dict or list to log21.tree_print function and it will print it in a tree-like
-  structure. It's also colorized XD.
-+ ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
-+ LoggingWindow : Helps you to log messages and debug your code in a window other than the console.
-+ Any idea? Feel free to [open an issue](https://github.com/MPCodeWriter21/log21/issues) or submit a pull request.
++ متن های رنگی : هدف اصلی این پکیج پایتون در ابتدا نوشتن متون رنگی با پشتیبانی از کد رنگ های ANSI در محیط خط فرمان
+  ویندوز بود.
++ تجزیه و تحلیل ورودی های خط فرمان : این پکیج دارای یک کلاس به نام ColorizingArgumentParser است که قابل استفاده به صورت
+  مشابه argparse.ArgumentParser می باشد با این تفاوت که این کلاس خروجی های رنگی چاپ می کند.
++ Logging : پکیج log21 قابلیت های ماژول logging را به صورت رنگی و با امکانات بیشتر مانند تغییر levelname ارائه می دهد.
++ چاپ زیبا : آیا تا به حال خواسته اید خروجی ماژول pprint را رنگی کنید؟ log21 این کار را برایتان انجام می دهد!
++ چاپ درختی : شما می توانید یک دیکشنری با لیست را به تابع log21.tree_print ورودی دهید و تابع آن را به صورت درخت مانند
+  پرینت خواهد کرد. به علاوه خروجی رنگی خواهد بود!
++ نوار پیشرفت(ProgressBar) : نوار پیشرفت log21 را می توان برای نشان دادن پیشرفت یک فرآیند به روشی زیبا استفاده کرد.
++ پنجره لاگینگ(LoggingWindow) : به شما کمک می کند تا پیام ها را چاپ و کد خود را در پنجره ای غیر از خط فرمان اشکال زدایی
+  کنید.
++ ایده ای دارید؟ به راحتی می توانید [یک مساله طرح کنید](https://github.com/MPCodeWriter21/log21/issues) یا یک pull
+  request ارسال کنید.
 
-![issues](https://img.shields.io/github/issues/MPCodeWriter21/log21)
-![contributors](https://img.shields.io/github/contributors/MPCodeWriter21/log21)
+</div>
 
-Installation
-------------
+![مسائل](https://img.shields.io/github/issues/MPCodeWriter21/log21)
+![مشارکت کنندگان](https://img.shields.io/github/contributors/MPCodeWriter21/log21)
 
-Well, this is a python package so the first thing you need is python.
+<div style="direction: rtl">
+<h2>نصب و راه اندازی</h2>
 
-If you don't have python installed, please visit [Python.org](https://python.org) and install the latest version of
-python.
+خب، log21 یک پکیج پایتون است، بنابراین اولین چیزی که نیاز دارید پایتون است.
 
-Then you can install log21 using pip module:
+اگر پایتون را نصب نکرده‌اید، لطفاً از [Python.org](https://python.org) دیدن کنید و آخرین نسخه پایتون را نصب کنید.
+
+سپس می توانید log21 را با استفاده از ماژول pip نصب کنید:
 
 ```shell
 python -m pip install log21 -U
 ```
 
-Or you can clone [the repository](https://github.com/MPCodeWriter21/log21) and run:
+یا می توانید این مخزن(repository) را کلون کرده و کد زیر را اجرا کنید:
 
 ```shell
 python setup.py install
 ```
 
-Changes
--------
-
-### 2.1.2
-
-Fixed import error in tkinter-less environments.
-
-[Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
+</div>
 
 
-Usage Examples:
----------------
+<h2 style="direction: rtl">مثال های استفاده:</h2>
 
 ```python3
 import log21
@@ -232,28 +230,30 @@ for i in range(84):
 ![ProgressBar - Example 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.1.gif)
 ![ProgressBar - Example 2](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.2.gif)
 
-About
+<div style="direction: rtl">
+درباره
 -----
-Author: CodeWriter21 (Mehrad Pooryoussof)
+نویسنده: کدنویس۲۱ (مهراد پوریوسف)
 
-GitHub: [MPCodeWriter21](https://github.com/MPCodeWriter21)
+گیت هاب: [MPCodeWriter21](https://github.com/MPCodeWriter21)
 
-Telegram Channel: [@CodeWriter21](https://t.me/CodeWriter21)
+کانال تلگرام: [@CodeWriter21](https://t.me/CodeWriter21)
 
-Aparat Channel: [CodeWriter21](https://www.aparat.com/CodeWriter21)
+کانال آپارات: [CodeWriter21](https://www.aparat.com/CodeWriter21)
 
-### License
+### مجوز
 
-![License](https://img.shields.io/github/license/MPCodeWriter21/log21)
+![لایسنس](https://img.shields.io/github/license/MPCodeWriter21/log21)
 
 [apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-### Donate
+### اهدا کیند
 
-In order to support this project you can donate some crypto of your choice 8D
+:به منظور حمایت از این پروژه، می توانید مقداری کریپتو به انتخاب خود اهدا کنید
 
-[Donate Addresses](https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md)
+[آدرس های رمزارز](https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md)
 
-Or if you can't, give [this project](https://github.com/MPCodeWriter21/log21) a star on GitHub :)
+یا اگر نمی توانید، به [این پروژه](https://github.com/MPCodeWriter21/log21) در GitHub ستاره بدهید :)
+</div>
 
 
