@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.1.4
+
+Bug fixes.
+
 ### 2.1.3
 
 Added log21.input function.

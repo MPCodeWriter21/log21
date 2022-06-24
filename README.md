@@ -50,9 +50,9 @@ python setup.py install
 Changes
 -------
 
-### 2.1.3
+### 2.1.4
 
-Added log21.input function.
+Bug fixes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
