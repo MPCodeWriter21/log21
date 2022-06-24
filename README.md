@@ -50,7 +50,7 @@ python setup.py install
 Changes
 -------
 
-### 2.1.4
+### 2.1.5
 
 Bug fixes.
 
