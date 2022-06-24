@@ -140,7 +140,7 @@ class Logger(_logging.Logger):
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
 
-    def input(self, *msg, args: tuple = (), end='\033[0m', **kwargs):
+    def input(self, *msg, args: tuple = (), end='', **kwargs):
         """
         Log 'msg % args'.
 

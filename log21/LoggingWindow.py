@@ -291,7 +291,7 @@ else:
             self.logs.delete('1.0', _tkinter.END)
             self.logs.config(state=_tkinter.DISABLED)
 
-        def input(self, *msg, args: tuple = (), end='\033[0m', **kwargs) -> str:
+        def input(self, *msg, args: tuple = (), end='', **kwargs) -> str:
             """
             Prints a message and waits for input.
 
