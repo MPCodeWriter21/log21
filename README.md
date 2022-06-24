@@ -50,9 +50,9 @@ python setup.py install
 Changes
 -------
 
-### 2.1.2
+### 2.1.3
 
-Fixed import error in tkinter-less environments.
+Added log21.input function.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

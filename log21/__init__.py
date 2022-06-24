@@ -19,7 +19,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -215,6 +215,11 @@ getLogger = get_logger
 def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
     logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
     logger.print(*msg, args=args, end=end, **kwargs)
+
+
+def input(self, *msg, args: tuple = (), end='\033[0m', **kwargs):
+    logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
+    logger.input()
 
 
 def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False, sort_dicts=True,
