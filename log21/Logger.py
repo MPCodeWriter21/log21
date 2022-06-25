@@ -1,9 +1,12 @@
 # log21.Logger.py
 # CodeWriter21
 
-import log21 as _log21
 import logging as _logging
+
+from getpass import getpass
 from logging import raiseExceptions as _raiseExceptions
+
+import log21 as _log21
 from log21.Levels import *
 
 __all__ = ['Logger']
@@ -152,6 +155,16 @@ class Logger(_logging.Logger):
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
         return input()
+
+    def getpass(self, *msg, args: tuple = (), end='', **kwargs):
+        """
+
+
+        :return:
+        """
+        msg = ' '.join([str(m) for m in msg]) + end
+        self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
+        return getpass('')
 
     def print_progress(self, progress: float, total: float):
         """

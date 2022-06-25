@@ -249,6 +249,7 @@ else:
 
             # Input related lines
             self.getting_input = False
+            self.getting_pass = False
             self.input_text = ''
             # cursor counter is used for making a nice blinking cursor
             self.__cursor_counter = 1
@@ -317,14 +318,41 @@ else:
                 self.getting_input = False
             return self.input_text
 
+        def getpass(self, *msg, args: tuple = (), end='', **kwargs) -> str:
+            """
+            Prints a message and waits for input.
+
+            :param msg: The message to print.
+            :param args: The arguments to pass to the message.
+            :param end: The end of the message.
+            :param kwargs:
+            :return: The input.
+            """
+            msg = ' '.join([str(m) for m in msg]) + end
+            self._log(self.level if self.level >= _NOTSET else _NOTSET, msg, args, **kwargs)
+            self.input_text = ''
+            self.getting_pass = True
+            self.cursor_position = 0
+            self.logs.focus()
+            try:
+                while self.getting_pass:
+                    self.cursor_position = self.cursor_position
+                    self.window.update()
+                    self.window.after(10)
+            except KeyboardInterrupt:
+                self.input_text = ''
+                self.getting_pass = False
+            return self.input_text
+
         def key_press(self, event):
             """
             KeyPress event callback for self.logs.
             """
-            if self.getting_input:
+            if self.getting_input or self.getting_pass:
                 # Handles Enter key
                 if event.keysym == 'Return':
                     self.getting_input = False
+                    self.getting_pass = False
                     self.cursor_position = 0
                     self.logs.config(state=_tkinter.NORMAL)
                     self.logs.insert(_tkinter.END, '\n')
@@ -337,16 +365,19 @@ else:
                         self.logs.delete(f'end-{len(self.input_text) + 1}c', 'end-1c')
                         self.input_text = self.input_text[:self.cursor_position - 1] + \
                                           self.input_text[self.cursor_position:]
-                        self.logs.insert(_tkinter.END, self.input_text)
+                        if self.getting_pass:
+                            self.logs.insert(_tkinter.END, '*' * len(self.input_text))
+                        else:
+                            self.logs.insert(_tkinter.END, self.input_text)
                         self.logs.config(state=_tkinter.DISABLED)
                         self.cursor_position -= 1
                 # Handles Right Arrow
                 elif event.keysym == 'Right':
-                    if self.cursor_position < len(self.input_text):
+                    if self.cursor_position < len(self.input_text) and not self.getting_pass:
                         self.cursor_position += 1
                 # Handles Left Arrow
                 elif event.keysym == 'Left':
-                    if self.cursor_position > 0:
+                    if self.cursor_position > 0 and not self.getting_pass:
                         self.cursor_position -= 1
                 # Handles other keys
                 elif event.char:
@@ -354,7 +385,10 @@ else:
                     self.logs.delete(f'end-{len(self.input_text) + 1}c', 'end-1c')
                     self.input_text = self.input_text[:self.cursor_position] + event.char + \
                                       self.input_text[self.cursor_position:]
-                    self.logs.insert(_tkinter.END, self.input_text)
+                    if self.getting_pass:
+                        self.logs.insert(_tkinter.END, '*' * len(self.input_text))
+                    else:
+                        self.logs.insert(_tkinter.END, self.input_text)
                     self.logs.config(state=_tkinter.DISABLED)
                     self.cursor_position += 1
 
