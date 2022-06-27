@@ -190,7 +190,7 @@ class ColorizingFormatter(_Formatter):
         if hasattr(record, 'threadName'):
             record.threadName = _gc(*self.thread_name_color) + record.threadName + reset
         if hasattr(record, 'message'):
-            record.message = _gc(*self.message_color) + record.message + reset
+            record.message = _gc(*self.message_color) + record.message
 
         return record
 

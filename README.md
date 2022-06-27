@@ -50,9 +50,9 @@ python setup.py install
 Changes
 -------
 
-### 2.1.7
+### 2.1.8
 
-Added `getpass` method to `log21.Logger` class and added `log21.getpass` function.
+Bug fixes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

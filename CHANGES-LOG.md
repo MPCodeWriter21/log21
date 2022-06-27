@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.1.8
+
+Bug fixes.
+
 ### 2.1.7
 
 Added `getpass` method to `log21.Logger` class and added `log21.getpass` function.
