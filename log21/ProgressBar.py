@@ -26,14 +26,15 @@ class ProgressBar:
             >>> pb(1, 10)
             [==----------------]
             >>> pb(2, 10)
-            [====\-------------]
+            [====\\-------------]
             >>>
             >>> # A better example
             >>> import time
             >>> pb = ProgressBar()
             >>> for i in range(500):
-            >>>     pb(i + 1, 500)
-            >>>     time.sleep(0.01)
+            ...     pb(i + 1, 500)
+            ...     time.sleep(0.01)
+            ...
             |████████████████████████████████████████████████████████████████████████████████████████████| 100%
             >>> # Of course, You should try it yourself to see the progress! XD
             >>>

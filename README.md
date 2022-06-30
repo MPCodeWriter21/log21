@@ -50,9 +50,14 @@ python setup.py install
 Changes
 -------
 
-### 2.1.8
+### 2.2.0
 
-Bug fixes.
+Added CrashReporter!
+
+You can use Reporter classes to monitor your program and send crash reports to the developer. It can help you fix the
+bugs and improve your program before your users get upset about it. See some examples in
+the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
+file.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

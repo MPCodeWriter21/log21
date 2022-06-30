@@ -6,7 +6,9 @@ import logging as _logging
 
 from typing import Union as _Union, Dict as _Dict
 
-from log21.Levels import *
+import log21.CrashReporter as CrashReporter
+
+from log21.Levels import INPUT, CRITICAL, FATAL, ERROR, WARNING, WARN, INFO, DEBUG, NOTSET
 from log21.Logger import Logger
 from log21.Manager import Manager
 from log21.ProgressBar import ProgressBar
@@ -19,7 +21,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.1.8"
+__version__ = "2.2.0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -28,7 +30,8 @@ __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingForm
            'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager', 'get_color_name', 'closest_color',
            'ansi_escape', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
            'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
-           'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window']
+           'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter', 'console_crash_reporter',
+           'file_crash_reporter']
 
 _manager = Manager()
 _logging.setLoggerClass(Logger)
@@ -109,11 +112,13 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
     :param show_level: bool = True: Show the level of logging in the log
     :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
     :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
-    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of %-formatting,
-        :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format string.
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of
+        %-formatting, :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format
+        string.
     :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
     :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
-    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
+    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything
+        else
     :param override: bool = True: Overrides the logger attributes even if it already exists
     :param level_names: Dict[int, str] = None: You can specify custom level names.
     :return: log21.Logger
@@ -164,8 +169,9 @@ def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_ti
     >>>
     >>> # Progressbar usage:
     >>> for i in range(100):
-    >>>     window.print_progress(i + 1, 100)
-    >>>     time.sleep(0.1)
+    ...     window.print_progress(i + 1, 100)
+    ...     time.sleep(0.1)
+    ...
     >>>
     >>> # Gettig input from the user:
     >>> name: str = window.input('Enter your name: ')
@@ -179,11 +185,13 @@ def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_ti
     :param show_level: bool = True: Show the level of logging in the log
     :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
     :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
-    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of %-formatting,
-        :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format string.
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of
+        %-formatting, :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format
+        string.
     :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
     :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
-    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything else
+    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything
+        else
     :param override: bool = True: Overrides the logger attributes even if it already exists
     :param level_names: Dict[int, str] = None: You can specify custom level names.
     :param width: int = 80: The width of the window
@@ -430,3 +438,10 @@ def progress_bar(progress: float, total: float, width: int = None, prefix: str =
     bar = ProgressBar(width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage)
 
     print(bar.get_bar(progress, total))
+
+
+__console_reporter = CrashReporter.ConsoleReporter()
+console_crash_reporter = __console_reporter.reporter
+
+__file_reporter = CrashReporter.FileReporter(file='crash_report.log')
+file_crash_reporter = __file_reporter.reporter

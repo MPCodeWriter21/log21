@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # setup.py
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.md', 'r') as file:
     long_description = file.read()
 
 DESCRIPTION = 'A simple logging package that helps you log colorized messages in Windows console.'
-VERSION = '2.1.8'
+VERSION = '2.2.0'
 
 setup(
     name='log21',
@@ -20,7 +20,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     install_requires=['webcolors'],
-    packages=['log21'],
+    packages=find_packages(),
     keywords=['python', 'log', 'colorize', 'color', 'logging'],
     classifiers=[
         "Intended Audience :: Developers",

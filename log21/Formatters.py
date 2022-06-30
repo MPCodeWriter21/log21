@@ -1,11 +1,11 @@
-# log21.Formatter.py
+# log21.Formatters.py
 # CodeWriter21
 
 import time as _time
 from logging import Formatter as __Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
 from log21.Colors import get_colors as _gc, ansi_escape
-from log21.Levels import *
+from log21.Levels import INPUT, CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 

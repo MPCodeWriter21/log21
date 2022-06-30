@@ -6,6 +6,15 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.2.0
+
+Added CrashReporter!
+
+You can use Reporter classes to monitor your program and send crash reports to the developer. It can help you fix the
+bugs and improve your program before your users get upset about it. See some examples in
+the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
+file.
+
 ### 2.1.8
 
 Bug fixes.
