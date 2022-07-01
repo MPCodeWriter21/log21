@@ -22,6 +22,9 @@ Features
   structure. It's also colorized XD.
 + ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
 + LoggingWindow : Helps you to log messages and debug your code in a window other than the console.
++ CrashReporter : log21's crash reporter can be used to report crashes in different ways. You can use it to log crashes
+  to console or files or use it to receive crash reports of your program through email. And you can also define your own
+  crash reporter functions and use them instead!
 + Any idea? Feel free to [open an issue](https://github.com/MPCodeWriter21/log21/issues) or submit a pull request.
 
 ![issues](https://img.shields.io/github/issues/MPCodeWriter21/log21)
@@ -50,14 +53,29 @@ python setup.py install
 Changes
 -------
 
-### 2.2.0
+### 2.3.0
 
-Added CrashReporter!
+Added progressbar custom formatting.
 
-You can use Reporter classes to monitor your program and send crash reports to the developer. It can help you fix the
-bugs and improve your program before your users get upset about it. See some examples in
-the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
-file.
+Now you can use your own formatting for the progressbar instead of the default one.
+
+Let's see an example:
+
+```python
+# We import the ProgressBar class from log21
+from log21 import ProgressBar
+# psutil is a module that can be used to get the current memory usage or cpu usage of your system
+# If you want to try this example, you need to install psutil: pip install psutil
+import psutil
+# We use the time module to make a delay between the progressbar updates
+import time
+
+cpu_bar = ProgressBar(format_='CPU Usage: {prefix}{bar}{suffix} {percentage}%', style='{', new_line_when_complete=False)
+
+while True:
+    cpu_bar.update(psutil.cpu_percent(), 100)
+    time.sleep(0.1)
+```
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
