@@ -6,6 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.1
+
+Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set the formatter of the handler when
+you create it. Added `handlers` argument to `Logger`. You can use it to add handlers to the logger when you create it.
+
 ### 2.3.0
 
 Added progressbar custom formatting.

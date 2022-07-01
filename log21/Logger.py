@@ -3,7 +3,8 @@
 
 import logging as _logging
 
-from getpass import getpass
+from getpass import getpass as _getpass
+from typing import Sequence as _Sequence, Union as _Union
 from logging import raiseExceptions as _raiseExceptions
 
 import log21 as _log21
@@ -13,10 +14,18 @@ __all__ = ['Logger']
 
 
 class Logger(_logging.Logger):
-    def __init__(self, name, level=NOTSET):
+    def __init__(self, name, level=NOTSET, handlers: _Union[_Sequence[_logging.Handler], _logging.Handler] = None):
         super().__init__(name, level)
         self.setLevel(level)
         self._progress_bar = None
+        if handlers:
+            if not isinstance(handlers, _Sequence):
+                if isinstance(handlers, _logging.Handler):
+                    handlers = [handlers]
+                else:
+                    raise TypeError("handlers must be a list of logging.Handler objects")
+            for handler in handlers:
+                self.addHandler(handler)
 
     def isEnabledFor(self, level):
         """
@@ -164,7 +173,7 @@ class Logger(_logging.Logger):
         """
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
-        return getpass('')
+        return _getpass('')
 
     def print_progress(self, progress: float, total: float):
         """

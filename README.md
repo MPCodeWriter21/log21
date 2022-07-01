@@ -53,29 +53,10 @@ python setup.py install
 Changes
 -------
 
-### 2.3.0
+### 2.3.1
 
-Added progressbar custom formatting.
-
-Now you can use your own formatting for the progressbar instead of the default one.
-
-Let's see an example:
-
-```python
-# We import the ProgressBar class from log21
-from log21 import ProgressBar
-# psutil is a module that can be used to get the current memory usage or cpu usage of your system
-# If you want to try this example, you need to install psutil: pip install psutil
-import psutil
-# We use the time module to make a delay between the progressbar updates
-import time
-
-cpu_bar = ProgressBar(format_='CPU Usage: {prefix}{bar}{suffix} {percentage}%', style='{', new_line_when_complete=False)
-
-while True:
-    cpu_bar.update(psutil.cpu_percent(), 100)
-    time.sleep(0.1)
-```
+Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set the formatter of the handler when
+you create it. Added `handlers` argument to `Logger`. You can use it to add handlers to the logger when you create it.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

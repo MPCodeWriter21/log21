@@ -18,10 +18,15 @@ if IS_WINDOWS:
 class StreamHandler(_StreamHandler):
     terminator = ''
 
-    def __init__(self, handle_carriage_return: bool = True, handle_new_line: bool = True, stream=None):
+    def __init__(self, handle_carriage_return: bool = True, handle_new_line: bool = True, stream=None, formatter=None,
+                 level=None):
         self.HandleCR = handle_carriage_return
         self.HandleNL = handle_new_line
         super().__init__(stream=stream)
+        if formatter is not None:
+            self.setFormatter(formatter)
+        if level is not None:
+            self.setLevel(level)
 
     def check_cr(self, record):
         if record.msg:
