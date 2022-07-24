@@ -24,7 +24,7 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           pip install dist/*.whl
-          export PACKAGE_VERSION=$(python -c "import log21; print(log21.__version__)")
+          export env.PACKAGE_VERSION=$(python -c "import log21; print(log21.__version__)")
           echo ${{ env.PACKAGE_VERSION }}
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
