@@ -6,6 +6,23 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.2
+
+Added `additional_variables` argument to `log21.ProgressBar` class. You can use it in order to add additional variables
+to the progress bar:
+
+```python3
+import log21, time
+
+progress_bar = log21.ProgressBar(format_='Iteration: {i} {prefix}{bar}{suffix} {percentage}%', style='{',
+                                 additional_variables={"i": 0})
+
+for i in range(100):
+    progress_bar(i + 1, 100, i=i)
+    time.sleep(0.1)
+# Iteration: 99 |██████████████████████████████████████████████████████████████████████████████| 100%
+```
+
 ### 2.3.1
 
 Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set the formatter of the handler when

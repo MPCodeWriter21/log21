@@ -53,10 +53,22 @@ python setup.py install
 Changes
 -------
 
-### 2.3.1
+### 2.3.2
 
-Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set the formatter of the handler when
-you create it. Added `handlers` argument to `Logger`. You can use it to add handlers to the logger when you create it.
+Added `additional_variables` argument to `log21.ProgressBar` class. You can use it in order to add additional variables
+to the progress bar:
+
+```python3
+import log21, time
+
+progress_bar = log21.ProgressBar(format_='Iteration: {i} {prefix}{bar}{suffix} {percentage}%', style='{',
+                                 additional_variables={"i": 0})
+
+for i in range(100):
+    progress_bar(i + 1, 100, i=i)
+    time.sleep(0.1)
+# Iteration: 99 |██████████████████████████████████████████████████████████████████████████████| 100%
+```
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

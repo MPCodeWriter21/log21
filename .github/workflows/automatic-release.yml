@@ -23,10 +23,12 @@ jobs:
       - name: Build
         run: |
           python setup.py sdist bdist_wheel
+          pip install dist/*.whl
+          export PACKAGE_VERSION=$(python -c "import log21; print(log21.__version__)")
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          automatic_release_tag: PACKAGE_VERSION
           title: "Auto Build"
           files: |
             dist/*

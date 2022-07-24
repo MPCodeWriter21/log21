@@ -3,6 +3,8 @@
 
 import os as _os
 
+from typing import Dict as _Dict, Any as _Any
+
 import log21 as _log21
 from log21.Logger import Logger as _Logger
 from log21.StreamHandler import ColorizingStreamHandler as _ColorizingStreamHandler
@@ -39,7 +41,8 @@ class ProgressBar:
 
     def __init__(self, *args, width: int = None, show_percentage: bool = True, prefix: str = '|', suffix: str = '|',
                  fill: str = '█', empty: str = ' ', format_: str = None, style: str = '%',
-                 new_line_when_complete: bool = True, colors: dict = None, logger: '_log21.Logger' = _logger):
+                 new_line_when_complete: bool = True, colors: dict = None, logger: '_log21.Logger' = _logger,
+                 additional_variables: _Dict[str, _Any] = None):
         """
         :param args: Prevents the use of positional arguments
         :param width: The width of the progress bar
@@ -53,6 +56,7 @@ class ProgressBar:
         :param new_line_when_complete: Whether to print a new line when the progress is complete or failed
         :param colors: The colors of the progress bar
         :param logger: The logger to use
+        :param additional_variables: Additional variables to use in the format and their default values
         """
         self.width = width if width else _os.get_terminal_size().columns - 1
         if self.width < 3:
@@ -71,6 +75,16 @@ class ProgressBar:
             raise ValueError('`empty` must be a single character')
         if style not in ['%', '{']:
             raise ValueError('`style` must be either `%` or `{`')
+        if additional_variables:
+            if not isinstance(additional_variables, dict):
+                raise TypeError('`additional_variables` must be a dictionary')
+            for key, value in additional_variables.items():
+                if not isinstance(key, str):
+                    raise TypeError('`additional_variables` keys must be strings')
+                if not isinstance(value, str):
+                    additional_variables[key] = str(value)
+        else:
+            additional_variables = dict()
 
         self.colors = {
             'progress in-progress': _gc('LightYellow'),
@@ -105,24 +119,30 @@ class ProgressBar:
             for key, value in colors.items():
                 self.colors[key] = value
         self.logger = logger
+        self.additional_variables = additional_variables
         self.i = 0
 
-    def get_bar(self, progress: float, total: float):
+    def get_bar(self, progress: float, total: float, **kwargs) -> str:
         if progress == total:
-            return self.progress_complete()
+            return self.progress_complete(**kwargs)
         elif progress > total or progress < 0:
-            return self.progress_failed(progress, total)
+            return self.progress_failed(progress, total, **kwargs)
         else:
-            return self.progress_in_progress(progress, total)
+            return self.progress_in_progress(progress, total, **kwargs)
 
-    def progress_in_progress(self, progress: float, total: float):
+    def progress_in_progress(self, progress: float, total: float, **kwargs):
         percentage = str(round(progress / total * 100, 2))
         progress_dict = {
             'prefix': self.prefix,
             'bar': '',
             'suffix': self.suffix,
-            'percentage': percentage
+            'percentage': percentage,
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            if key in ['prefix', 'bar', 'suffix', 'percentage']:
+                raise ValueError(f'`{key}` is a reserved keyword')
+            progress_dict[key] = value
 
         if self.style == '%':
             used_characters = len(self.format % progress_dict)
@@ -142,28 +162,34 @@ class ProgressBar:
 
         progress_dict = {
             'prefix': self.colors['prefix-color in-progress'] + self.prefix + self.colors['reset-color'],
-            'bar': self.colors['progress in-progress'] +
-                   (self.fill * fill_length + spinner_char + self.empty * empty_length) + self.colors['reset-color'],
+            'bar': self.colors['progress in-progress'] + (self.fill * fill_length + spinner_char +
+                                                          self.empty * empty_length) + self.colors['reset-color'],
             'suffix': self.colors['suffix-color in-progress'] + self.suffix + self.colors['reset-color'],
-            'percentage': self.colors["percentage in-progress"] + str(percentage) + self.colors['reset-color']
+            'percentage': self.colors["percentage in-progress"] + str(percentage) + self.colors['reset-color'],
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            progress_dict[key] = value
 
         if self.style == '%':
-            bar = self.format % progress_dict
+            return '\r' + self.format % progress_dict + self.colors['reset-color']
         elif self.style == '{':
-            bar = self.format.format(**progress_dict)
+            return '\r' + self.format.format(**progress_dict) + self.colors['reset-color']
         else:
             raise ValueError('`style` must be either `%` or `{`')
 
-        return '\r' + bar + self.colors['reset-color']
-
-    def progress_complete(self):
+    def progress_complete(self, **kwargs):
         progress_dict = {
             'prefix': self.prefix,
             'bar': '',
             'suffix': self.suffix,
-            'percentage': '100'
+            'percentage': '100',
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            if key in ['prefix', 'bar', 'suffix', 'percentage']:
+                raise ValueError(f'`{key}` is a reserved keyword')
+            progress_dict[key] = value
 
         if self.style == '%':
             bar_length = self.width - len(self.format % progress_dict)
@@ -176,25 +202,33 @@ class ProgressBar:
             'prefix': self.colors['prefix-color complete'] + self.prefix + self.colors['reset-color'],
             'bar': self.colors['progress complete'] + (self.fill * bar_length) + self.colors['reset-color'],
             'suffix': self.colors['suffix-color complete'] + self.suffix + self.colors['reset-color'],
-            'percentage': self.colors["percentage complete"] + '100' + self.colors['reset-color']
+            'percentage': self.colors["percentage complete"] + '100' + self.colors['reset-color'],
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            progress_dict[key] = value
 
         if self.style == '%':
-            bar = self.format % progress_dict
+            return '\r' + self.format % progress_dict + self.colors['reset-color'] + \
+                   ('\n' if self.new_line_when_complete else '')
         elif self.style == '{':
-            bar = self.format.format(**progress_dict)
+            return '\r' + self.format.format(**progress_dict) + self.colors['reset-color'] + \
+                   ('\n' if self.new_line_when_complete else '')
         else:
             raise ValueError('`style` must be either `%` or `{`')
 
-        return '\r' + bar + self.colors['reset-color'] + ('\n' if self.new_line_when_complete else '')
-
-    def progress_failed(self, progress: float, total: float):
+    def progress_failed(self, progress: float, total: float, **kwargs):
         progress_dict = {
             'prefix': self.prefix,
             'bar': '',
             'suffix': self.suffix,
-            'percentage': str(round(progress / total * 100, 2))
+            'percentage': str(round(progress / total * 100, 2)),
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            if key in ['prefix', 'bar', 'suffix', 'percentage']:
+                raise ValueError(f'`{key}` is a reserved keyword')
+            progress_dict[key] = value
 
         if self.style == '%':
             bar_length = self.width - len(self.format % progress_dict)
@@ -212,8 +246,11 @@ class ProgressBar:
             'prefix': self.colors['prefix-color failed'] + self.prefix + self.colors['reset-color'],
             'bar': self.colors['progress failed'] + (bar_char * bar_length) + self.colors['reset-color'],
             'suffix': self.colors['suffix-color failed'] + self.suffix + self.colors['reset-color'],
-            'percentage': self.colors["percentage failed"] + progress_dict['percentage'] + self.colors['reset-color']
+            'percentage': self.colors["percentage failed"] + progress_dict['percentage'] + self.colors['reset-color'],
+            **self.additional_variables
         }
+        for key, value in kwargs.items():
+            progress_dict[key] = value
 
         if self.style == '%':
             bar = self.format % progress_dict
@@ -224,11 +261,11 @@ class ProgressBar:
 
         return '\r' + bar + self.colors['reset-color'] + ('\n' if self.new_line_when_complete else '')
 
-    def __call__(self, progress: float, total: float, logger: '_log21.Logger' = None):
+    def __call__(self, progress: float, total: float, logger: '_log21.Logger' = None, **kwargs):
         if not logger:
             logger = self.logger
 
-        logger.print(self.get_bar(progress, total), end='')
+        logger.print(self.get_bar(progress, total, **kwargs), end='')
 
-    def update(self, progress: float, total: float, logger: '_log21.Logger' = None):
-        self(progress, total, logger)
+    def update(self, progress: float, total: float, logger: '_log21.Logger' = None, **kwargs):
+        self(progress, total, logger, **kwargs)

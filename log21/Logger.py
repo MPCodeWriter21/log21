@@ -175,11 +175,11 @@ class Logger(_logging.Logger):
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
         return _getpass('')
 
-    def print_progress(self, progress: float, total: float):
+    def print_progress(self, progress: float, total: float, **kwargs):
         """
         Log progress.
         """
-        self.progress_bar(progress, total)
+        self.progress_bar(progress, total, **kwargs)
 
     @property
     def progress_bar(self):
