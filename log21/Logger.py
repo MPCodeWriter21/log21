@@ -191,3 +191,14 @@ class Logger(_logging.Logger):
     @progress_bar.setter
     def progress_bar(self, value: '_log21.ProgressBar'):
         self._progress_bar = value
+
+    def clear_line(self, length: int = None):
+        """
+        Clear the current line.
+
+        :param length: The length of the line to clear.
+        :return:
+        """
+        for handler in self.handlers:
+            if hasattr(handler, 'clear_line'):
+                handler.clear_line(length)

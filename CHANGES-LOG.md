@@ -6,6 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.4
+
+Added a new method to `log21.Logger` class: `log21.Logger.clear_line`. This method clears the current line in the
+console and moves the cursor to the beginning of the line.
+
 ### 2.3.3
 
 Fixed a bug that would cause an error creating a progress bar with no value set for width in systems without support for

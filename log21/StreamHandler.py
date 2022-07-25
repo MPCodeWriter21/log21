@@ -58,6 +58,26 @@ class StreamHandler(_StreamHandler):
             self.check_nl(record)
         super().emit(record)
 
+    def clear_line(self, length: int = None):
+        """
+        Clear the current line.
+
+        :param length: The length of the line to clear.
+        :return:
+        """
+        if IS_WINDOWS:
+            file_descriptor = getattr(self.stream, 'fileno', None)
+            if file_descriptor:
+                file_descriptor = file_descriptor()
+                if file_descriptor in (1, 2):
+                    if length is None:
+                        length = _os.get_terminal_size(file_descriptor)[0]
+                    self.stream.write('\r' + (' ' * (length - 1)) + '\r')
+        else:
+            if length is None:
+                length = _os.get_terminal_size()[0]
+            self.stream.write('\r' + (' ' * (length - 1)) + '\r')
+
 
 # A stream handler that supports colorizing.
 class ColorizingStreamHandler(StreamHandler):
