@@ -53,10 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.3.4
+### 2.3.5
 
-Added a new method to `log21.Logger` class: `log21.Logger.clear_line`. This method clears the current line in the
-console and moves the cursor to the beginning of the line.
+Minor improvements.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

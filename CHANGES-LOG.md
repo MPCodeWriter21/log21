@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.5
+
+Minor improvements.
+
 ### 2.3.4
 
 Added a new method to `log21.Logger` class: `log21.Logger.clear_line`. This method clears the current line in the

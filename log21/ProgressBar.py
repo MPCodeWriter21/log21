@@ -1,7 +1,7 @@
 # log21.ProgressBar.py
 # CodeWriter21
 
-import os as _os
+import shutil as _shutil
 
 from typing import Dict as _Dict, Any as _Any
 
@@ -61,7 +61,7 @@ class ProgressBar:
         # Sets a default value for the width
         if width is None:
             try:
-                width = _os.get_terminal_size().columns - 1
+                width = _shutil.get_terminal_size().columns - 1
             except OSError:
                 width = 50
             if width < 1:

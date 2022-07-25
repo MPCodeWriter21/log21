@@ -3,6 +3,7 @@
 
 import os as _os
 import re as _re
+import shutil as _shutil
 
 from logging import StreamHandler as _StreamHandler
 from log21.Colors import ansi_escape as _ansi_escape, get_colors as _gc, hex_escape as _hex_escape
@@ -36,7 +37,8 @@ class StreamHandler(_StreamHandler):
                 if file_descriptor:
                     file_descriptor = file_descriptor()
                     if file_descriptor in (1, 2):  # stdout or stderr
-                        self.stream.write('\r' + (' ' * (_os.get_terminal_size(file_descriptor)[0] - 1)) + '\r')
+                        self.stream.write(
+                            '\r' + (' ' * (_shutil.get_terminal_size(file_descriptor).columns - 1)) + '\r')
                         index = record.msg.rfind('\r')
                         find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
                         record.msg = _gc(*find.split(record.msg[:index])) + record.msg[index + 1:]
@@ -65,18 +67,13 @@ class StreamHandler(_StreamHandler):
         :param length: The length of the line to clear.
         :return:
         """
-        if IS_WINDOWS:
-            file_descriptor = getattr(self.stream, 'fileno', None)
-            if file_descriptor:
-                file_descriptor = file_descriptor()
-                if file_descriptor in (1, 2):
-                    if length is None:
-                        length = _os.get_terminal_size(file_descriptor)[0]
-                    self.stream.write('\r' + (' ' * (length - 1)) + '\r')
-        else:
-            if length is None:
-                length = _os.get_terminal_size()[0]
-            self.stream.write('\r' + (' ' * (length - 1)) + '\r')
+        file_descriptor = getattr(self.stream, 'fileno', None)
+        if file_descriptor:
+            file_descriptor = file_descriptor()
+            if file_descriptor in (1, 2):
+                if length is None:
+                    length = _shutil.get_terminal_size(file_descriptor).columns
+                self.stream.write('\r' + (' ' * (length - 1)) + '\r')
 
 
 # A stream handler that supports colorizing.
