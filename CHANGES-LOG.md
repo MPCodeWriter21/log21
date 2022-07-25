@@ -6,6 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.3
+
+Fixed a bug that would cause an error creating a progress bar with no value set for width in systems without support for
+os.get_terminal_size().
+
 ### 2.3.2
 
 Added `additional_variables` argument to `log21.ProgressBar` class. You can use it in order to add additional variables

@@ -58,7 +58,15 @@ class ProgressBar:
         :param logger: The logger to use
         :param additional_variables: Additional variables to use in the format and their default values
         """
-        self.width = width if width else _os.get_terminal_size().columns - 1
+        # Sets a default value for the width
+        if width is None:
+            try:
+                width = _os.get_terminal_size().columns - 1
+            except OSError:
+                width = 50
+            if width < 1:
+                width = 50
+        self.width = width
         if self.width < 3:
             raise ValueError('`width` must be greater than 1')
         if not isinstance(fill, str):
