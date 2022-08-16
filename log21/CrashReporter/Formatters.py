@@ -19,7 +19,7 @@ class Formatter:
 
         self.datefmt = datefmt
 
-    def format(self, exception: Exception):
+    def format(self, exception: BaseException):
         exception_dict = {
             '__name__': __name__,
             'type': type(exception),

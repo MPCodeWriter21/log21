@@ -66,7 +66,8 @@ class Reporter:
     raise_after_report: bool
 
     def __init__(self, report_function: _Callable[[BaseException], _Any], raise_after_report: bool = False,
-                 formatter: '_log21.CrashReporter.Formatter' = None, exceptions_to_catch: _Iterable[BaseException] = None,
+                 formatter: '_log21.CrashReporter.Formatter' = None,
+                 exceptions_to_catch: _Iterable[BaseException] = None,
                  exceptions_to_ignore: _Iterable[BaseException] = None):
         """
         :param report_function: Function to call when an exception is raised.
@@ -137,6 +138,26 @@ class Reporter:
 
         return wrap
 
+    def catch(self, exception: BaseException):
+        """
+        Add an exception to the list of exceptions to catch.
+
+        :param exception: Exception to catch.
+        """
+        if self._exceptions_to_catch is None:
+            self._exceptions_to_catch = set()
+        self._exceptions_to_catch.add(exception)
+
+    def ignore(self, exception: BaseException):
+        """
+        Add an exception to the list of exceptions to ignore.
+
+        :param exception: Exception to ignore.
+        """
+        if self._exceptions_to_ignore is None:
+            self._exceptions_to_ignore = set()
+        self._exceptions_to_ignore.add(exception)
+
 
 class ConsoleReporter(Reporter):
     """
@@ -186,12 +207,13 @@ class ConsoleReporter(Reporter):
     """
 
     def __init__(self, raise_after_report: bool = False, formatter: '_log21.CrashReporter.Formatter' = None,
-                 print_function: _Callable = print):
+                 print_function: _Callable = print, exceptions_to_catch: _Iterable[BaseException] = None,
+                 exceptions_to_ignore: _Iterable[BaseException] = None):
         """
         :param raise_after_report: If True, the exception will be raised after the report_function is called.
         :param print_function: Function to use to print the message.
         """
-        super().__init__(self._report, raise_after_report)
+        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
 
         if formatter:
             if isinstance(formatter, _log21.CrashReporter.Formatter):
@@ -203,7 +225,7 @@ class ConsoleReporter(Reporter):
 
         self.print = print_function
 
-    def _report(self, exception: Exception):
+    def _report(self, exception: BaseException):
         """
         Prints the exception to the console.
 
@@ -220,8 +242,10 @@ class FileReporter(Reporter):
     """
 
     def __init__(self, file: _Union[str, _PathLike, _IO], raise_after_report: bool = True,
-                 formatter: '_log21.CrashReporter.Formatter' = None):
-        super().__init__(self._report, raise_after_report)
+                 formatter: '_log21.CrashReporter.Formatter' = None,
+                 exceptions_to_catch: _Iterable[BaseException] = None,
+                 exceptions_to_ignore: _Iterable[BaseException] = None):
+        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
         if isinstance(file, str):
             self.file = open(file, 'a')
         elif isinstance(file, _PathLike):
@@ -242,7 +266,7 @@ class FileReporter(Reporter):
         else:
             self.formatter = _log21.CrashReporter.Formatters.Formatter(**_FILE_REPORTER_FORMAT)
 
-    def _report(self, exception: Exception):
+    def _report(self, exception: BaseException):
         """
         Writes the exception to the file.
 
@@ -292,8 +316,10 @@ class EmailReporter(Reporter):
     """
 
     def __init__(self, mail_host: str, port: int, from_address: str, to_address: str, password: str, username: str = '',
-                 tls: bool = True, raise_after_report: bool = True, formatter: '_log21.CrashReporter.Formatter' = None):
-        super().__init__(self._report, raise_after_report)
+                 tls: bool = True, raise_after_report: bool = True, formatter: '_log21.CrashReporter.Formatter' = None,
+                 exceptions_to_catch: _Iterable[BaseException] = None,
+                 exceptions_to_ignore: _Iterable[BaseException] = None):
+        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
         self.mail_host = mail_host
         self.port = port
         self.from_address = from_address
@@ -328,7 +354,7 @@ class EmailReporter(Reporter):
         else:
             self.formatter = _log21.CrashReporter.Formatters.Formatter(**_EMAIL_REPORTER_FORMAT)
 
-    def _report(self, exception: Exception):
+    def _report(self, exception: BaseException):
         """
         Sends an email with the exception.
 

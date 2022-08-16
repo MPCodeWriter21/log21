@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.3.7
+### 2.3.8
 
-Added `exceptions_to_catch` and `exceptions_to_ignore` arguments to `log21.CrashReporter.Reporter` class.
+Added `catch` and `ignore` methods to `log21.CrashReporter.Reporter`.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
