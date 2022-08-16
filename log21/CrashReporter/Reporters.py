@@ -5,7 +5,7 @@ import ssl as _ssl
 import smtplib as _smtplib  # This module is used to send emails.
 
 from os import PathLike as _PathLike
-from typing import Callable as _Callable, Any as _Any, Union as _Union, IO as _IO
+from typing import Callable as _Callable, Any as _Any, Union as _Union, IO as _IO, Set as _Set, Iterable as _Iterable
 from functools import wraps as _wraps
 from email.mime.text import MIMEText as _MIMEText
 from email.mime.multipart import MIMEMultipart as _MIMEMultipart
@@ -60,11 +60,14 @@ class Reporter:
         >>>
     """
 
-    _reporter_function: _Callable[[Exception], _Any]  # A function that will be called when an exception is raised.
+    _reporter_function: _Callable[[BaseException], _Any]  # A function that will be called when an exception is raised.
+    _exceptions_to_catch: _Set = None
+    _exceptions_to_ignore: _Set = None
     raise_after_report: bool
 
-    def __init__(self, report_function: _Callable[[Exception], _Any], raise_after_report: bool = True,
-                 formatter: '_log21.CrashReporter.Formatter' = None):
+    def __init__(self, report_function: _Callable[[BaseException], _Any], raise_after_report: bool = False,
+                 formatter: '_log21.CrashReporter.Formatter' = None, exceptions_to_catch: _Iterable[BaseException] = None,
+                 exceptions_to_ignore: _Iterable[BaseException] = None):
         """
         :param report_function: Function to call when an exception is raised.
         :param raise_after_report: If True, the exception will be raised after the report_function is called.
@@ -72,6 +75,8 @@ class Reporter:
         self._reporter_function = report_function
         self.raise_after_report = raise_after_report
         self.formatter = formatter
+        self._exceptions_to_catch = set(exceptions_to_catch) if exceptions_to_catch else None
+        self._exceptions_to_ignore = set(exceptions_to_ignore) if exceptions_to_ignore else None
 
     def reporter(self, func):
         """
@@ -81,14 +86,54 @@ class Reporter:
         :return: Wrapped function.
         """
 
-        @_wraps(func)
-        def wrap(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                self._reporter_function(e)
-                if self.raise_after_report:
-                    raise e
+        exceptions_to_catch = tuple(self._exceptions_to_catch) if self._exceptions_to_catch else None
+        exceptions_to_ignore = tuple(self._exceptions_to_ignore) if self._exceptions_to_ignore else None
+
+        if exceptions_to_catch and exceptions_to_ignore:
+            @_wraps(func)
+            def wrap(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except BaseException as e:
+                    if isinstance(e, exceptions_to_catch) and not isinstance(e, exceptions_to_ignore):
+                        self._reporter_function(e)
+                        if self.raise_after_report:
+                            raise e
+                    else:
+                        raise e
+        elif self._exceptions_to_catch:
+            @_wraps(func)
+            def wrap(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except BaseException as e:
+                    if isinstance(e, exceptions_to_catch):
+                        self._reporter_function(e)
+                        if self.raise_after_report:
+                            raise e
+                    else:
+                        raise e
+        elif self._exceptions_to_ignore:
+            @_wraps(func)
+            def wrap(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except BaseException as e:
+                    if not isinstance(e, exceptions_to_ignore):
+                        self._reporter_function(e)
+                        if self.raise_after_report:
+                            raise e
+                    else:
+                        raise e
+        else:
+            @_wraps(func)
+            def wrap(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except BaseException as e:
+                    self._reporter_function(e)
+                    if self.raise_after_report:
+                        raise e
 
         return wrap
 

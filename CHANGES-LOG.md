@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.7
+
+Added `exceptions_to_catch` and `exceptions_to_ignore` arguments to `log21.CrashReporter.Reporter` class.
+
 ### 2.3.6
 
 Added `Print` logging level.

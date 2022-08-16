@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.3.6
+### 2.3.7
 
-Added `Print` logging level.
+Added `exceptions_to_catch` and `exceptions_to_ignore` arguments to `log21.CrashReporter.Reporter` class.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
