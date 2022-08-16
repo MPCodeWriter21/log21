@@ -8,7 +8,7 @@ from typing import Sequence as _Sequence, Union as _Union
 from logging import raiseExceptions as _raiseExceptions
 
 import log21 as _log21
-from log21.Levels import CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
+from log21.Levels import CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET, PRINT, INPUT
 
 __all__ = ['Logger']
 
@@ -32,7 +32,7 @@ class Logger(_logging.Logger):
         Is this logger enabled for level 'level'?
         """
 
-        return self.level <= level
+        return (self.level <= level) or (level in (PRINT, INPUT))
 
     def log(self, level: int, *msg, args: tuple = (), end='\n', **kwargs):
         """
@@ -150,7 +150,7 @@ class Logger(_logging.Logger):
         logger.print("Houston, we have a %s", args=("major disaster",), exc_info=1)
         """
         msg = ' '.join([str(m) for m in msg]) + end
-        self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
+        self._log(PRINT, msg, args, **kwargs)
 
     def input(self, *msg, args: tuple = (), end='', **kwargs):
         """
@@ -162,7 +162,7 @@ class Logger(_logging.Logger):
         age = logger.input("Enter your age: ")
         """
         msg = ' '.join([str(m) for m in msg]) + end
-        self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
+        self._log(INPUT, msg, args, **kwargs)
         return input()
 
     def getpass(self, *msg, args: tuple = (), end='', **kwargs):

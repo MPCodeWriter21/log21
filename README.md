@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.3.5
+### 2.3.6
 
-Minor improvements.
+Added `Print` logging level.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
@@ -259,4 +259,8 @@ In order to support this project you can donate some crypto of your choice 8D
 
 Or if you can't, give [this project](https://github.com/MPCodeWriter21/log21) a star on GitHub :)
 
+References
+----------
 
++ ANSI Color Codes (
+  Wikipedia): [https://en.wikipedia.org/wiki/ANSI_escape_code](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)

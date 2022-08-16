@@ -3,9 +3,10 @@
 
 import logging as _logging
 
-__all__ = ['CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET', 'INPUT']
+__all__ = ['CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET', 'INPUT', 'PRINT']
 
-INPUT = 60
+INPUT = 70
+PRINT = 60
 CRITICAL = _logging.CRITICAL
 FATAL = CRITICAL
 ERROR = _logging.ERROR

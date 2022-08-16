@@ -254,6 +254,12 @@ for i in range(84):
 [آدرس های رمزارز](https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md)
 
 یا اگر نمی توانید، به [این پروژه](https://github.com/MPCodeWriter21/log21) در GitHub ستاره بدهید :)
+
+
+ارجاع ها
+----------
+
++ کد های رنگ ANSI (
+  ویکیپدیا): [https://en.wikipedia.org/wiki/ANSI_escape_code](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
+
 </div>
-
-

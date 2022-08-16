@@ -5,7 +5,7 @@ import time as _time
 from logging import Formatter as __Formatter
 from typing import Dict as _Dict, Tuple as _Tuple
 from log21.Colors import get_colors as _gc, ansi_escape
-from log21.Levels import INPUT, CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
+from log21.Levels import INPUT, CRITICAL, ERROR, WARNING, INFO, DEBUG, PRINT
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
@@ -17,6 +17,7 @@ class _Formatter(__Formatter):
         WARNING: 'WARNING',
         ERROR: 'ERROR',
         CRITICAL: 'CRITICAL',
+        PRINT: 'PRINT',
         INPUT: 'INPUT'
     }
 
@@ -80,7 +81,9 @@ class ColorizingFormatter(_Formatter):
         INFO: ('green',),
         WARNING: ('lightyellow',),
         ERROR: ('light red',),
-        CRITICAL: ('background red', 'white')
+        CRITICAL: ('background red', 'white'),
+        PRINT: ('Cyan',),
+        INPUT: ('Magenta',)
     }
     time_color: _Tuple[str, ...] = ('lightblue',)
     name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \

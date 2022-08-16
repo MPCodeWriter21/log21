@@ -252,4 +252,9 @@ In order to support this project you can donate some crypto of your choice 8D
 
 Or if you can't, give [this project](https://github.com/MPCodeWriter21/log21) a star on GitHub :)
 
+References
+----------
+
++ ANSI Color Codes (
+  Wikipedia): [https://en.wikipedia.org/wiki/ANSI_escape_code](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors)
 

@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.6
+
+Added `Print` logging level.
+
 ### 2.3.5
 
 Minor improvements.
