@@ -21,7 +21,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.3.8"
+__version__ = "2.3.9"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -31,7 +31,7 @@ __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingForm
            'ansi_escape', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
            'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
            'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter', 'console_crash_reporter',
-           'file_crash_reporter']
+           'file_crash_reporter', 'console_reporter', 'file_reporter']
 
 _manager = Manager()
 _logging.setLoggerClass(Logger)
@@ -440,8 +440,8 @@ def progress_bar(progress: float, total: float, width: int = None, prefix: str =
     print(bar.get_bar(progress, total))
 
 
-__console_reporter = CrashReporter.ConsoleReporter()
-console_crash_reporter = __console_reporter.reporter
+console_reporter = CrashReporter.ConsoleReporter()
+console_crash_reporter = console_reporter.reporter
 
-__file_reporter = CrashReporter.FileReporter(file='crash_report.log')
-file_crash_reporter = __file_reporter.reporter
+file_reporter = CrashReporter.FileReporter(file='crash_report.log')
+file_crash_reporter = file_reporter.reporter

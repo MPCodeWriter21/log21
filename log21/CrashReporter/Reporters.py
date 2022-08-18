@@ -87,54 +87,20 @@ class Reporter:
         :return: Wrapped function.
         """
 
-        exceptions_to_catch = tuple(self._exceptions_to_catch) if self._exceptions_to_catch else None
-        exceptions_to_ignore = tuple(self._exceptions_to_ignore) if self._exceptions_to_ignore else None
+        exceptions_to_catch = tuple(self._exceptions_to_catch) if self._exceptions_to_catch else BaseException
+        exceptions_to_ignore = tuple(self._exceptions_to_ignore) if self._exceptions_to_ignore else tuple()
 
-        if exceptions_to_catch and exceptions_to_ignore:
-            @_wraps(func)
-            def wrap(*args, **kwargs):
-                try:
-                    return func(*args, **kwargs)
-                except BaseException as e:
-                    if isinstance(e, exceptions_to_catch) and not isinstance(e, exceptions_to_ignore):
-                        self._reporter_function(e)
-                        if self.raise_after_report:
-                            raise e
-                    else:
-                        raise e
-        elif self._exceptions_to_catch:
-            @_wraps(func)
-            def wrap(*args, **kwargs):
-                try:
-                    return func(*args, **kwargs)
-                except BaseException as e:
-                    if isinstance(e, exceptions_to_catch):
-                        self._reporter_function(e)
-                        if self.raise_after_report:
-                            raise e
-                    else:
-                        raise e
-        elif self._exceptions_to_ignore:
-            @_wraps(func)
-            def wrap(*args, **kwargs):
-                try:
-                    return func(*args, **kwargs)
-                except BaseException as e:
-                    if not isinstance(e, exceptions_to_ignore):
-                        self._reporter_function(e)
-                        if self.raise_after_report:
-                            raise e
-                    else:
-                        raise e
-        else:
-            @_wraps(func)
-            def wrap(*args, **kwargs):
-                try:
-                    return func(*args, **kwargs)
-                except BaseException as e:
+        @_wraps(func)
+        def wrap(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except BaseException as e:
+                if isinstance(e, exceptions_to_catch) and not isinstance(e, exceptions_to_ignore):
                     self._reporter_function(e)
                     if self.raise_after_report:
                         raise e
+                else:
+                    raise e
 
         return wrap
 
@@ -144,9 +110,14 @@ class Reporter:
 
         :param exception: Exception to catch.
         """
+        if not isinstance(exception, BaseException):
+            raise TypeError('`exception` must be an instance of BaseException')
         if self._exceptions_to_catch is None:
             self._exceptions_to_catch = set()
-        self._exceptions_to_catch.add(exception)
+        if exception not in self._exceptions_to_catch:
+            self._exceptions_to_catch.add(exception)
+        else:
+            raise ValueError('exception is already in the list of exceptions to catch')
 
     def ignore(self, exception: BaseException):
         """
@@ -154,9 +125,14 @@ class Reporter:
 
         :param exception: Exception to ignore.
         """
+        if not isinstance(exception, BaseException):
+            raise TypeError('`exception` must be an instance of BaseException')
         if self._exceptions_to_ignore is None:
             self._exceptions_to_ignore = set()
-        self._exceptions_to_ignore.add(exception)
+        if exception not in self._exceptions_to_ignore:
+            self._exceptions_to_ignore.add(exception)
+        else:
+            raise ValueError('exception is already in the list of exceptions to ignore')
 
 
 class ConsoleReporter(Reporter):

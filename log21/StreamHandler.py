@@ -44,14 +44,13 @@ class StreamHandler(_StreamHandler):
                         record.msg = _gc(*find.split(record.msg[:index])) + record.msg[index + 1:]
 
     def check_nl(self, record):
-        if record.msg:
-            while record.msg[0] == '\n':
-                file_descriptor = getattr(self.stream, 'fileno', None)
-                if file_descriptor:
-                    file_descriptor = file_descriptor()
-                    if file_descriptor in (1, 2):  # stdout or stderr
-                        self.stream.write('\n')
-                        record.msg = record.msg[1:]
+        while record.msg and record.msg[0] == '\n':
+            file_descriptor = getattr(self.stream, 'fileno', None)
+            if file_descriptor:
+                file_descriptor = file_descriptor()
+                if file_descriptor in (1, 2):  # stdout or stderr
+                    self.stream.write('\n')
+                    record.msg = record.msg[1:]
 
     def emit(self, record):
         if self.HandleCR:
