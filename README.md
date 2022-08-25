@@ -53,7 +53,7 @@ python setup.py install
 Changes
 -------
 
-### 2.3.9
+### 2.3.10
 
 Minor fixes and improvements.
 

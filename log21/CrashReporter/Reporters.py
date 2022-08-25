@@ -5,7 +5,8 @@ import ssl as _ssl
 import smtplib as _smtplib  # This module is used to send emails.
 
 from os import PathLike as _PathLike
-from typing import Callable as _Callable, Any as _Any, Union as _Union, IO as _IO, Set as _Set, Iterable as _Iterable
+from typing import Callable as _Callable, Any as _Any, Union as _Union, IO as _IO, Set as _Set, Iterable as _Iterable, \
+    Type as _Type
 from functools import wraps as _wraps
 from email.mime.text import MIMEText as _MIMEText
 from email.mime.multipart import MIMEMultipart as _MIMEMultipart
@@ -104,14 +105,14 @@ class Reporter:
 
         return wrap
 
-    def catch(self, exception: BaseException):
+    def catch(self, exception: _Type[BaseException]):
         """
         Add an exception to the list of exceptions to catch.
 
         :param exception: Exception to catch.
         """
-        if not isinstance(exception, BaseException):
-            raise TypeError('`exception` must be an instance of BaseException')
+        if not issubclass(exception, BaseException):
+            raise TypeError('`exception` must be a subclass of BaseException.')
         if self._exceptions_to_catch is None:
             self._exceptions_to_catch = set()
         if exception not in self._exceptions_to_catch:
@@ -119,14 +120,14 @@ class Reporter:
         else:
             raise ValueError('exception is already in the list of exceptions to catch')
 
-    def ignore(self, exception: BaseException):
+    def ignore(self, exception: _Type[BaseException]):
         """
         Add an exception to the list of exceptions to ignore.
 
         :param exception: Exception to ignore.
         """
-        if not isinstance(exception, BaseException):
-            raise TypeError('`exception` must be an instance of BaseException')
+        if not issubclass(exception, BaseException):
+            raise TypeError('`exception` must be a subclass of BaseException.')
         if self._exceptions_to_ignore is None:
             self._exceptions_to_ignore = set()
         if exception not in self._exceptions_to_ignore:

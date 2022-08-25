@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.3.10
+
+Minor fixes and improvements.
+
 ### 2.3.9
 
 Minor fixes and improvements.
