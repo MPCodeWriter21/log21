@@ -6,6 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.4.0
+
++ Made it more compatible with multi-threading.
++ Fixed some bugs.
+
 ### 2.3.10
 
 Minor fixes and improvements.

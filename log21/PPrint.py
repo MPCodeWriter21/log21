@@ -76,9 +76,8 @@ class PrettyPrinter(_PrettyPrinter):
     }
 
     def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Dict[str, str] = None, *,
-                 compact=False, sort_dicts=True, underscore_numbers=False):
-        super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact,
-                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers)
+                 compact=False, **kwargs):
+        super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact, **kwargs)
         self._depth = depth
         self._indent_per_level = indent
         self._width = width
@@ -87,8 +86,6 @@ class PrettyPrinter(_PrettyPrinter):
         else:
             self._stream = _sys.stdout
         self._compact = bool(compact)
-        self._sort_dicts = sort_dicts
-        self._underscore_numbers = underscore_numbers
         if signs_colors:
             for sign, color in signs_colors.items():
                 self.signs_colors[sign.lower()] = _gc(color)
@@ -182,7 +179,7 @@ class PrettyPrinter(_PrettyPrinter):
             del context[object_id]
             return self.signs_colors.get('curly-braces') + "{" + self.signs_colors.get('data') + \
                    (self.signs_colors.get('comma') + ", " + self.signs_colors.get('data')).join(components) + \
-                   self.signs_colors.get('data'), readable, recursive
+                   self.signs_colors.get('curly-braces') + "}", readable, recursive
 
         if (issubclass(type_, list) and representation is list.__repr__) or \
                 (issubclass(type_, tuple) and representation is tuple.__repr__):
@@ -563,8 +560,7 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
-def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False,
-            sort_dicts=True, underscore_numbers=False):
+def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False, **kwargs):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,
-                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers).pformat(obj)
+                         **kwargs).pformat(obj)
