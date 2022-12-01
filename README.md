@@ -53,10 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.4.0
+### 2.4.1
 
-+ Made it more compatible with multi-threading.
-+ Fixed some bugs.
+Bug fixes and improvements.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

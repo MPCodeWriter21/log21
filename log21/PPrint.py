@@ -76,7 +76,7 @@ class PrettyPrinter(_PrettyPrinter):
     }
 
     def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Dict[str, str] = None, *,
-                 compact=False, **kwargs):
+                 compact=False, sort_dicts=True, underscore_numbers=False, **kwargs):
         super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact, **kwargs)
         self._depth = depth
         self._indent_per_level = indent
@@ -86,6 +86,8 @@ class PrettyPrinter(_PrettyPrinter):
         else:
             self._stream = _sys.stdout
         self._compact = bool(compact)
+        self._sort_dicts = sort_dicts
+        self._underscore_numbers = underscore_numbers
         if signs_colors:
             for sign, color in signs_colors.items():
                 self.signs_colors[sign.lower()] = _gc(color)
@@ -560,7 +562,8 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
-def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False, **kwargs):
+def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False,
+            sort_dicts=True, underscore_numbers=False, **kwargs):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,
-                         **kwargs).pformat(obj)
+                         sort_dicts=True, underscore_numbers=False, **kwargs).pformat(obj)
