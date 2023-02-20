@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.4.1
+### 2.4.2
 
-Bug fixes and improvements.
+Bug fixes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

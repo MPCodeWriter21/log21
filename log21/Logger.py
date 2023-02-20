@@ -119,7 +119,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(ERROR, msg, args, **kwargs)
 
-    def exception(self, *msg, args, exc_info=True, **kwargs):
+    def exception(self, *msg, args: tuple = (), exc_info=True, **kwargs):
         """
         Convenience method for logging an ERROR with exception information.
         """
