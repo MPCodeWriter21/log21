@@ -2,9 +2,10 @@
 # CodeWriter21
 
 import io as _io
+import os as _os
 import logging as _logging
 
-from typing import Union as _Union, Dict as _Dict
+from typing import Union as _Union, Dict as _Dict, Type as _Type
 
 import log21.CrashReporter as CrashReporter
 
@@ -21,7 +22,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.4.2"
+__version__ = "2.4.3"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -39,7 +40,8 @@ _logging.setLoggerClass(Logger)
 
 def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:%S", show_level: bool = True,
                        show_time: bool = True, colorize_time_and_level: bool = True,
-                       level_names: _Dict[int, str] = None):
+                       level_names: _Dict[int, str] = None,
+                       formatter_class: _Type[_logging.Formatter] = ColorizingFormatter):
     # Prepares a formatting if the fmt was None
     if not fmt:
         style = '%'
@@ -50,8 +52,10 @@ def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:
             fmt = "[%(asctime)s] " + fmt
         fmt = '\r' + fmt
     # Defines the formatter
-    formatter = ColorizingFormatter(fmt, datefmt, style=style, level_names=level_names)
-    if not colorize_time_and_level:
+    formatter = formatter_class(fmt, datefmt, style=style)
+    if isinstance(formatter, Formatters._Formatter):
+        formatter.level_names = level_names
+    if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
         for key in formatter.level_colors:
             formatter.level_colors[key] = tuple()
         formatter.time_color = tuple()
@@ -62,7 +66,8 @@ def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
                show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
                datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-               handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None) -> Logger:
+               handle_new_line: bool = True, override=False, level_names: _Dict[int, str] = None,
+               file: _Union[_os.PathLike, str] = None) -> Logger:
     """
     Returns a logging.Logger with colorizing support.
     >>>
@@ -121,6 +126,7 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
         else
     :param override: bool = True: Overrides the logger attributes even if it already exists
     :param level_names: Dict[int, str] = None: You can specify custom level names.
+    :param file: Union[os.PathLike, str] = None: The file to log to
     :return: log21.Logger
     """
     if not isinstance(name, str):
@@ -138,6 +144,14 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         _manager.addLogger(name, logger)
+
+        if file:
+            file_handler = FileHandler.FileHandler(file)
+            file_formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, False, level_names,
+                                                formatter_class=Formatters.DecolorizingFormatter)
+            file_handler.setFormatter(file_formatter)
+            logger.addHandler(file_handler)
+
     return logger
 
 
@@ -257,7 +271,7 @@ root = Logger('root-logger', INFO)
 
 def basic_config(force: bool = False, encoding: str = None, errors: str = 'backslashreplace', handlers=None,
                  stream=None, filename=None, filemode: str = 'a', date_format: str = "%H:%M:%S", style: str = '%',
-                 format_: str = None, level: int = None):
+                 format_: str = None, level: _Union[int, str] = None):
     """
     Do basic configuration for the logging system.
 

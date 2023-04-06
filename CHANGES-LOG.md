@@ -6,6 +6,14 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.4.3
+
+Improvements.
+
+### 2.4.2
+
+Bug Fixes.
+
 ### 2.4.1
 
 Bug fixes and improvements.
