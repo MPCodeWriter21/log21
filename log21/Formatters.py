@@ -11,7 +11,7 @@ __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
 class _Formatter(__Formatter):
-    level_names: _Dict[int, str] = {
+    _level_names: _Dict[int, str] = {
         DEBUG: 'DEBUG',
         INFO: 'INFO',
         WARNING: 'WARNING',
@@ -51,6 +51,19 @@ class _Formatter(__Formatter):
         if level_names:
             for level, name in level_names.items():
                 self.level_names[level] = name
+
+    @property
+    def level_names(self):
+        return self._level_names
+
+    @level_names.setter
+    def level_names(self, level_names):
+        if level_names:
+            if not isinstance(level_names, _Dict):
+                raise TypeError('`level_names` must be a dictionary!')
+            self._level_names = level_names
+        else:
+            self._level_names = dict()
 
     def format(self, record) -> str:
         record.message = record.getMessage()

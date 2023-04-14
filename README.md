@@ -14,7 +14,7 @@ Features
 
 + Colors : The main reason for this package was to log text in the Windows console with the support of ANSI colors.
 + Argument parsing : log21's argument parser can be used like python's argparse but it also colorizes the output.
-+ Logging : A similar logger to logging.Logger but with colorized output and other options such as levelname
++ Logging : A similar logger to logging. Logger but with colorized output and other options such as levelname
   modifications. It can also decolorize the output if you want to log into a file.
 + Pretty printing : Have you ever wanted to colorize the output of the pprint module? log21's pretty printer can do
   that.
@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.4.3
+### 2.4.4
 
-Improvements.
+Some bug fixes.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

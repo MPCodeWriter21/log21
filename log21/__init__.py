@@ -22,7 +22,7 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.4.3"
+__version__ = "2.4.4"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
@@ -53,7 +53,7 @@ def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:
         fmt = '\r' + fmt
     # Defines the formatter
     formatter = formatter_class(fmt, datefmt, style=style)
-    if isinstance(formatter, Formatters._Formatter):
+    if isinstance(formatter, Formatters._Formatter) and level_names:
         formatter.level_names = level_names
     if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
         for key in formatter.level_colors:
