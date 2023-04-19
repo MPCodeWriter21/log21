@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.4.5
+
+Added `no_color` parameter to ProgressBar.
+
 ### 2.4.4
 
 Some bug fixes.

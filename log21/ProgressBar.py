@@ -41,8 +41,8 @@ class ProgressBar:
 
     def __init__(self, *args, width: int = None, show_percentage: bool = True, prefix: str = '|', suffix: str = '|',
                  fill: str = '█', empty: str = ' ', format_: str = None, style: str = '%',
-                 new_line_when_complete: bool = True, colors: dict = None, logger: '_log21.Logger' = _logger,
-                 additional_variables: _Dict[str, _Any] = None):
+                 new_line_when_complete: bool = True, colors: dict = None, no_color: bool = False,
+                 logger: '_log21.Logger' = _logger, additional_variables: _Dict[str, _Any] = None):
         """
         :param args: Prevents the use of positional arguments
         :param width: The width of the progress bar
@@ -55,6 +55,7 @@ class ProgressBar:
         :param style: The style that is used to format the progress bar
         :param new_line_when_complete: Whether to print a new line when the progress is complete or failed
         :param colors: The colors of the progress bar
+        :param no_color: If True, removes the colors of the progress bar
         :param logger: The logger to use
         :param additional_variables: Additional variables to use in the format and their default values
         """
@@ -83,6 +84,8 @@ class ProgressBar:
             raise ValueError('`empty` must be a single character')
         if style not in ['%', '{']:
             raise ValueError('`style` must be either `%` or `{`')
+        if colors and no_color:
+            raise PermissionError('You cannot use `no_color` and `colors` parameters together!')
         if additional_variables:
             if not isinstance(additional_variables, dict):
                 raise TypeError('`additional_variables` must be a dictionary')
@@ -126,6 +129,8 @@ class ProgressBar:
         if colors:
             for key, value in colors.items():
                 self.colors[key] = value
+        if no_color:
+            self.colors = {name: '' for name in self.colors}
         self.logger = logger
         self.additional_variables = additional_variables
         self.i = 0

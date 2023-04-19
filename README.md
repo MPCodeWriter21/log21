@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.4.4
+### 2.4.5
 
-Some bug fixes.
+Added `no_color` parameter to ProgressBar.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 
