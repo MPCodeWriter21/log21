@@ -53,33 +53,12 @@ python setup.py install
 Changes
 -------
 
-### 2.4.6
+### 2.4.7
 
-Shortened the usage syntax for the CrashReporters:
-
-```python
-import log21
-
-# Define a ConsoleReporter object
-console_reporter = log21.CrashReporter.ConsoleReporter()
-
-
-# This works with other `log21.CrashReporter.Reporter` subclasses as well.
-
-# Old syntax (still supported)
-@console_reporter.reporter
-def divide_old(a, b):
-    return a / b
-
-
-# New Syntax
-@console_reporter.reporter
-def divide_new(a, b):
-    return a / b
-
-```
-
-`console_crash_reporter` and `file_crash_reporter` are removed!
+Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra static or dynamic values to the
+report formatter.
+They can be used in the format string. For dynamic values you can pass a function that takes no
+arguments as the value.
 
 [Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
 

@@ -4,12 +4,26 @@
 import traceback
 
 from datetime import datetime as _datetime
+from typing import Dict as _Dict, Union as _Union, Callable as _Callable, Any as _Any
 
 __all__ = ['Formatter', 'CONSOLE_REPORTER_FORMAT', 'FILE_REPORTER_FORMAT', 'EMAIL_REPORTER_FORMAT']
 
+RESERVED_KEYS = (
+    '__name__',
+    'type',
+    'message',
+    'traceback',
+    'name',
+    'file',
+    'lineno',
+    'function',
+    'asctime'
+)
+
 
 class Formatter:
-    def __init__(self, format_: str, style: str = '%', datefmt: str = '%Y-%m-%d %H:%M:%S'):
+    def __init__(self, format_: str, style: str = '%', datefmt: str = '%Y-%m-%d %H:%M:%S',
+                 extra_values: _Dict[str, _Union[str, _Callable, _Any]] = None):
         self._format = format_
 
         if style in ['%', '{']:
@@ -18,6 +32,12 @@ class Formatter:
             raise ValueError('Invalid style: "' + str(style) + '" Valid styles: %, {')
 
         self.datefmt = datefmt
+        self.extra_values = dict()
+        if extra_values:
+            for key in extra_values:
+                if key in RESERVED_KEYS:
+                    raise ValueError(f'`{key}` is a reserved-key and cannot be used in `extra_values`.')
+                self.extra_values[key] = extra_values[key]
 
     def format(self, exception: BaseException):
         exception_dict = {
@@ -31,6 +51,11 @@ class Formatter:
             'function': exception.__traceback__.tb_next.tb_frame.f_code.co_name,
             'asctime': _datetime.now().strftime(self.datefmt),
         }
+        for key, value in self.extra_values.items():
+            if callable(value):
+                exception_dict[key] = value()
+            else:
+                exception_dict[key] = value
 
         if self.__style == '%':
             return self._format % exception_dict

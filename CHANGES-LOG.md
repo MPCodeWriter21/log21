@@ -6,6 +6,13 @@ Help this project by [Donation](DONATE.md)
 Changes log
 -----------
 
+### 2.4.7
+
+Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra static or dynamic values to the
+report formatter.
+They can be used in the format string. For dynamic values you can pass a function that takes no
+arguments as the value.
+
 ### 2.4.6
 
 Shortened the usage syntax for the CrashReporters:
