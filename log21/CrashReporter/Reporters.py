@@ -135,6 +135,9 @@ class Reporter:
         else:
             raise ValueError('exception is already in the list of exceptions to ignore')
 
+    def __call__(self, func):
+        return self.reporter(func)
+
 
 class ConsoleReporter(Reporter):
     """
@@ -263,7 +266,7 @@ class EmailReporter(Reporter):
         >>> # Define a EmailReporter object
         >>> email_reporter = EmailReporter(
         ...     mail_host='smtp.yandex.ru',
-        ...     mail_port=465,
+        ...     port=465,
         ...     from_address='MyEmail@yandex.ru',
         ...     to_address='CodeWriter21@gmail.com',
         ...     password='My$up3rStr0ngP@assw0rd XD'
