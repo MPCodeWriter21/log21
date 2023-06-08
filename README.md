@@ -53,10 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.5.0
+### 2.5.1
 
-Added `level_colors` argument to `log21.get_logger` function with will be passed to the formatter and allows
-user to set custom level colors while making a new logger.
+Switched from `setup.py` build system to `pyproject.toml`
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

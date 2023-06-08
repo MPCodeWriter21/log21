@@ -5,6 +5,10 @@ Help this project by [Donation](DONATE.md)
 
 Changes
 -----------
+### 2.5.1
+
+Switched from `setup.py` build system to `pyproject.toml`
+
 ### 2.5.0
 
 Added `level_colors` argument to `log21.get_logger` function with will be passed to the formatter and allows

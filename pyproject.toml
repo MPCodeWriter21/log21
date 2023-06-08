@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "log21"
+authors = [
+  {name = "CodeWriter21(Mehrad Pooryoussof)", email = "CodeWriter21@gmail.com"}
+]
+description = "A simple logging package that helps you log colorized messages in Windows console."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.6"
+keywords = ['python', 'log', 'colorize', 'color', 'logging', 'Python3', 'CodeWriter21']
+license = {text = "Apache License 2.0"}
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Operating System :: Unix",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X"
+]
+dependencies = [
+  "webcolors"
+]
+version = "2.5.1"
+
+[project.urls]
+Homepage = "https://github.com/MPCodeWriter21/log21"
+Donations = "https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md"
+Source = "https://github.com/MPCodeWriter21/log21"
