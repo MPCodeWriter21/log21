@@ -5,7 +5,7 @@ import re as _re
 import sys as _sys
 import log21 as _log21
 import argparse as _argparse
-from typing import Dict as _Dict
+from typing import Mapping as _Mapping
 from gettext import gettext as _gettext
 from textwrap import TextWrapper as _TextWrapper
 from log21.Colors import get_colors as _gc
@@ -27,7 +27,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         'choices': 'LightGreen'
     }
 
-    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None, colors: _Dict[str, str] = None):
+    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None, colors: _Mapping[str, str] = None):
         super().__init__(prog, indent_increment, max_help_position, width)
         if colors:
             for key, value in colors.items():
@@ -477,7 +477,7 @@ class ColorizingTextWrapper(_TextWrapper):
 
 
 class ColorizingArgumentParser(_argparse.ArgumentParser):
-    def __init__(self, formatter_class=ColorizingHelpFormatter, colors: _Dict[str, str] = None, **kwargs):
+    def __init__(self, formatter_class=ColorizingHelpFormatter, colors: _Mapping[str, str] = None, **kwargs):
         self.logger = _log21.Logger('ArgumentParser')
         self.colors = colors
         super().__init__(formatter_class=formatter_class, **kwargs)

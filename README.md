@@ -53,14 +53,12 @@ python setup.py install
 Changes
 -------
 
-### 2.4.7
+### 2.5.0
 
-Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra static or dynamic values to the
-report formatter.
-They can be used in the format string. For dynamic values you can pass a function that takes no
-arguments as the value.
+Added `level_colors` argument to `log21.get_logger` function with will be passed to the formatter and allows
+user to set custom level colors while making a new logger.
 
-[Full Changes Log](https://github.com/MPCodeWriter21/log21/blob/master/CHANGES-LOG.md)
+[Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
 
 Usage Examples:

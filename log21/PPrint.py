@@ -7,7 +7,7 @@ import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
 
-from typing import Dict as _Dict, Union as _Union
+from typing import Mapping as _Mapping, Union as _Union
 from pprint import PrettyPrinter as _PrettyPrinter
 
 from log21.Colors import get_colors as _gc
@@ -65,7 +65,7 @@ class _SafeKey:
 
 
 class PrettyPrinter(_PrettyPrinter):
-    signs_colors: _Dict[str, str] = {
+    signs_colors: _Mapping[str, str] = {
         'square-brackets': _gc('LightCyan'),
         'curly-braces': _gc('LightBlue'),
         'parenthesis': _gc('LightGreen'),
@@ -75,7 +75,7 @@ class PrettyPrinter(_PrettyPrinter):
         'data': _gc('Green')
     }
 
-    def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Dict[str, str] = None, *,
+    def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Mapping[str, str] = None, *,
                  compact=False, sort_dicts=True, underscore_numbers=False, **kwargs):
         super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact, **kwargs)
         self._depth = depth
@@ -562,7 +562,7 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
-def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Dict[str, str] = None, *, compact=False,
+def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Mapping[str, str] = None, *, compact=False,
             sort_dicts=True, underscore_numbers=False, **kwargs):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,

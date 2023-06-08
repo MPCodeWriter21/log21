@@ -3,7 +3,7 @@
 
 import time as _time
 from logging import Formatter as __Formatter
-from typing import Dict as _Dict, Tuple as _Tuple
+from typing import Mapping as _Mapping, Tuple as _Tuple
 from log21.Colors import get_colors as _gc, ansi_escape
 from log21.Levels import INPUT, CRITICAL, ERROR, WARNING, INFO, DEBUG, PRINT
 
@@ -11,7 +11,7 @@ __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
 class _Formatter(__Formatter):
-    _level_names: _Dict[int, str] = {
+    _level_names: _Mapping[int, str] = {
         DEBUG: 'DEBUG',
         INFO: 'INFO',
         WARNING: 'WARNING',
@@ -21,7 +21,7 @@ class _Formatter(__Formatter):
         INPUT: 'INPUT'
     }
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Dict[int, str] = None):
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Mapping[int, str] = None):
         """
         `level_names` usage:
         >>> import log21
@@ -59,8 +59,8 @@ class _Formatter(__Formatter):
     @level_names.setter
     def level_names(self, level_names):
         if level_names:
-            if not isinstance(level_names, _Dict):
-                raise TypeError('`level_names` must be a dictionary!')
+            if not isinstance(level_names, _Mapping):
+                raise TypeError('`level_names` must be a Mapping, a dictionary like object!')
             self._level_names = level_names
         else:
             self._level_names = dict()
@@ -89,7 +89,7 @@ class _Formatter(__Formatter):
 
 class ColorizingFormatter(_Formatter):
     # Default color values
-    level_colors: _Dict[int, _Tuple[str, ...]] = {
+    level_colors: _Mapping[int, _Tuple[str, ...]] = {
         DEBUG: ('lightblue',),
         INFO: ('green',),
         WARNING: ('lightyellow',),
@@ -102,8 +102,8 @@ class ColorizingFormatter(_Formatter):
     name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \
         message_color = tuple()
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Dict[int, str] = None,
-                 level_colors: _Dict[int, _Tuple[str]] = None,
+    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Mapping[int, str] = None,
+                 level_colors: _Mapping[int, _Tuple[str]] = None,
                  time_color: _Tuple[str, ...] = None, name_color: _Tuple[str, ...] = None,
                  pathname_color: _Tuple[str, ...] = None, filename_color: _Tuple[str, ...] = None,
                  module_color: _Tuple[str, ...] = None, func_name_color: _Tuple[str, ...] = None,
@@ -111,40 +111,40 @@ class ColorizingFormatter(_Formatter):
         super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
         # Checks and sets colors
         if level_colors:
-            if type(level_colors) is not dict:
-                raise TypeError('`level_colors` must be a dictionary!')
+            if not isinstance(level_colors, _Mapping):
+                raise TypeError('`level_colors` must be a dictionary like object!')
             for level, color in level_colors.items():
                 self.level_colors[level] = (_gc(*color),)
         if time_color:
-            if type(time_color) is not tuple:
+            if not isinstance(time_color, tuple):
                 raise TypeError('`time_color` must be a tuple!')
             self.time_color = time_color
         if name_color:
-            if type(name_color) is not tuple:
+            if not isinstance(name_color, tuple):
                 raise TypeError('`name_color` must be a tuple!')
             self.name_color = name_color
         if pathname_color:
-            if type(pathname_color) is not tuple:
+            if not isinstance(pathname_color, tuple):
                 raise TypeError('`pathname_color` must be a tuple!')
             self.pathname_color = pathname_color
         if filename_color:
-            if type(filename_color) is not tuple:
+            if not isinstance(filename_color, tuple):
                 raise TypeError('`filename_color` must be a tuple!')
             self.filename_color = filename_color
         if module_color:
-            if type(module_color) is not tuple:
+            if not isinstance(module_color, tuple):
                 raise TypeError('`module_color` must be a tuple!')
             self.module_color = module_color
         if func_name_color:
-            if type(func_name_color) is not tuple:
+            if not isinstance(func_name_color, tuple):
                 raise TypeError('`func_name_color` must be a tuple!')
             self.func_name_color = func_name_color
         if thread_name_color:
-            if type(thread_name_color) is not tuple:
+            if not isinstance(thread_name_color, tuple):
                 raise TypeError('`thread_name_color` must be a tuple!')
             self.thread_name_color = thread_name_color
         if message_color:
-            if type(message_color) is not tuple:
+            if not isinstance(message_color, tuple):
                 raise TypeError('`message_color` must be a tuple!')
             self.message_color = message_color
 

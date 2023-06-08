@@ -3,8 +3,14 @@ log21
 
 Help this project by [Donation](DONATE.md)
 
-Changes log
+Changes
 -----------
+### 2.5.0
+
+Added `level_colors` argument to `log21.get_logger` function with will be passed to the formatter and allows
+user to set custom level colors while making a new logger.
+Also changed most `Dict` type hints to be `Mapping` and `list` to `Sequence` to make the functions more general
+and less strict.
 
 ### 2.4.7
 

@@ -1,7 +1,7 @@
 # log21.TreePrint.py
 # CodeWriter21
 
-from typing import Union as _Union
+from typing import Union as _Union, Mapping as _Mapping, Sequence as _Sequence
 
 from log21.Colors import get_colors as _gc
 
@@ -13,8 +13,8 @@ class TreePrint:
             'fruit': _gc('LightMagenta'),
         }
 
-        def __init__(self, value: _Union[str, int], children: list = None, indent: int = 4, colors: dict = None,
-                     mode='-'):
+        def __init__(self, value: _Union[str, int], children: list = None, indent: int = 4,
+                     colors: _Mapping[str, str] = None, mode='-'):
             self.value = str(value)
             if children:
                 self._children = children
@@ -106,9 +106,9 @@ class TreePrint:
                 return self._children[index]
 
         @staticmethod
-        def add_to(node: 'TreePrint.Node', data: _Union[dict, list, str, int], indent: int = 4, colors: dict = None,
-                   mode='-'):
-            if isinstance(data, dict):
+        def add_to(node: 'TreePrint.Node', data: _Union[_Mapping, _Sequence, str, int], indent: int = 4,
+                   colors: _Mapping[str, str] = None, mode='-'):
+            if isinstance(data, _Mapping):
                 if len(data) == 1:
                     child = TreePrint.Node(list(data.keys())[0], indent=indent, colors=colors, mode=mode)
                     TreePrint.Node.add_to(child, list(data.values())[0], indent=indent, colors=colors, mode=mode)
@@ -118,14 +118,14 @@ class TreePrint:
                         child = TreePrint.Node(key, indent=indent, colors=colors, mode=mode)
                         TreePrint.Node.add_to(child, value, indent=indent, colors=colors, mode=mode)
                         node.add_child(child)
-            elif isinstance(data, list):
+            elif isinstance(data, _Sequence):
                 for value in data:
-                    if isinstance(value, dict):
+                    if isinstance(value, _Mapping):
                         for key, dict_value in value.items():
                             child = TreePrint.Node(key, indent=indent, colors=colors, mode=mode)
                             TreePrint.Node.add_to(child, dict_value, indent=indent, colors=colors, mode=mode)
                             node.add_child(child)
-                    elif isinstance(value, list):
+                    elif isinstance(value, _Sequence):
                         child = TreePrint.Node('>', indent=indent, colors=colors, mode=mode)
                         TreePrint.Node.add_to(child, value, indent=indent, colors=colors, mode=mode)
                         node.add_child(child)
@@ -136,23 +136,24 @@ class TreePrint:
                 child = TreePrint.Node(str(data), indent=indent, colors=colors, mode=mode)
                 node.add_child(child)
 
-    def __init__(self, data: _Union[dict, list, str, int], indent: int = 4, colors: dict = None, mode='-'):
+    def __init__(self, data: _Union[_Mapping, _Sequence, str, int], indent: int = 4, 
+                 colors: _Mapping[str, str] = None, mode='-'):
         self.indent = indent
         self.mode = mode
-        if isinstance(data, dict):
+        if isinstance(data, _Mapping):
             if len(data) == 1:
                 self.root = self.Node(list(data.keys())[0], indent=indent, colors=colors)
                 self.add_to_root(list(data.values()), colors=colors)
             else:
                 self.root = self.Node('root', indent=indent, colors=colors)
                 self.add_to_root(data, colors=colors)
-        elif isinstance(data, list):
+        elif isinstance(data, _Sequence):
             self.root = self.Node('root', indent=indent, colors=colors)
             self.add_to_root(data, colors=colors)
         else:
             self.root = self.Node(str(data), indent=indent, colors=colors)
 
-    def add_to_root(self, data: _Union[dict, list, str, int], colors: dict = None):
+    def add_to_root(self, data: _Union[_Mapping, _Sequence, str, int], colors: _Mapping[str, str] = None):
         self.Node.add_to(self.root, data, indent=self.indent, colors=colors, mode=self.mode)
 
     def __str__(self, mode=None):
@@ -161,5 +162,6 @@ class TreePrint:
         return self.root.__str__(mode=mode)
 
 
-def tree_format(data: _Union[dict, list, str, int], indent: int = 4, mode='-', colors: dict = None):
+def tree_format(data: _Union[_Mapping, _Sequence, str, int], indent: int = 4, mode='-',
+                colors: _Mapping[str, str] = None):
     return str(TreePrint(data, indent=indent, colors=colors, mode=mode))

@@ -3,7 +3,7 @@
 
 import shutil as _shutil
 
-from typing import Dict as _Dict, Any as _Any
+from typing import Mapping as _Mapping, Any as _Any
 
 import log21 as _log21
 from log21.Logger import Logger as _Logger
@@ -42,7 +42,7 @@ class ProgressBar:
     def __init__(self, *args, width: int = None, show_percentage: bool = True, prefix: str = '|', suffix: str = '|',
                  fill: str = '█', empty: str = ' ', format_: str = None, style: str = '%',
                  new_line_when_complete: bool = True, colors: dict = None, no_color: bool = False,
-                 logger: '_log21.Logger' = _logger, additional_variables: _Dict[str, _Any] = None):
+                 logger: '_log21.Logger' = _logger, additional_variables: _Mapping[str, _Any] = None):
         """
         :param args: Prevents the use of positional arguments
         :param width: The width of the progress bar
@@ -87,8 +87,8 @@ class ProgressBar:
         if colors and no_color:
             raise PermissionError('You cannot use `no_color` and `colors` parameters together!')
         if additional_variables:
-            if not isinstance(additional_variables, dict):
-                raise TypeError('`additional_variables` must be a dictionary')
+            if not isinstance(additional_variables, _Mapping):
+                raise TypeError('`additional_variables` must be a dictionary like object.')
             for key, value in additional_variables.items():
                 if not isinstance(key, str):
                     raise TypeError('`additional_variables` keys must be strings')

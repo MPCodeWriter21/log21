@@ -4,7 +4,7 @@
 import traceback
 
 from datetime import datetime as _datetime
-from typing import Dict as _Dict, Union as _Union, Callable as _Callable, Any as _Any
+from typing import Mapping as _Mapping, Union as _Union, Callable as _Callable, Any as _Any
 
 __all__ = ['Formatter', 'CONSOLE_REPORTER_FORMAT', 'FILE_REPORTER_FORMAT', 'EMAIL_REPORTER_FORMAT']
 
@@ -23,7 +23,7 @@ RESERVED_KEYS = (
 
 class Formatter:
     def __init__(self, format_: str, style: str = '%', datefmt: str = '%Y-%m-%d %H:%M:%S',
-                 extra_values: _Dict[str, _Union[str, _Callable, _Any]] = None):
+                 extra_values: _Mapping[str, _Union[str, _Callable, _Any]] = None):
         self._format = format_
 
         if style in ['%', '{']:
