@@ -25,7 +25,7 @@ classifiers = [
 dependencies = [
   "webcolors"
 ]
-version = "2.5.2"
+version = "2.5.3"
 
 [project.urls]
 Homepage = "https://github.com/MPCodeWriter21/log21"

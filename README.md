@@ -53,9 +53,13 @@ python setup.py install
 Changes
 -------
 
-### 2.5.2
+### 2.5.3
 
-Improved type-hintings.
+Moved some dictionaries to `__init__` methods.
+`colors` in `Argparse.ColorizingHelpFormatter` class.
+`_level_name` in `Formatters._Formatter` class and `level_colors` in `Formatters.ColorizingFormatter` class.
+`sign_colors` in `PPrint.PrettyPrinter` class.
+`colors` in `TreePrint.TreePrint.Node` class.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

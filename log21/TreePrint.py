@@ -10,11 +10,6 @@ from log21.Colors import get_colors as _gc
 
 class TreePrint:
     class Node:
-        colors = {
-            'branches': _gc('Green'),
-            'fruit': _gc('LightMagenta'),
-        }
-
         def __init__(self, value: _Union[str, int], children: _Optional[_List[TreePrint.Node]] = None, indent: int = 4,
                      colors: _Optional[_Mapping[str, str]] = None, mode: str='-'):
             self.value = str(value)
@@ -23,7 +18,11 @@ class TreePrint:
             else:
                 self._children = []
             self.indent = indent
-            self.colors = self.colors.copy()
+            self.colors = {
+                'branches': _gc('Green'),
+                'fruit': _gc('LightMagenta'),
+            }
+
             if colors:
                 for key, value in colors.items():
                     if key in self.colors:

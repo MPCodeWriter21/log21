@@ -6,6 +6,14 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.5.3
+
+Moved some dictionaries to `__init__` methods.
+`colors` in `Argparse.ColorizingHelpFormatter` class.
+`_level_name` in `Formatters._Formatter` class and `level_colors` in `Formatters.ColorizingFormatter` class.
+`sign_colors` in `PPrint.PrettyPrinter` class.
+`colors` in `TreePrint.TreePrint.Node` class.
+
 ### 2.5.2
 
 Improved type-hintings.

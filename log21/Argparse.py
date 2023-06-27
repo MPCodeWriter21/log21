@@ -17,20 +17,22 @@ __all__ = ['ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTex
 
 
 class ColorizingHelpFormatter(_argparse.HelpFormatter):
-    colors = {
-        'usage': 'Cyan',
-        'brackets': 'LightRed',
-        'switches': 'LightCyan',
-        'values': 'Green',
-        'colons': 'LightRed',
-        'commas': 'LightRed',
-        'section headers': 'LightGreen',
-        'help': 'LightWhite',
-        'choices': 'LightGreen'
-    }
-
-    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None, colors: _Mapping[str, str] = None):
+    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None,
+                 colors: _Optional[_Mapping[str, str]] = None):
         super().__init__(prog, indent_increment, max_help_position, width)
+        
+        self.colors = {
+            'usage': 'Cyan',
+            'brackets': 'LightRed',
+            'switches': 'LightCyan',
+            'values': 'Green',
+            'colons': 'LightRed',
+            'commas': 'LightRed',
+            'section headers': 'LightGreen',
+            'help': 'LightWhite',
+            'choices': 'LightGreen'
+        }
+
         if colors:
             for key, value in colors.items():
                 if key in self.colors:

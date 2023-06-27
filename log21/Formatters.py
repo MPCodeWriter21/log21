@@ -11,16 +11,6 @@ __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
 class _Formatter(__Formatter):
-    _level_names: _Dict[int, str] = {
-        DEBUG: 'DEBUG',
-        INFO: 'INFO',
-        WARNING: 'WARNING',
-        ERROR: 'ERROR',
-        CRITICAL: 'CRITICAL',
-        PRINT: 'PRINT',
-        INPUT: 'INPUT'
-    }
-
     def __init__(self, fmt: _Optional[str] = None, datefmt: _Optional[str] = None, style: str = '%',
                  level_names: _Optional[_Mapping[int, str]] = None):
         """
@@ -49,6 +39,17 @@ class _Formatter(__Formatter):
         >>>
         """
         super().__init__(fmt=fmt, datefmt=datefmt, style=style)
+
+        self._level_names: _Dict[int, str] = {
+            DEBUG: 'DEBUG',
+            INFO: 'INFO',
+            WARNING: 'WARNING',
+            ERROR: 'ERROR',
+            CRITICAL: 'CRITICAL',
+            PRINT: 'PRINT',
+            INPUT: 'INPUT'
+        }
+
         if level_names:
             for level, name in level_names.items():
                 self.level_names[level] = name
@@ -89,16 +90,6 @@ class _Formatter(__Formatter):
 
 
 class ColorizingFormatter(_Formatter):
-    # Default color values
-    level_colors: _Dict[int, _Tuple[str, ...]] = {
-        DEBUG: ('lightblue',),
-        INFO: ('green',),
-        WARNING: ('lightyellow',),
-        ERROR: ('light red',),
-        CRITICAL: ('background red', 'white'),
-        PRINT: ('Cyan',),
-        INPUT: ('Magenta',)
-    }
     time_color: _Tuple[str, ...] = ('lightblue',)
     name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \
         message_color = tuple()
@@ -112,6 +103,15 @@ class ColorizingFormatter(_Formatter):
                  thread_name_color: _Optional[_Tuple[str, ...]] = None,
                  message_color: _Optional[_Tuple[str, ...]] = None):
         super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
+        self.level_colors: _Dict[int, _Tuple[str, ...]] = {
+            DEBUG: ('lightblue',),
+            INFO: ('green',),
+            WARNING: ('lightyellow',),
+            ERROR: ('light red',),
+            CRITICAL: ('background red', 'white'),
+            PRINT: ('Cyan',),
+            INPUT: ('Magenta',)
+        }
         # Checks and sets colors
         if level_colors:
             if not isinstance(level_colors, _Mapping):
