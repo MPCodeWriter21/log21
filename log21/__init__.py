@@ -5,7 +5,7 @@ import io as _io
 import os as _os
 import logging as _logging
 
-from typing import Union as _Union, Mapping as _Mapping, Type as _Type, Tuple as _Tuple
+from typing import Union as _Union, Mapping as _Mapping, Type as _Type, Tuple as _Tuple, Optional as _Optional
 
 import log21.CrashReporter as CrashReporter
 
@@ -22,12 +22,12 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.5.1"
+__version__ = "2.5.2"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
            'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN',
-           'INFO', 'DEBUG', 'NOTSET', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
+           'INFO', 'DEBUG', 'NOTSET', 'INPUT', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
            'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager', 'get_color_name', 'closest_color',
            'ansi_escape', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
            'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
@@ -38,10 +38,10 @@ _manager = Manager()
 _logging.setLoggerClass(Logger)
 
 
-def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:%S", show_level: bool = True,
-                       show_time: bool = True, colorize_time_and_level: bool = True,
-                       level_names: _Mapping[int, str] = None, 
-                       level_colors: _Mapping[int, _Tuple[str, ...]] = None,
+def _prepare_formatter(fmt: _Optional[str] = None, style: str = '%', datefmt: str = "%H:%M:%S",
+                       show_level: bool = True, show_time: bool = True, colorize_time_and_level: bool = True,
+                       level_names: _Optional[_Mapping[int, str]] = None,
+                       level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
                        formatter_class: _Type[_logging.Formatter] = ColorizingFormatter):
     # Prepares a formatting if the fmt was None
     if not fmt:
@@ -55,7 +55,7 @@ def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:
 
     if level_colors and not issubclass(formatter_class, ColorizingFormatter):
         warning('`formatter_class` should be a subclass of ColorizingFormatter when used with level_colors.')
-        warning(f'Using `{formatter_class.__class__.__name__}` might lead to unexpected behaviour!')
+        warning(f'Using `{formatter_class.__name__}` might lead to unexpected behaviour!')
 
     # Defines the formatter
     if level_colors:
@@ -74,11 +74,11 @@ def _prepare_formatter(fmt: str = None, style: str = '%', datefmt: str = "%H:%M:
 
 
 def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
-               show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
+               show_level: bool = True, colorize_time_and_level: bool = True, fmt: _Optional[str] = None,
                datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-               handle_new_line: bool = True, override=False, level_names: _Mapping[int, str] = None,
-               level_colors: _Mapping[int, _Tuple[str, ...]] = None,
-               file: _Union[_os.PathLike, str] = None) -> Logger:
+               handle_new_line: bool = True, override=False, level_names: _Optional[_Mapping[int, str]] = None,
+               level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
+               file: _Optional[_Union[_os.PathLike, str]] = None) -> _Union[Logger, _logging.Logger]:
     """
     Returns a logging.Logger with colorizing support.
     >>>
@@ -169,9 +169,9 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
 
 
 def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
-                       show_level: bool = True, colorize_time_and_level: bool = True, fmt: str = None,
+                       show_level: bool = True, colorize_time_and_level: bool = True, fmt: _Optional[str] = None,
                        datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-                       handle_new_line: bool = True, override=False, level_names: _Mapping[int, str] = None,
+                       handle_new_line: bool = True, override=False, level_names: _Optional[_Mapping[int, str]] = None,
                        width: int = 80, height: int = 20, allow_shell: bool = False) -> LoggingWindow:
     """
     Returns a logging window.
@@ -262,7 +262,7 @@ def getpass(*msg, args: tuple = (), end='', **kwargs):
     return logger.getpass(*msg, args=args, end=end, **kwargs)
 
 
-def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Mapping[str, str] = None, *, sort_dicts=True,
+def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Optional[_Mapping[str, str]] = None, *, sort_dicts=True,
            underscore_numbers=False, compact=False, end='\033[0m\n', **kwargs):
     logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
     logger.print(pformat(obj=obj, indent=indent, width=width, depth=depth, signs_colors=signs_colors, compact=compact,
@@ -282,7 +282,7 @@ tprint = tree_print
 root = Logger('root-logger', INFO)
 
 
-def basic_config(force: bool = False, encoding: str = None, errors: str = 'backslashreplace', handlers=None,
+def basic_config(force: bool = False, encoding: str = None, errors: _Optional[str] = 'backslashreplace', handlers=None,
                  stream=None, filename=None, filemode: str = 'a', date_format: str = "%H:%M:%S", style: str = '%',
                  format_: str = None, level: _Union[int, str] = None):
     """
@@ -456,7 +456,7 @@ def log(level, *msg, args=(), **kwargs):
     root.log(level, *msg, args=args, **kwargs)
 
 
-def progress_bar(progress: float, total: float, width: int = None, prefix: str = '|', suffix: str = '|',
+def progress_bar(progress: float, total: float, width: _Optional[int] = None, prefix: str = '|', suffix: str = '|',
                  show_percentage: bool = True):
     """
     Print a progress bar to the console.

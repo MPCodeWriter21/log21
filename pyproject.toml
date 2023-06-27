@@ -9,7 +9,7 @@ authors = [
 ]
 description = "A simple logging package that helps you log colorized messages in Windows console."
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 keywords = ['python', 'log', 'colorize', 'color', 'logging', 'Python3', 'CodeWriter21']
 license = {text = "Apache License 2.0"}
 classifiers = [
@@ -25,7 +25,7 @@ classifiers = [
 dependencies = [
   "webcolors"
 ]
-version = "2.5.1"
+version = "2.5.2"
 
 [project.urls]
 Homepage = "https://github.com/MPCodeWriter21/log21"

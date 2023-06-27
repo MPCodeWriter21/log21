@@ -53,9 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.5.1
+### 2.5.2
 
-Switched from `setup.py` build system to `pyproject.toml`
+Improved type-hintings.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

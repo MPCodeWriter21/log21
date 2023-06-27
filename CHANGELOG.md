@@ -5,6 +5,11 @@ Help this project by [Donation](DONATE.md)
 
 Changes
 -----------
+
+### 2.5.2
+
+Improved type-hintings.
+
 ### 2.5.1
 
 Switched from `setup.py` build system to `pyproject.toml`

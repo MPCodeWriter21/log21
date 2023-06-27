@@ -4,7 +4,7 @@
 import logging as _logging
 
 from getpass import getpass as _getpass
-from typing import Sequence as _Sequence, Union as _Union
+from typing import Sequence as _Sequence, Union as _Union, Optional as _Optional, Callable as _Callable
 from logging import raiseExceptions as _raiseExceptions
 
 import log21 as _log21
@@ -14,7 +14,8 @@ __all__ = ['Logger']
 
 
 class Logger(_logging.Logger):
-    def __init__(self, name, level=NOTSET, handlers: _Union[_Sequence[_logging.Handler], _logging.Handler] = None):
+    def __init__(self, name, level: _Union[int, str]=NOTSET,
+                 handlers: _Optional[_Union[_Sequence[_logging.Handler], _logging.Handler]] = None):
         super().__init__(name, level)
         self.setLevel(level)
         self._progress_bar = None
@@ -192,7 +193,7 @@ class Logger(_logging.Logger):
     def progress_bar(self, value: '_log21.ProgressBar'):
         self._progress_bar = value
 
-    def clear_line(self, length: int = None):
+    def clear_line(self, length: _Optional[int] = None):
         """
         Clear the current line.
 
@@ -200,5 +201,5 @@ class Logger(_logging.Logger):
         :return:
         """
         for handler in self.handlers:
-            if hasattr(handler, 'clear_line'):
+            if isinstance(getattr(handler, 'clear_line', None), _Callable):
                 handler.clear_line(length)

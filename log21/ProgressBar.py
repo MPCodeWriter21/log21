@@ -1,9 +1,11 @@
 # log21.ProgressBar.py
 # CodeWriter21
 
+from __future__ import annotations
+
 import shutil as _shutil
 
-from typing import Mapping as _Mapping, Any as _Any
+from typing import Mapping as _Mapping, Any as _Any, Optional as _Optional
 
 import log21 as _log21
 from log21.Logger import Logger as _Logger
@@ -39,10 +41,10 @@ class ProgressBar:
         >>>
     """
 
-    def __init__(self, *args, width: int = None, show_percentage: bool = True, prefix: str = '|', suffix: str = '|',
-                 fill: str = '█', empty: str = ' ', format_: str = None, style: str = '%',
-                 new_line_when_complete: bool = True, colors: dict = None, no_color: bool = False,
-                 logger: '_log21.Logger' = _logger, additional_variables: _Mapping[str, _Any] = None):
+    def __init__(self, *, width: _Optional[int] = None, show_percentage: bool = True, prefix: str = '|',
+                 suffix: str = '|', fill: str = '█', empty: str = ' ', format_: _Optional[str] = None, style: str = '%',
+                 new_line_when_complete: bool = True, colors: _Optional[_Mapping[str, str]] = None, no_color: bool = False,
+                 logger: _log21.Logger = _logger, additional_variables: _Optional[_Mapping[str, _Any]] = None):
         """
         :param args: Prevents the use of positional arguments
         :param width: The width of the progress bar
@@ -274,11 +276,11 @@ class ProgressBar:
 
         return '\r' + bar + self.colors['reset-color'] + ('\n' if self.new_line_when_complete else '')
 
-    def __call__(self, progress: float, total: float, logger: '_log21.Logger' = None, **kwargs):
+    def __call__(self, progress: float, total: float, logger: _Optional[_log21.Logger] = None, **kwargs):
         if not logger:
             logger = self.logger
 
         logger.print(self.get_bar(progress, total, **kwargs), end='')
 
-    def update(self, progress: float, total: float, logger: '_log21.Logger' = None, **kwargs):
+    def update(self, progress: float, total: float, logger: _Optional[_log21.Logger] = None, **kwargs):
         self(progress, total, logger, **kwargs)

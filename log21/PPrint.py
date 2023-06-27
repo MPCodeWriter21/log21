@@ -7,8 +7,8 @@ import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
 
-from typing import Mapping as _Mapping, Union as _Union
 from pprint import PrettyPrinter as _PrettyPrinter
+from typing import Mapping as _Mapping, Optional as _Optional
 
 from log21.Colors import get_colors as _gc
 
@@ -75,8 +75,8 @@ class PrettyPrinter(_PrettyPrinter):
         'data': _gc('Green')
     }
 
-    def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Mapping[str, str] = None, *,
-                 compact=False, sort_dicts=True, underscore_numbers=False, **kwargs):
+    def __init__(self, indent=1, width=80, depth=None, stream=None, signs_colors: _Optional[_Mapping[str, str]] = None,
+                 *, compact=False, sort_dicts=True, underscore_numbers=False, **kwargs):
         super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact, **kwargs)
         self._depth = depth
         self._indent_per_level = indent
@@ -562,8 +562,8 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
-def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Mapping[str, str] = None, *, compact=False,
+def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Optional[_Mapping[str, str]] = None, *, compact=False,
             sort_dicts=True, underscore_numbers=False, **kwargs):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, signs_colors=signs_colors,
-                         sort_dicts=True, underscore_numbers=False, **kwargs).pformat(obj)
+                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers, **kwargs).pformat(obj)

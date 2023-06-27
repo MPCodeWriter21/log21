@@ -3,7 +3,7 @@
 
 import time as _time
 from logging import Formatter as __Formatter
-from typing import Mapping as _Mapping, Tuple as _Tuple
+from typing import Mapping as _Mapping, Tuple as _Tuple, Dict as _Dict, Optional as _Optional
 from log21.Colors import get_colors as _gc, ansi_escape
 from log21.Levels import INPUT, CRITICAL, ERROR, WARNING, INFO, DEBUG, PRINT
 
@@ -11,7 +11,7 @@ __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
 
 class _Formatter(__Formatter):
-    _level_names: _Mapping[int, str] = {
+    _level_names: _Dict[int, str] = {
         DEBUG: 'DEBUG',
         INFO: 'INFO',
         WARNING: 'WARNING',
@@ -21,7 +21,8 @@ class _Formatter(__Formatter):
         INPUT: 'INPUT'
     }
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Mapping[int, str] = None):
+    def __init__(self, fmt: _Optional[str] = None, datefmt: _Optional[str] = None, style: str = '%',
+                 level_names: _Optional[_Mapping[int, str]] = None):
         """
         `level_names` usage:
         >>> import log21
@@ -57,7 +58,7 @@ class _Formatter(__Formatter):
         return self._level_names
 
     @level_names.setter
-    def level_names(self, level_names):
+    def level_names(self, level_names: _Mapping[int, str]):
         if level_names:
             if not isinstance(level_names, _Mapping):
                 raise TypeError('`level_names` must be a Mapping, a dictionary like object!')
@@ -89,7 +90,7 @@ class _Formatter(__Formatter):
 
 class ColorizingFormatter(_Formatter):
     # Default color values
-    level_colors: _Mapping[int, _Tuple[str, ...]] = {
+    level_colors: _Dict[int, _Tuple[str, ...]] = {
         DEBUG: ('lightblue',),
         INFO: ('green',),
         WARNING: ('lightyellow',),
@@ -102,12 +103,14 @@ class ColorizingFormatter(_Formatter):
     name_color = pathname_color = filename_color = module_color = func_name_color = thread_name_color = \
         message_color = tuple()
 
-    def __init__(self, fmt: str = None, datefmt: str = None, style: str = '%', level_names: _Mapping[int, str] = None,
-                 level_colors: _Mapping[int, _Tuple[str]] = None,
-                 time_color: _Tuple[str, ...] = None, name_color: _Tuple[str, ...] = None,
-                 pathname_color: _Tuple[str, ...] = None, filename_color: _Tuple[str, ...] = None,
-                 module_color: _Tuple[str, ...] = None, func_name_color: _Tuple[str, ...] = None,
-                 thread_name_color: _Tuple[str, ...] = None, message_color: _Tuple[str, ...] = None):
+    def __init__(self, fmt: _Optional[str] = None, datefmt: _Optional[str] = None, style: str = '%',
+                 level_names: _Optional[_Mapping[int, str]] = None,
+                 level_colors: _Optional[_Mapping[int, _Tuple[str]]] = None,
+                 time_color: _Optional[_Tuple[str, ...]] = None, name_color: _Optional[_Tuple[str, ...]] = None,
+                 pathname_color: _Optional[_Tuple[str, ...]] = None, filename_color: _Optional[_Tuple[str, ...]] = None,
+                 module_color: _Optional[_Tuple[str, ...]] = None, func_name_color: _Optional[_Tuple[str, ...]] = None,
+                 thread_name_color: _Optional[_Tuple[str, ...]] = None,
+                 message_color: _Optional[_Tuple[str, ...]] = None):
         super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
         # Checks and sets colors
         if level_colors:

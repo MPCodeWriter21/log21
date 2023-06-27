@@ -6,6 +6,7 @@ import re as _re
 import shutil as _shutil
 
 from logging import StreamHandler as _StreamHandler
+from typing import Optional as _Optional
 from log21.Colors import ansi_escape as _ansi_escape, get_colors as _gc, hex_escape as _hex_escape
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
@@ -59,7 +60,7 @@ class StreamHandler(_StreamHandler):
             self.check_nl(record)
         super().emit(record)
 
-    def clear_line(self, length: int = None):
+    def clear_line(self, length: _Optional[int] = None):
         """
         Clear the current line.
 
