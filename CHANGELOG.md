@@ -6,6 +6,16 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.5.4
+
+Added constant colors directly to the Colors module. Now you can do this:
+```python
+from log21 import print
+from log21.colors import GREEN, WHITE, RED
+
+print(GREEN + 'This' + WHITE + ' is' + RED + ' Red')
+```
+
 ### 2.5.3
 
 Moved some dictionaries to `__init__` methods.

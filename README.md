@@ -53,13 +53,15 @@ python setup.py install
 Changes
 -------
 
-### 2.5.3
+### 2.5.4
 
-Moved some dictionaries to `__init__` methods.
-`colors` in `Argparse.ColorizingHelpFormatter` class.
-`_level_name` in `Formatters._Formatter` class and `level_colors` in `Formatters.ColorizingFormatter` class.
-`sign_colors` in `PPrint.PrettyPrinter` class.
-`colors` in `TreePrint.TreePrint.Node` class.
+Added constant colors directly to the Colors module. Now you can do this:
+```python
+from log21 import print
+from log21.colors import GREEN, WHITE, RED
+
+print(GREEN + 'This' + WHITE + ' is' + RED + ' Red')
+```
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

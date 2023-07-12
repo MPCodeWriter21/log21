@@ -2,136 +2,181 @@
 # CodeWriter21
 
 import re as _re
-import webcolors as _webcolors
 from typing import Union as _Union, Sequence as _Sequence
 
-__all__ = ['Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name', 'closest_color', 'hex_escape']
+import webcolors as _webcolors
+
+__all__ = [
+    'Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name',
+    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW',
+    'BLUE', 'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN',
+    'BACK_YELLOW', 'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE',
+    'GREY', 'LIGHT_RED', 'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE',
+    'LIGHT_MAGENTA', 'LIGHT_CYAN', 'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED',
+    'BACK_LIGHT_GREEN', 'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE',
+    'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN', 'BACK_LIGHT_WHITE'
+]
 
 # Regex pattern to find ansi colors in message
 ansi_escape = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
 hex_escape = _re.compile(r'\x1b(#[0-9a-fA-F]{6})h([f|b])')
 
+RESET = '\033[0m'
+BLACK = '\033[30m'
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+BACK_BLACK = '\033[40m'
+BACK_RED = '\033[41m'
+BACK_GREEN = '\033[42m'
+BACK_YELLOW = '\033[43m'
+BACK_BLUE = '\033[44m'
+BACK_MAGENTA = '\033[45m'
+BACK_CYAN = '\033[46m'
+BACK_WHITE = '\033[47m'
+GREY = '\033[90m'
+LIGHT_RED = '\033[91m'
+LIGHT_GREEN = '\033[92m'
+LIGHT_YELLOW = '\033[93m'
+LIGHT_BLUE = '\033[94m'
+LIGHT_MAGENTA = '\033[95m'
+LIGHT_CYAN = '\033[96m'
+LIGHT_WHITE = '\033[97m'
+BACK_GREY = '\033[100m'
+BACK_LIGHT_RED = '\033[101m'
+BACK_LIGHT_GREEN = '\033[102m'
+BACK_LIGHT_YELLOW = '\033[103m'
+BACK_LIGHT_BLUE = '\033[104m'
+BACK_LIGHT_MAGENTA = '\033[105m'
+BACK_LIGHT_CYAN = '\033[106m'
+BACK_LIGHT_WHITE = '\033[107m'
+
 
 class Colors:
+    """A class containing color-maps."""
     color_map = {
-        'Reset': '\033[0m',
-        'Black': '\033[30m',
-        'Red': '\033[31m',
-        'Green': '\033[32m',
-        'Yellow': '\033[33m',
-        'Blue': '\033[34m',
-        'Magenta': '\033[35m',
-        'Cyan': '\033[36m',
-        'White': '\033[37m',
-        'BackBlack': '\033[40m',
-        'BackRed': '\033[41m',
-        'BackGreen': '\033[42m',
-        'BackYellow': '\033[43m',
-        'BackBlue': '\033[44m',
-        'BackMagenta': '\033[45m',
-        'BackCyan': '\033[46m',
-        'BackWhite': '\033[47m',
-        'Grey': '\033[90m',
-        'LightRed': '\033[91m',
-        'LightGreen': '\033[92m',
-        'LightYellow': '\033[93m',
-        'LightBlue': '\033[94m',
-        'LightMagenta': '\033[95m',
-        'LightCyan': '\033[96m',
-        'LightWhite': '\033[97m',
-        'BackGrey': '\033[100m',
-        'BackLightRed': '\033[101m',
-        'BackLightGreen': '\033[102m',
-        'BackLightYellow': '\033[103m',
-        'BackLightBlue': '\033[104m',
-        'BackLightMagenta': '\033[105m',
-        'BackLightCyan': '\033[106m',
-        'BackLightWhite': '\033[107m'
+        'Reset': RESET,
+        'Black': BLACK,
+        'Red': RED,
+        'Green': GREEN,
+        'Yellow': YELLOW,
+        'Blue': BLUE,
+        'Magenta': MAGENTA,
+        'Cyan': CYAN,
+        'White': WHITE,
+        'BackBlack': BACK_BLACK,
+        'BackRed': BACK_RED,
+        'BackGreen': BACK_GREEN,
+        'BackYellow': BACK_YELLOW,
+        'BackBlue': BACK_BLUE,
+        'BackMagenta': BACK_MAGENTA,
+        'BackCyan': BACK_CYAN,
+        'BackWhite': BACK_WHITE,
+        'Grey': GREY,
+        'LightRed': LIGHT_RED,
+        'LightGreen': LIGHT_GREEN,
+        'LightYellow': LIGHT_YELLOW,
+        'LightBlue': LIGHT_BLUE,
+        'LightMagenta': LIGHT_MAGENTA,
+        'LightCyan': LIGHT_CYAN,
+        'LightWhite': LIGHT_WHITE,
+        'BackGrey': BACK_GREY,
+        'BackLightRed': BACK_LIGHT_RED,
+        'BackLightGreen': BACK_LIGHT_GREEN,
+        'BackLightYellow': BACK_LIGHT_YELLOW,
+        'BackLightBlue': BACK_LIGHT_BLUE,
+        'BackLightMagenta': BACK_LIGHT_MAGENTA,
+        'BackLightCyan': BACK_LIGHT_CYAN,
+        'BackLightWhite': BACK_LIGHT_WHITE,
     }
     color_map_ = {
-        'reset': '\x1b[0m',
-        'black': '\x1b[30m',
-        'red': '\x1b[31m',
-        'green': '\x1b[32m',
-        'yellow': '\x1b[33m',
-        'blue': '\x1b[34m',
-        'magenta': '\x1b[35m',
-        'cyan': '\x1b[36m',
-        'white': '\x1b[37m',
-        'backblack': '\x1b[40m',
-        'backred': '\x1b[41m',
-        'backgreen': '\x1b[42m',
-        'backyellow': '\x1b[43m',
-        'backblue': '\x1b[44m',
-        'backmagenta': '\x1b[45m',
-        'backcyan': '\x1b[46m',
-        'backwhite': '\x1b[47m',
-        'grey': '\x1b[90m',
-        'gray': '\x1b[90m',
-        'lightred': '\x1b[91m',
-        'lightgreen': '\x1b[92m',
-        'lightyellow': '\x1b[93m',
-        'lightblue': '\x1b[94m',
-        'lightmagenta': '\x1b[95m',
-        'lightcyan': '\x1b[96m',
-        'lightwhite': '\x1b[97m',
-        'backgrey': '\x1b[100m',
-        'backlightred': '\x1b[101m',
-        'backlightgreen': '\x1b[102m',
-        'backlightyellow': '\x1b[103m',
-        'backlightblue': '\x1b[104m',
-        'backlightmagenta': '\x1b[105m',
-        'backlightcyan': '\x1b[106m',
-        'backlightwhite': '\x1b[107m',
-        'brightblack': '\x1b[90m',
-        'brightred': '\x1b[91m',
-        'brightgreen': '\x1b[92m',
-        'brightyellow': '\x1b[93m',
-        'brightblue': '\x1b[94m',
-        'brightmagenta': '\x1b[95m',
-        'brightcyan': '\x1b[96m',
-        'brightwhite': '\x1b[97m',
-        'backbrightblack': '\x1b[100m',
-        'backbrightred': '\x1b[101m',
-        'backbrightgreen': '\x1b[102m',
-        'backbrightyellow': '\x1b[103m',
-        'backbrightblue': '\x1b[104m',
-        'backbrightmagenta': '\x1b[105m',
-        'backbrightcyan': '\x1b[106m',
-        'backbrightwhite': '\x1b[107m',
-        'rst': '\x1b[0m',
-        'bk': '\x1b[30m',
-        'r': '\x1b[31m',
-        'g': '\x1b[32m',
-        'y': '\x1b[33m',
-        'b': '\x1b[34m',
-        'm': '\x1b[35m',
-        'c': '\x1b[36m',
-        'w': '\x1b[37m',
-        'bbk': '\x1b[40m',
-        'br': '\x1b[41m',
-        'bg': '\x1b[42m',
-        'by': '\x1b[43m',
-        'bb': '\x1b[44m',
-        'bm': '\x1b[45m',
-        'bc': '\x1b[46m',
-        'bw': '\x1b[47m',
-        'gr': '\x1b[90m',
-        'lr': '\x1b[91m',
-        'lg': '\x1b[92m',
-        'ly': '\x1b[93m',
-        'lb': '\x1b[94m',
-        'lm': '\x1b[95m',
-        'lc': '\x1b[96m',
-        'lw': '\x1b[97m',
-        'bgr': '\x1b[100m',
-        'blr': '\x1b[101m',
-        'blg': '\x1b[102m',
-        'bly': '\x1b[103m',
-        'blb': '\x1b[104m',
-        'blm': '\x1b[105m',
-        'blc': '\x1b[106m',
-        'blw': '\x1b[107m',
+        'reset': RESET,
+        'black': BLACK,
+        'red': RED,
+        'green': GREEN,
+        'yellow': YELLOW,
+        'blue': BLUE,
+        'magenta': MAGENTA,
+        'cyan': CYAN,
+        'white': WHITE,
+        'backblack': BACK_BLACK,
+        'backred': BACK_RED,
+        'backgreen': BACK_GREEN,
+        'backyellow': BACK_YELLOW,
+        'backblue': BACK_BLUE,
+        'backmagenta': BACK_MAGENTA,
+        'backcyan': BACK_CYAN,
+        'backwhite': BACK_WHITE,
+        'grey': GREY,
+        'gray': GREY,
+        'lightred': LIGHT_RED,
+        'lightgreen': LIGHT_GREEN,
+        'lightyellow': LIGHT_YELLOW,
+        'lightblue': LIGHT_BLUE,
+        'lightmagenta': LIGHT_MAGENTA,
+        'lightcyan': LIGHT_CYAN,
+        'lightwhite': LIGHT_WHITE,
+        'backgrey': BACK_GREY,
+        'backlightred': BACK_LIGHT_RED,
+        'backlightgreen': BACK_LIGHT_GREEN,
+        'backlightyellow': BACK_LIGHT_YELLOW,
+        'backlightblue': BACK_LIGHT_BLUE,
+        'backlightmagenta': BACK_LIGHT_MAGENTA,
+        'backlightcyan': BACK_LIGHT_CYAN,
+        'backlightwhite': BACK_LIGHT_WHITE,
+        'brightblack': GREY,
+        'brightred': LIGHT_RED,
+        'brightgreen': LIGHT_GREEN,
+        'brightyellow': LIGHT_YELLOW,
+        'brightblue': LIGHT_BLUE,
+        'brightmagenta': LIGHT_MAGENTA,
+        'brightcyan': LIGHT_CYAN,
+        'brightwhite': LIGHT_WHITE,
+        'backbrightblack': BACK_GREY,
+        'backbrightred': BACK_LIGHT_RED,
+        'backbrightgreen': BACK_LIGHT_GREEN,
+        'backbrightyellow': BACK_LIGHT_YELLOW,
+        'backbrightblue': BACK_LIGHT_BLUE,
+        'backbrightmagenta': BACK_LIGHT_MAGENTA,
+        'backbrightcyan': BACK_LIGHT_CYAN,
+        'backbrightwhite': BACK_LIGHT_WHITE,
+        'rst': RESET,
+        'bk': BLACK,
+        'r': RED,
+        'g': GREEN,
+        'y': YELLOW,
+        'b': BLUE,
+        'm': MAGENTA,
+        'c': CYAN,
+        'w': WHITE,
+        'bbk': BACK_BLACK,
+        'br': BACK_RED,
+        'bg': BACK_GREEN,
+        'by': BACK_YELLOW,
+        'bb': BACK_BLUE,
+        'bm': BACK_MAGENTA,
+        'bc': BACK_CYAN,
+        'bw': BACK_WHITE,
+        'gr': GREY,
+        'lr': LIGHT_RED,
+        'lg': LIGHT_GREEN,
+        'ly': LIGHT_YELLOW,
+        'lb': LIGHT_BLUE,
+        'lm': LIGHT_MAGENTA,
+        'lc': LIGHT_CYAN,
+        'lw': LIGHT_WHITE,
+        'bgr': BACK_GREY,
+        'blr': BACK_LIGHT_RED,
+        'blg': BACK_LIGHT_GREEN,
+        'bly': BACK_LIGHT_YELLOW,
+        'blb': BACK_LIGHT_BLUE,
+        'blm': BACK_LIGHT_MAGENTA,
+        'blc': BACK_LIGHT_CYAN,
+        'blw': BACK_LIGHT_WHITE,
     }
     change_map = {
         'aqua': 'LightCyan',
@@ -161,15 +206,18 @@ def closest_color(requested_color: _Sequence[int]):
     min_colors = {}
     for key, name in _webcolors.CSS2_HEX_TO_NAMES.items():
         r_c, g_c, b_c = _webcolors.hex_to_rgb(key)
-        rd = (r_c - requested_color[0]) ** 2
-        gd = (g_c - requested_color[1]) ** 2
-        bd = (b_c - requested_color[2]) ** 2
-        min_colors[(rd + gd + bd)] = name
+        r_d = (r_c - requested_color[0])**2
+        g_d = (g_c - requested_color[1])**2
+        b_d = (b_c - requested_color[2])**2
+        min_colors[(r_d + g_d + b_d)] = name
     return min_colors[min(min_colors.keys())]
 
 
-def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor],
-                   raise_exceptions: bool = False) -> str:
+def get_color_name(
+    color: _Union[str, _Sequence[int], _webcolors.IntegerRGB,
+                  _webcolors.HTML5SimpleColor],
+    raise_exceptions: bool = False
+) -> str:
     """
     Takes a color in RGB format and returns a color name close to the RGB value.
 
@@ -181,18 +229,22 @@ def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _we
     'Magenta'
     >>>
 
-    :param color: Union[str, Sequence[int]: The input color. Example: '#00FF00', (128, 0, 128)
-    :param raise_exceptions: bool = False: Returns empty string when raise_exceptions is False and an error occurs.
+    :param color: Union[str, Sequence[int]: The input color. Example: '#00FF00',
+        (128, 0, 128)
+    :param raise_exceptions: bool = False: Returns empty string when raise_exceptions is
+        False and an error occurs.
     :raises TypeError
     :return: str: The color name.
     """
     # Makes sure that the input parameters has valid values.
-    if not isinstance(color, (str, tuple, _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor)):
+    if not isinstance(color,
+                      (str, tuple, _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor)):
         if raise_exceptions:
-            raise TypeError('Input color must be a str or Tuple[int, int, int] or webcolors.IntegerRGB or ' +
-                            'webcolors.HTML5SimpleColor')
-        else:
-            return ''
+            raise TypeError(
+                'Input color must be a str or Tuple[int, int, int] or '
+                'webcolors.IntegerRGB or webcolors.HTML5SimpleColor'
+            )
+        return ''
     if isinstance(color, str):
         if color.startswith('#') and len(color) == 7:
             color = _webcolors.hex_to_rgb(color)
@@ -201,20 +253,18 @@ def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _we
         else:
             if raise_exceptions:
                 raise TypeError('String color format must be `#0021ff` or `000033255`!')
-            else:
-                return ''
+            return ''
     if isinstance(color, _Sequence):
         if len(color) == 3:
-            if not (isinstance(color[0], int) and isinstance(color[1], int) and isinstance(color[2], int)):
+            if not (isinstance(color[0], int) and isinstance(color[1], int)
+                    and isinstance(color[2], int)):
                 if raise_exceptions:
                     raise TypeError('Color sequence format must be (int, int, int)!')
-                else:
-                    return ''
+                return ''
         else:
             if raise_exceptions:
                 raise TypeError('Color sequence format must be (int, int, int)!')
-            else:
-                return ''
+            return ''
 
     # Looks for the name of the input RGB color.
     try:
@@ -227,8 +277,8 @@ def get_color_name(color: _Union[str, _Sequence[int], _webcolors.IntegerRGB, _we
 
 
 def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> str:
-    """
-    Gets a color name and returns it in ansi format
+    """Gets a color name and returns it in ansi format
+    
     >>>
     >>> get_color('LightRed')
     '\x1b[91m'
@@ -238,7 +288,7 @@ def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> 
     [21:21:21] [INFO] Hello World!
     >>> # Note that you must run it yourself to see the colorful result ;D
     >>>
-
+    
     :param color: color name(Example: Blue)
     :param raise_exceptions: bool = False:
         False: It will return '' instead of raising exceptions when an error occurs.
@@ -250,40 +300,39 @@ def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> 
     if not isinstance(color, (str, _Sequence)):
         if raise_exceptions:
             raise TypeError('`color` must be str or Sequence!')
-        else:
-            return ''
+        return ''
     if isinstance(color, _Sequence) and not isinstance(color, str):
         color = get_color_name(color)
         return get_color(color)
-    else:
-        color = color.lower()
-        color = color.replace(' ', '').replace('_', '').replace('-', '')
-        color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
-        if (color.startswith('#') and len(color) == 7) or (color.isdigit() and len(color) == 9):
-            color = get_color_name(color)
-            return get_color(color)
-        elif color in Colors.color_map_:
-            return Colors.color_map_[color]
-        elif ansi_escape.match(color):
-            return ansi_escape.match(color).group()
-        elif color in Colors.change_map:
-            return get_color(Colors.change_map[color])
-        else:
-            if raise_exceptions:
-                raise KeyError(f'`{color}` not found!')
-            else:
-                return ''
+
+    color = color.lower()
+    color = color.replace(' ', '').replace('_', '').replace('-', '')
+    color = color.replace('foreground', '').replace('fore', '').replace('ground', '')
+    if (color.startswith('#') and len(color) == 7) or (color.isdigit()
+                                                       and len(color) == 9):
+        color = get_color_name(color)
+        return get_color(color)
+    if color in Colors.color_map_:
+        return Colors.color_map_[color]
+    if ansi_escape.match(color):
+        return ansi_escape.match(color).group()
+    if color in Colors.change_map:
+        return get_color(Colors.change_map[color])
+    if raise_exceptions:
+        raise KeyError(f'`{color}` not found!')
+    return ''
 
 
 def get_colors(*colors: str, raise_exceptions: bool = False) -> str:
-    """
-    Gets a list of colors and combines them into one.
+    """Gets a list of colors and combines them into one.
+
     >>>
     >>> get_colors('LightCyan')
     '\x1b[96m'
     >>>
     >>> import log21
-    >>> log21.get_logger().info(log21.get_colors('Green', 'Background White') + 'Hello World!')
+    >>> log21.get_logger().info(log21.get_colors('Green', 'Background White') +
+    ... 'Hello World!')
     [21:21:21] [INFO] Hello World!
     >>> # Note that you must run it yourself to see the colorful result ;D
     >>>
