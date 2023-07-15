@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.5.5
+
+Fixed a bug in the `TreePrint` class.
+
 ### 2.5.4
 
 Added constant colors directly to the Colors module. Now you can do this:

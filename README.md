@@ -53,15 +53,9 @@ python setup.py install
 Changes
 -------
 
-### 2.5.4
+### 2.5.5
 
-Added constant colors directly to the Colors module. Now you can do this:
-```python
-from log21 import print
-from log21.colors import GREEN, WHITE, RED
-
-print(GREEN + 'This' + WHITE + ' is' + RED + ' Red')
-```
+Fixed a bug in the `TreePrint` class.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

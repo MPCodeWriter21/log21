@@ -22,27 +22,37 @@ from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
 from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
 
-__version__ = "2.5.4"
+__version__ = "2.5.5"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
-__all__ = ['ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter', 'DecolorizingFormatter',
-           'get_logger', 'Logger', 'Colors', 'get_color', 'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN',
-           'INFO', 'DEBUG', 'NOTSET', 'INPUT', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter', 'pformat',
-           'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager', 'get_color_name', 'closest_color',
-           'ansi_escape', '__version__', '__author__', '__github__', 'debug', 'info', 'warning', 'warn', 'error',
-           'critical', 'fatal', 'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
-           'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter', 'console_reporter',
-           'file_reporter']
+__all__ = [
+    'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
+    'DecolorizingFormatter', 'get_logger', 'Logger', 'Colors', 'get_color',
+    'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG',
+    'NOTSET', 'INPUT', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter',
+    'pformat', 'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager',
+    'get_color_name', 'closest_color', 'ansi_escape', '__version__', '__author__',
+    '__github__', 'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal',
+    'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
+    'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
+    'console_reporter', 'file_reporter'
+]
 
 _manager = Manager()
 _logging.setLoggerClass(Logger)
 
 
-def _prepare_formatter(fmt: _Optional[str] = None, style: str = '%', datefmt: str = "%H:%M:%S",
-                       show_level: bool = True, show_time: bool = True, colorize_time_and_level: bool = True,
-                       level_names: _Optional[_Mapping[int, str]] = None,
-                       level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
-                       formatter_class: _Type[_logging.Formatter] = ColorizingFormatter):
+def _prepare_formatter(
+    fmt: _Optional[str] = None,
+    style: str = '%',
+    datefmt: str = "%H:%M:%S",
+    show_level: bool = True,
+    show_time: bool = True,
+    colorize_time_and_level: bool = True,
+    level_names: _Optional[_Mapping[int, str]] = None,
+    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
+    formatter_class: _Type[_logging.Formatter] = ColorizingFormatter
+):
     # Prepares a formatting if the fmt was None
     if not fmt:
         style = '%'
@@ -54,15 +64,21 @@ def _prepare_formatter(fmt: _Optional[str] = None, style: str = '%', datefmt: st
         fmt = '\r' + fmt
 
     if level_colors and not issubclass(formatter_class, ColorizingFormatter):
-        warning('`formatter_class` should be a subclass of ColorizingFormatter when used with level_colors.')
-        warning(f'Using `{formatter_class.__name__}` might lead to unexpected behaviour!')
+        warning(
+            '`formatter_class` should be a subclass of ColorizingFormatter when used with level_colors.'
+        )
+        warning(
+            f'Using `{formatter_class.__name__}` might lead to unexpected behaviour!'
+        )
 
     # Defines the formatter
     if level_colors:
-        formatter = formatter_class(fmt, datefmt, style=style, level_colors=level_colors)
+        formatter = formatter_class(
+            fmt, datefmt, style=style, level_colors=level_colors
+        )
     else:
         formatter = formatter_class(fmt, datefmt, style=style)
-    
+
     if isinstance(formatter, Formatters._Formatter) and level_names:
         formatter.level_names = level_names
     if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
@@ -73,12 +89,22 @@ def _prepare_formatter(fmt: _Optional[str] = None, style: str = '%', datefmt: st
     return formatter
 
 
-def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
-               show_level: bool = True, colorize_time_and_level: bool = True, fmt: _Optional[str] = None,
-               datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-               handle_new_line: bool = True, override=False, level_names: _Optional[_Mapping[int, str]] = None,
-               level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
-               file: _Optional[_Union[_os.PathLike, str]] = None) -> _Union[Logger, _logging.Logger]:
+def get_logger(
+    name: str = '',
+    level: _Union[int, str] = NOTSET,
+    show_time: bool = True,
+    show_level: bool = True,
+    colorize_time_and_level: bool = True,
+    fmt: _Optional[str] = None,
+    datefmt: str = "%H:%M:%S",
+    style: str = '%',
+    handle_carriage_return: bool = True,
+    handle_new_line: bool = True,
+    override=False,
+    level_names: _Optional[_Mapping[int, str]] = None,
+    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
+    file: _Optional[_Union[_os.PathLike, str]] = None
+) -> _Union[Logger, _logging.Logger]:
     """
     Returns a logging.Logger with colorizing support.
     >>>
@@ -148,31 +174,55 @@ def get_logger(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool
         logger = _manager.getLogger(name)
     if (not logger) or override:
         logger = Logger(name, level)
-        formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, colorize_time_and_level,
-                                       level_names, level_colors)
+        formatter = _prepare_formatter(
+            fmt, style, datefmt, show_level, show_time, colorize_time_and_level,
+            level_names, level_colors
+        )
 
         # Defines the handler
-        handler = ColorizingStreamHandler(handle_carriage_return=handle_carriage_return,
-                                          handle_new_line=handle_new_line)
+        handler = ColorizingStreamHandler(
+            handle_carriage_return=handle_carriage_return,
+            handle_new_line=handle_new_line
+        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         _manager.addLogger(name, logger)
 
         if file:
             file_handler = FileHandler.FileHandler(file)
-            file_formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, False, level_names,
-                                                formatter_class=Formatters.DecolorizingFormatter)
+            file_formatter = _prepare_formatter(
+                fmt,
+                style,
+                datefmt,
+                show_level,
+                show_time,
+                False,
+                level_names,
+                formatter_class=Formatters.DecolorizingFormatter
+            )
             file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
 
     return logger
 
 
-def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_time: bool = True,
-                       show_level: bool = True, colorize_time_and_level: bool = True, fmt: _Optional[str] = None,
-                       datefmt: str = "%H:%M:%S", style: str = '%', handle_carriage_return: bool = True,
-                       handle_new_line: bool = True, override=False, level_names: _Optional[_Mapping[int, str]] = None,
-                       width: int = 80, height: int = 20, allow_shell: bool = False) -> LoggingWindow:
+def get_logging_window(
+    name: str = '',
+    level: _Union[int, str] = NOTSET,
+    show_time: bool = True,
+    show_level: bool = True,
+    colorize_time_and_level: bool = True,
+    fmt: _Optional[str] = None,
+    datefmt: str = "%H:%M:%S",
+    style: str = '%',
+    handle_carriage_return: bool = True,
+    handle_new_line: bool = True,
+    override=False,
+    level_names: _Optional[_Mapping[int, str]] = None,
+    width: int = 80,
+    height: int = 20,
+    allow_shell: bool = False
+) -> LoggingWindow:
     """
     Returns a logging window.
 
@@ -232,12 +282,20 @@ def get_logging_window(name: str = '', level: _Union[int, str] = NOTSET, show_ti
     if name:
         logging_window = _manager.getLogger(name)
     if (not logging_window) or override:
-        logging_window = LoggingWindow(name, level=level, width=width, height=height, allow_shell=allow_shell)
-        formatter = _prepare_formatter(fmt, style, datefmt, show_level, show_time, colorize_time_and_level, level_names)
+        logging_window = LoggingWindow(
+            name, level=level, width=width, height=height, allow_shell=allow_shell
+        )
+        formatter = _prepare_formatter(
+            fmt, style, datefmt, show_level, show_time, colorize_time_and_level,
+            level_names
+        )
 
         # Defines the handler
-        handler = LoggingWindowHandler(logging_window, handle_carriage_return=handle_carriage_return,
-                                       handle_new_line=handle_new_line)
+        handler = LoggingWindowHandler(
+            logging_window,
+            handle_carriage_return=handle_carriage_return,
+            handle_new_line=handle_new_line
+        )
         handler.setFormatter(formatter)
         logging_window.addHandler(handler)
         _manager.addLogger(name, logging_window)
@@ -262,19 +320,53 @@ def getpass(*msg, args: tuple = (), end='', **kwargs):
     return logger.getpass(*msg, args=args, end=end, **kwargs)
 
 
-def pprint(obj, indent=1, width=80, depth=None, signs_colors: _Optional[_Mapping[str, str]] = None, *, sort_dicts=True,
-           underscore_numbers=False, compact=False, end='\033[0m\n', **kwargs):
+def pprint(
+    obj,
+    indent=1,
+    width=80,
+    depth=None,
+    signs_colors: _Optional[_Mapping[str, str]] = None,
+    *,
+    sort_dicts=True,
+    underscore_numbers=False,
+    compact=False,
+    end='\033[0m\n',
+    **kwargs
+):
     logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
-    logger.print(pformat(obj=obj, indent=indent, width=width, depth=depth, signs_colors=signs_colors, compact=compact,
-                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers), end=end, **kwargs)
+    logger.print(
+        pformat(
+            obj=obj,
+            indent=indent,
+            width=width,
+            depth=depth,
+            signs_colors=signs_colors,
+            compact=compact,
+            sort_dicts=sort_dicts,
+            underscore_numbers=underscore_numbers
+        ),
+        end=end,
+        **kwargs
+    )
 
 
 pretty_print = pprint
 
 
-def tree_print(obj, indent: int = 4, mode='-', colors: _Mapping[str, str] = None, end='\033[0m\n', **kwargs):
-    logger = get_logger('log21.tree_print', level=DEBUG, show_time=False, show_level=False)
-    logger.print(tree_format(obj, indent=indent, mode=mode, colors=colors), end=end, **kwargs)
+def tree_print(
+    obj,
+    indent: int = 4,
+    mode='-',
+    colors: _Mapping[str, str] = None,
+    end='\033[0m\n',
+    **kwargs
+):
+    logger = get_logger(
+        'log21.tree_print', level=DEBUG, show_time=False, show_level=False
+    )
+    logger.print(
+        tree_format(obj, indent=indent, mode=mode, colors=colors), end=end, **kwargs
+    )
 
 
 tprint = tree_print
@@ -282,9 +374,19 @@ tprint = tree_print
 root = Logger('root-logger', INFO)
 
 
-def basic_config(force: bool = False, encoding: str = None, errors: _Optional[str] = 'backslashreplace', handlers=None,
-                 stream=None, filename=None, filemode: str = 'a', date_format: str = "%H:%M:%S", style: str = '%',
-                 format_: str = None, level: _Union[int, str] = None):
+def basic_config(
+    force: bool = False,
+    encoding: str = None,
+    errors: _Optional[str] = 'backslashreplace',
+    handlers=None,
+    stream=None,
+    filename=None,
+    filemode: str = 'a',
+    date_format: str = "%H:%M:%S",
+    style: str = '%',
+    format_: str = None,
+    level: _Union[int, str] = None
+):
     """
     Do basic configuration for the logging system.
 
@@ -343,26 +445,34 @@ def basic_config(force: bool = False, encoding: str = None, errors: _Optional[st
     if len(root.handlers) == 0:
         if handlers is None:
             if stream and filename:
-                raise ValueError("'stream' and 'filename' should not be specified together")
+                raise ValueError(
+                    "'stream' and 'filename' should not be specified together"
+                )
         else:
             if stream or filename:
-                raise ValueError("'stream' or 'filename' should not be specified together with 'handlers'")
+                raise ValueError(
+                    "'stream' or 'filename' should not be specified together with 'handlers'"
+                )
         if handlers is None:
             if filename:
                 if 'b' in filemode:
                     errors = None
                 else:
                     encoding = _io.text_encoding(encoding)
-                handler = DecolorizingFileHandler(filename, filemode, encoding=encoding, errors=errors)
+                handler = DecolorizingFileHandler(
+                    filename, filemode, encoding=encoding, errors=errors
+                )
             else:
                 handler = ColorizingStreamHandler(stream=stream)
             handlers = [handler]
         if style not in '%{$':
             raise ValueError('Style must be one of: %, {, $')
         if not format_:
-            format_ = {'%': '[%(asctime)s] [%(levelname)s] %(message)s',
-                       '{': '[{asctime}] [{levelname}] {message}',
-                       '$': '[${asctime}] [${levelname}] ${message}'}[style]
+            format_ = {
+                '%': '[%(asctime)s] [%(levelname)s] %(message)s',
+                '{': '[{asctime}] [{levelname}] {message}',
+                '$': '[${asctime}] [${levelname}] ${message}'
+            }[style]
         else:
             format_ = format_
         formatter = ColorizingFormatter(format_, date_format, style=style)
@@ -456,13 +566,21 @@ def log(level, *msg, args=(), **kwargs):
     root.log(level, *msg, args=args, **kwargs)
 
 
-def progress_bar(progress: float, total: float, width: _Optional[int] = None, prefix: str = '|', suffix: str = '|',
-                 show_percentage: bool = True):
+def progress_bar(
+    progress: float,
+    total: float,
+    width: _Optional[int] = None,
+    prefix: str = '|',
+    suffix: str = '|',
+    show_percentage: bool = True
+):
     """
     Print a progress bar to the console.
     """
 
-    bar = ProgressBar(width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage)
+    bar = ProgressBar(
+        width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage
+    )
 
     print(bar.get_bar(progress, total))
 
