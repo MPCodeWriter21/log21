@@ -23,9 +23,10 @@ classifiers = [
   "Operating System :: MacOS :: MacOS X"
 ]
 dependencies = [
-  "webcolors"
+  "webcolors",
+  "docstring-parser"
 ]
-version = "2.5.5"
+version = "2.6.0"
 
 [tool.setuptools.packages.find]
 where = ["src"]

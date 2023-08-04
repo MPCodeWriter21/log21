@@ -4,25 +4,27 @@
 import io as _io
 import os as _os
 import logging as _logging
+from typing import (Type as _Type, Tuple as _Tuple, Union as _Union,
+                    Mapping as _Mapping, Optional as _Optional)
 
-from typing import Union as _Union, Mapping as _Mapping, Type as _Type, Tuple as _Tuple, Optional as _Optional
-
-import log21.CrashReporter as CrashReporter
-
-from log21.Levels import INPUT, CRITICAL, FATAL, ERROR, WARNING, WARN, INFO, DEBUG, NOTSET
+from log21 import CrashReporter
+from log21.Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
+                          get_color_name)
+from log21.Levels import (INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING,
+                          CRITICAL)
 from log21.Logger import Logger
-from log21.Manager import Manager
-from log21.ProgressBar import ProgressBar
 from log21.PPrint import PrettyPrinter, pformat
-from log21.TreePrint import TreePrint, tree_format
+from log21.Manager import Manager
 from log21.Argparse import ColorizingArgumentParser
-from log21.FileHandler import DecolorizingFileHandler
-from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
-from log21.StreamHandler import ColorizingStreamHandler, StreamHandler
+from log21.TreePrint import TreePrint, tree_format
 from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
-from log21.Colors import Colors, get_color, get_colors, ansi_escape, get_color_name, closest_color
+from log21.Argumentify import argumentify
+from log21.FileHandler import DecolorizingFileHandler
+from log21.ProgressBar import ProgressBar
+from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
+from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.5.5"
+__version__ = "2.6.0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -35,7 +37,7 @@ __all__ = [
     '__github__', 'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal',
     'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
     'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
-    'console_reporter', 'file_reporter'
+    'console_reporter', 'file_reporter', 'argumentify'
 ]
 
 _manager = Manager()
@@ -223,8 +225,7 @@ def get_logging_window(
     height: int = 20,
     allow_shell: bool = False
 ) -> LoggingWindow:
-    """
-    Returns a logging window.
+    """Returns a logging window.
 
     >>> # Let's see how it works
     >>> # Imports log21 and time modules
@@ -387,8 +388,7 @@ def basic_config(
     format_: str = None,
     level: _Union[int, str] = None
 ):
-    """
-    Do basic configuration for the logging system.
+    """Do basic configuration for the logging system.
 
     This function does nothing if the root logger already has handlers
     configured, unless the keyword argument *force* is set to ``True``.
@@ -488,9 +488,10 @@ basicConfig = basic_config
 
 
 def critical(*msg, args=(), **kwargs):
-    """
-    Log a message with severity 'CRITICAL' on the root logger. If the logger has no handlers, call basicConfig() to add
-    a console handler with a pre-defined format.
+    """Log a message with severity 'CRITICAL' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -498,16 +499,15 @@ def critical(*msg, args=(), **kwargs):
 
 
 def fatal(*msg, args=(), **kwargs):
-    """
-    Don't use this function, use critical() instead.
-    """
+    """Don't use this function, use critical() instead."""
     critical(*msg, args=args, **kwargs)
 
 
 def error(*msg, args=(), **kwargs):
-    """
-    Log a message with severity 'ERROR' on the root logger. If the logger has no handlers, call basicConfig() to add a
-    console handler with a pre-defined format.
+    """Log a message with severity 'ERROR' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -515,17 +515,20 @@ def error(*msg, args=(), **kwargs):
 
 
 def exception(*msg, args=(), exc_info=True, **kwargs):
-    """
-    Log a message with severity 'ERROR' on the root logger, with exception information. If the logger has no handlers,
-    basicConfig() is called to add a console handler with a pre-defined format.
+    """Log a message with severity 'ERROR' on the root logger, with exception
+    information.
+
+    If the logger has no handlers, basicConfig() is called to add a
+    console handler with a pre-defined format.
     """
     error(*msg, args=args, exc_info=exc_info, **kwargs)
 
 
 def warning(*msg, args=(), **kwargs):
-    """
-    Log a message with severity 'WARNING' on the root logger. If the logger has no handlers, call basicConfig() to add
-    a console handler with a pre-defined format.
+    """Log a message with severity 'WARNING' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -537,9 +540,10 @@ def warn(*msg, args=(), **kwargs):
 
 
 def info(*msg, args=(), **kwargs):
-    """
-    Log a message with severity 'INFO' on the root logger. If the logger has no handlers, call basicConfig() to add a
-    console handler with a pre-defined format.
+    """Log a message with severity 'INFO' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -547,9 +551,10 @@ def info(*msg, args=(), **kwargs):
 
 
 def debug(*msg, args=(), **kwargs):
-    """
-    Log a message with severity 'DEBUG' on the root logger. If the logger has no handlers, call basicConfig() to add a
-    console handler with a pre-defined format.
+    """Log a message with severity 'DEBUG' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -557,9 +562,10 @@ def debug(*msg, args=(), **kwargs):
 
 
 def log(level, *msg, args=(), **kwargs):
-    """
-    Log 'msg % args' with the integer severity 'level' on the root logger. If the logger has no handlers, call
-    basicConfig() to add a console handler with a pre-defined format.
+    """Log 'msg % args' with the integer severity 'level' on the root logger.
+
+    If the logger has no handlers, call basicConfig() to add a console
+    handler with a pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -574,9 +580,7 @@ def progress_bar(
     suffix: str = '|',
     show_percentage: bool = True
 ):
-    """
-    Print a progress bar to the console.
-    """
+    """Print a progress bar to the console."""
 
     bar = ProgressBar(
         width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage

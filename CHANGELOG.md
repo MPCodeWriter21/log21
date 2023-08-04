@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.6.0
+
+Added the `Argumentify` module. Check the examples.
+
 ### 2.5.5
 
 Fixed a bug in the `TreePrint` class.

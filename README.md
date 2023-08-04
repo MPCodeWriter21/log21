@@ -22,9 +22,12 @@ Features
   structure. It's also colorized XD.
 + ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
 + LoggingWindow : Helps you to log messages and debug your code in a window other than the console.
-+ CrashReporter : log21's crash reporter can be used to report crashes in different ways. You can use it to log crashes
-  to console or files or use it to receive crash reports of your program through email. And you can also define your own
-  crash reporter functions and use them instead!
++ CrashReporter : log21's crash reporter can be used to report crashes in different
+  ways. You can use it to log crashes to console or files or use it to receive crash
+  reports of your program through email. And you can also define your own crash
+  reporter functions and use them instead!
++ Argumentify : You can use the argumentify feature to decrease the number of lines you
+  need to write to parse command-line arguments. It's colored by the way!
 + Any idea? Feel free to [open an issue](https://github.com/MPCodeWriter21/log21/issues) or submit a pull request.
 
 ![issues](https://img.shields.io/github/issues/MPCodeWriter21/log21)
@@ -40,22 +43,27 @@ python.
 
 Then you can install log21 using pip module:
 
-```shell
+```bash
 python -m pip install log21 -U
 ```
 
 Or you can clone [the repository](https://github.com/MPCodeWriter21/log21) and run:
 
-```shell
-python setup.py install
+```bash
+pip install .
+```
+
+Or let the pip get it using git:
+```bash
+pip install git+https://github.com/MPCodeWriter21/log21
 ```
 
 Changes
 -------
 
-### 2.5.5
+### 2.6.0
 
-Fixed a bug in the `TreePrint` class.
+Added the `Argumentify` module. Check the examples.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
@@ -63,7 +71,9 @@ Fixed a bug in the `TreePrint` class.
 Usage Examples:
 ---------------
 
-```python3
+### Basic Logging
+
+```python
 import log21
 
 log21.print(log21.get_color('#FF0000') + 'This' + log21.get_color((0, 255, 0)) + ' is' + log21.get_color('Blue') +
@@ -87,7 +97,9 @@ logger.error(log21.get_colors('LightRed') + "I'm still here ;1")
 
 ----------------
 
-```python3
+### Argument Parsing (See Also: [Argumentify](https://github.com/MPCodeWriter21/log21#argumentify))
+
+```python
 import log21
 from log21 import ColorizingArgumentParser, get_logger, get_colors as gc
 
@@ -133,7 +145,9 @@ logger.info(gc('LightWhite') + 'Done!')
 
 ------------------
 
-```python3
+### Pretty-Printing and Tree-Printing
+
+```python
 import json
 import log21
 
@@ -156,7 +170,9 @@ log21.tree_print(data)
 
 ------------------
 
-```python3
+### Logging Window
+
+```python
 import log21
 
 window = log21.get_logging_window('My Logging Window', width=80)
@@ -197,7 +213,9 @@ window.error(colored_text)
 
 ------------------
 
-```python3
+### ProgressBar
+
+```python
 # Example 1
 import log21, time
 
@@ -234,6 +252,199 @@ for i in range(84):
 
 ![ProgressBar - Example 1](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.1.gif)
 ![ProgressBar - Example 2](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-5.2.gif)
+
+------------------
+
+### Argumentify (Check out [the manual way](https://github.com/MPCodeWriter21/log21#argument-parsing))
+
+```python
+# Common Section
+import log21
+
+
+class ReversedText:
+    def __init__(self, text: str):
+        self._text = text[::-1]
+
+    def __str__(self):
+        return self._text
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}(text='{self._text}') at {hex(id(self))}>"
+
+
+# Old way
+def main():
+    """Here is my main function"""
+    parser = log21.ColorizingArgumentParser()
+    parser.add_argument('--positional-arg', '-p', action='store', type=int,
+                        required=True, help="This argument is positional!")
+    parser.add_argument('--optional-arg', '-o', action='store', type=ReversedText,
+                        help="Whatever you pass here will be REVERSED!")
+    parser.add_argument('--arg-with-default', '-a', action='store', default=21,
+                        help="The default value is 21")
+    parser.add_argument('--additional-arg', '-A', action='store',
+                        help="This one is extra.")
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help="Increase verbosity")
+    args = parser.parse_args()
+
+    if args.verbose:
+        log21.basic_config(level='DEBUG')
+
+    log21.info(f"positional_arg = {args.positional_arg}")
+    log21.info(f"optional_arg = {args.optional_arg}")
+    log21.debug(f"arg_with_default = {args.arg_with_default}")
+    log21.debug(f"additional_arg = {args.additional_arg}")
+
+
+if __name__ == '__main__':
+    main()
+
+
+# New way
+def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: int = 21,
+         additional_arg=None, verbose: bool = False):
+    """Some description
+
+    :param positional_arg: This argument is positional!
+    :param optional_arg: Whatever you pass here will be REVERSED!
+    :param arg_with_default: The default value is 21
+    :param additional_arg: This one is extra.
+    :param verbose: Increase verbosity
+    """
+    if verbose:
+        log21.basic_config(level='DEBUG')
+
+    log21.info(f"{positional_arg = }")
+    log21.info(f"{optional_arg = !s}")
+    log21.debug(f"{arg_with_default = }")
+    log21.debug(f"{additional_arg = !s}")
+
+
+if __name__ == '__main__':
+    log21.argumentify(main)
+```
+
+![Old-Way](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-6.1.png)
+![New-Way](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-6.2.png)
+
+Example with multiple functions as entry-point:
+
+```python
+import ast
+import operator
+from functools import reduce
+
+import log21
+
+# `safe_eval` Based on https://stackoverflow.com/a/9558001/1113207
+# Supported Operators
+operators = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Pow: operator.pow,
+    ast.BitXor: operator.xor,
+    ast.USub: operator.neg
+}
+
+
+def safe_eval(expr: str):
+    """Safely evaluate a mathematical expression.
+
+    >>> eval_expr('2^6')
+    4
+    >>> eval_expr('2**6')
+    64
+    >>> eval_expr('1 + 2*3**(4^5) / (6 + -7)')
+    -5.0
+
+    :param expr: expression to evaluate
+    :raises SyntaxError: on invalid expression
+    :return: result of the evaluation
+    """
+    try:
+        return _eval(ast.parse(expr, mode='eval').body)
+    except (TypeError, KeyError, SyntaxError):
+        log21.error(f'Invalid expression: {expr}')
+        raise
+
+
+def _eval(node: ast.AST):
+    """Internal implementation of `safe_eval`.
+
+    :param node: AST node to evaluate
+    :raises TypeError: on invalid node
+    :raises KeyError: on invalid operator
+    :raises ZeroDivisionError: on division by zero
+    :raises ValueError: on invalid literal
+    :raises SyntaxError: on invalid syntax
+    :return: result of the evaluation
+    """
+    if isinstance(node, ast.Num):  # <number>
+        return node.n
+    if isinstance(node, ast.BinOp):  # <left> <operator> <right>
+        return operators[type(node.op)](_eval(node.left), _eval(node.right))
+    if isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+        return operators[type(node.op)](_eval(node.operand))
+    raise TypeError(node)
+
+
+# Example code
+def addition(*numbers: float):
+    """Addition of numbers.
+
+    Args:
+        numbers (float): numbers to add
+    """
+    if len(numbers) < 2:
+        log21.error('At least two numbers are required! Use `-n`.')
+        return
+    log21.info(f'Result: {sum(numbers)}')
+
+
+def multiplication(*numbers: float):
+    """Multiplication of numbers.
+
+    Args:
+        numbers (float): numbers to multiply
+    """
+    if len(numbers) < 2:
+        log21.error('At least two numbers are required! Use `-n`.')
+        return
+    log21.info(f'Result: {reduce(lambda x, y: x * y, numbers)}')
+
+
+def calc(*inputs: str, verbose: bool = False):
+    """Calculate numbers.
+
+    :param inputs: numbers and operators
+    """
+    expression = ' '.join(inputs)
+
+    if len(expression) < 3:
+        log21.error('At least two numbers and one operator are required! Use `-i`.')
+        return
+
+    if verbose:
+        log21.basic_config(level='DEBUG')
+
+    log21.debug(f'Expression: {expression}')
+    try:
+        log21.info(f'Result: {safe_eval(expression)}')
+    except (TypeError, KeyError, SyntaxError):
+        pass
+
+
+if __name__ == "__main__":
+    log21.argumentify({'add': addition, 'mul': multiplication, 'calc': calc})
+```
+
+![multi-entry](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-6.3.png)
+
 
 About
 -----
