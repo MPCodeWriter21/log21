@@ -61,9 +61,12 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.6.0
+### 2.6.1
 
-Added the `Argumentify` module. Check the examples.
+Added `encoding` to `log21.CrashReporter.FileReporter`.
+Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
+Added optional `dev` dependencies to `pyproject.toml`.
+Improved overall code quality.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
@@ -97,7 +100,7 @@ logger.error(log21.get_colors('LightRed') + "I'm still here ;1")
 
 ----------------
 
-### Argument Parsing (See Also: [Argumentify](https://github.com/MPCodeWriter21/log21#argumentify))
+### Argument Parsing (See Also: [Argumentify](https://github.com/MPCodeWriter21/log21#argumentify-check-out-the-manual-way))
 
 ```python
 import log21
@@ -255,7 +258,7 @@ for i in range(84):
 
 ------------------
 
-### Argumentify (Check out [the manual way](https://github.com/MPCodeWriter21/log21#argument-parsing))
+### Argumentify (Check out [the manual way](https://github.com/MPCodeWriter21/log21#argumentify-check-out-the-manual-way))
 
 ```python
 # Common Section

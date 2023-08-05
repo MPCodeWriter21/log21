@@ -278,7 +278,7 @@ def get_color_name(
 
 def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> str:
     """Gets a color name and returns it in ansi format
-    
+
     >>>
     >>> get_color('LightRed')
     '\x1b[91m'
@@ -288,7 +288,7 @@ def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> 
     [21:21:21] [INFO] Hello World!
     >>> # Note that you must run it yourself to see the colorful result ;D
     >>>
-    
+
     :param color: color name(Example: Blue)
     :param raise_exceptions: bool = False:
         False: It will return '' instead of raising exceptions when an error occurs.

@@ -3,24 +3,32 @@
 
 import re as _re
 import sys as _sys
-import log21 as _log21
 import argparse as _argparse
-
+from typing import Mapping as _Mapping, Optional as _Optional
 from gettext import gettext as _gettext
 from textwrap import TextWrapper as _TextWrapper
-from typing import Mapping as _Mapping, Optional as _Optional
 
+import log21 as _log21
 from log21.Colors import get_colors as _gc
 from log21.Formatters import DecolorizingFormatter as _Formatter
 
-__all__ = ['ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper']
+__all__ = [
+    'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper'
+]
 
 
 class ColorizingHelpFormatter(_argparse.HelpFormatter):
-    def __init__(self, prog, indent_increment=2, max_help_position=24, width=None,
-                 colors: _Optional[_Mapping[str, str]] = None):
+
+    def __init__(
+        self,
+        prog,
+        indent_increment=2,
+        max_help_position=24,
+        width=None,
+        colors: _Optional[_Mapping[str, str]] = None
+    ):
         super().__init__(prog, indent_increment, max_help_position, width)
-        
+
         self.colors = {
             'usage': 'Cyan',
             'brackets': 'LightRed',
@@ -39,6 +47,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                     self.colors[key] = value
 
     class _Section(object):
+
         def __init__(self, formatter, parent, heading=None):
             self.formatter = formatter
             self.parent = parent
@@ -67,14 +76,19 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 heading = ''
 
             # join the section-initial newline, the heading and the help
-            return join(['\n', heading, _gc(self.formatter.colors['help']), item_help, '\n'])
+            return join(
+                ['\n', heading,
+                 _gc(self.formatter.colors['help']), item_help, '\n']
+            )
 
     def _add_item(self, func, args):
         self._current_section.items.append((func, args))
 
     def _fill_text(self, text, width, indent):
         text = self._whitespace_matcher.sub(' ', text).strip()
-        return ColorizingTextWrapper(width=width, initial_indent=indent, subsequent_indent=indent).fill(text)
+        return ColorizingTextWrapper(
+            width=width, initial_indent=indent, subsequent_indent=indent
+        ).fill(text)
 
     def _split_lines(self, text, width):
         text = self._whitespace_matcher.sub(' ', text).strip()
@@ -82,15 +96,16 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
 
     def start_section(self, heading):
         self._indent()
-        section = self._Section(self, self._current_section,
-                                _gc(self.colors['section headers']) + str(heading) + '\033[0m')
+        section = self._Section(
+            self, self._current_section,
+            _gc(self.colors['section headers']) + str(heading) + '\033[0m'
+        )
         self._add_item(section.format_help, [])
         self._current_section = section
 
     def _format_action(self, action):
         # determine the required width and the entry label
-        help_position = min(self._action_max_length + 2,
-                            self._max_help_position)
+        help_position = min(self._action_max_length + 2, self._max_help_position)
         help_width = max(self._width - help_position, 11)
         action_width = help_position - self._current_indent - 2
         action_header = _gc('rst') + self._format_action_invocation(action)
@@ -101,7 +116,9 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
             action_header = self._current_indent * ' ' + action_header + '\n'
         # short action name; start on the same line and pad two spaces
         elif len(action_header) <= action_width:
-            action_header = '%*s%-*s  ' % (self._current_indent, '', action_width, action_header)
+            action_header = '%*s%-*s  ' % (
+                self._current_indent, '', action_width, action_header
+            )
         # long action name; start on the next line
         else:
             action_header = self._current_indent * ' ' + action_header + '\n'
@@ -181,7 +198,8 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                     else:
                         line_len = len(indent) - 1
                     for part in parts:
-                        if line_len + 1 + len(_Formatter.decolorize(part)) > text_width and line:
+                        if line_len + 1 + len(_Formatter.decolorize(part)
+                                              ) > text_width and line:
                             lines.append(indent + ' '.join(line))
                             line = []
                             line_len = len(indent) - 1
@@ -297,13 +315,15 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 else:
                     default = self._get_default_metavar_for_optional(action)
                     args_string = self._format_args(action, default)
-                    part = _gc(self.colors['switches']) + '%s %s%s' % (option_string, _gc(self.colors['values']),
-                                                                       args_string)
+                    part = _gc(self.colors['switches']) + '%s %s%s' % (
+                        option_string, _gc(self.colors['values']), args_string
+                    )
 
                 # make it look optional if it's not required or in a group
                 if not action.required and action not in group_actions:
                     part = _gc(self.colors['brackets']) + '[' + part + _gc(
-                        self.colors['brackets']) + ']\033[0m'
+                        self.colors['brackets']
+                    ) + ']\033[0m'
 
                 # add the action string to the list
                 parts.append(part)
@@ -348,8 +368,10 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 default = self._get_default_metavar_for_optional(action)
                 args_string = self._format_args(action, default)
                 for option_string in action.option_strings:
-                    parts.append(_gc(self.colors['switches']) + '%s %s%s' % (option_string, _gc(self.colors['values']),
-                                                                             args_string))
+                    parts.append(
+                        _gc(self.colors['switches']) + '%s %s%s' %
+                        (option_string, _gc(self.colors['values']), args_string)
+                    )
 
             return _gc(self.colors['commas']) + ', '.join(parts)
 
@@ -368,7 +390,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
             if isinstance(result, tuple):
                 return result
             else:
-                return (result,) * tuple_size
+                return (result, ) * tuple_size
 
         return format
 
@@ -421,7 +443,8 @@ class ColorizingTextWrapper(_TextWrapper):
 
             # First chunk on the line is whitespace -- drop it, unless this
             # is the very beginning of the text (i.e. no lines started yet).
-            if self.drop_whitespace and _Formatter.decolorize(chunks[-1]).strip() == '' and lines:
+            if self.drop_whitespace and _Formatter.decolorize(chunks[-1]
+                                                              ).strip() == '' and lines:
                 del chunks[-1]
 
             while chunks:
@@ -444,24 +467,23 @@ class ColorizingTextWrapper(_TextWrapper):
                 current_len = sum(map(len, current_line))
 
             # If the last chunk on this line is all whitespace, drop it.
-            if self.drop_whitespace and current_line and _Formatter.decolorize(current_line[-1]).strip() == '':
+            if self.drop_whitespace and current_line and _Formatter.decolorize(
+                    current_line[-1]).strip() == '':
                 current_len -= len(_Formatter.decolorize(current_line[-1]))
                 del current_line[-1]
 
             if current_line:
-                if (self.max_lines is None or
-                        len(lines) + 1 < self.max_lines or
-                        (not chunks or
-                         self.drop_whitespace and
-                         len(chunks) == 1 and
-                         not chunks[0].strip()) and current_len <= width):
+                if (self.max_lines is None or len(lines) + 1 < self.max_lines
+                        or (not chunks or self.drop_whitespace and len(chunks) == 1
+                            and not chunks[0].strip()) and current_len <= width):
                     # Convert current line back to a string and store it in
                     # list of all lines (return value).
                     lines.append(indent + ''.join(current_line))
                 else:
                     while current_line:
-                        if _Formatter.decolorize(current_line[-1]).strip() and current_len + len(
-                                self.placeholder) <= width:
+                        if _Formatter.decolorize(
+                                current_line[-1]
+                        ).strip() and current_len + len(self.placeholder) <= width:
                             current_line.append(self.placeholder)
                             lines.append(indent + ''.join(current_line))
                             break
@@ -481,7 +503,13 @@ class ColorizingTextWrapper(_TextWrapper):
 
 
 class ColorizingArgumentParser(_argparse.ArgumentParser):
-    def __init__(self, formatter_class=ColorizingHelpFormatter, colors: _Optional[_Mapping[str, str]] = None, **kwargs):
+
+    def __init__(
+        self,
+        formatter_class=ColorizingHelpFormatter,
+        colors: _Optional[_Mapping[str, str]] = None,
+        **kwargs
+    ):
         self.logger = _log21.Logger('ArgumentParser')
         self.colors = colors
         super().__init__(formatter_class=formatter_class, **kwargs)
@@ -501,7 +529,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser):
     def error(self, message):
         self.print_usage(_sys.stderr)
         args = {'prog': self.prog, 'message': message}
-        self.exit(2, _gettext(f'%(prog)s: {_gc("r")}error{_gc("lr")}:{_gc("rst")} %(message)s\n') % args)
+        self.exit(
+            2,
+            _gettext(
+                f'%(prog)s: {_gc("r")}error{_gc("lr")}:{_gc("rst")} %(message)s\n'
+            ) % args
+        )
 
     def _get_formatter(self):
         if hasattr(self.formatter_class, 'colors'):

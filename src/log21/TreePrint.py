@@ -3,17 +3,17 @@
 
 from __future__ import annotations
 
-from typing import (
-    List as _List, Union as _Union, Mapping as _Mapping, Optional as _Optional, Sequence
-    as _Sequence
-)
+from typing import (List as _List, Union as _Union, Mapping as _Mapping,
+                    Optional as _Optional, Sequence as _Sequence)
 
 from log21.Colors import get_colors as _gc
 
 
 class TreePrint:
+    """A class to help you print objects in a tree-like format."""
 
     class Node:
+        """A class to represent a node in a tree."""
 
         def __init__(
             self,
@@ -23,6 +23,14 @@ class TreePrint:
             colors: _Optional[_Mapping[str, str]] = None,
             mode: str = '-'
         ):
+            """Initialize a node.
+
+            :param value: The value of the node.
+            :param children: The children of the node.
+            :param indent: Number of spaces to indent the node.
+            :param colors: Colors to use for the node.
+            :param mode: Choose between '-' and '='.
+            """
             self.value = str(value)
             if children:
                 self._children = children
@@ -35,9 +43,9 @@ class TreePrint:
             }
 
             if colors:
-                for key, value in colors.items():
+                for key, value_ in colors.items():
                     if key in self.colors:
-                        self.colors[key] = _gc(value)
+                        self.colors[key] = _gc(value_)
             if not mode:
                 self.mode = 1
             else:
@@ -80,13 +88,13 @@ class TreePrint:
 
             for i, child in enumerate(self._children):
                 prefix_ = ''
-                for j in range(len(prefix)):
-                    if prefix[j] in '┌│├┬╔║╠╦':
+                for part in prefix:
+                    if part in '┌│├┬╔║╠╦':
                         prefix_ += chars[2]  # │ OR ║
-                    elif prefix[j] in chars:
+                    elif part in chars:
                         prefix_ += ' '
                     else:
-                        prefix_ += prefix[j]
+                        prefix_ += part
 
                 if i + 1 == len(self._children):
                     prefix_ += chars[6]  # └ OR ╚
@@ -100,14 +108,17 @@ class TreePrint:
             return text
 
         def has_child(self):
+            """Return True if node has children, False otherwise."""
             return len(self._children) > 0
 
         def add_child(self, child: TreePrint.Node):
+            """Add a child to the node."""
             if not isinstance(child, TreePrint.Node):
                 raise TypeError('`child` must be TreePrint.Node')
             self._children.append(child)
 
         def get_child(self, value: _Optional[str] = None, index: _Optional[int] = None):
+            """Get a child by value or index."""
             if value and index:
                 raise ValueError('`value` and `index` can not be both set')
             if not value and not index:
@@ -118,6 +129,7 @@ class TreePrint:
                         return child
             if index:
                 return self._children[index]
+            raise ValueError(f'Failed to find child: {value = }, {index = }')
 
         def add_to(
             self: TreePrint.Node,
@@ -125,7 +137,8 @@ class TreePrint:
             indent: int = 4,
             colors: _Optional[_Mapping[str, str]] = None,
             mode='-'
-        ):
+        ):  # pylint: disable=too-many-branches
+            """Add data to the node."""
             if isinstance(data, _Mapping):
                 if len(data) == 1:
                     child = TreePrint.Node(
@@ -206,6 +219,7 @@ class TreePrint:
         data: _Union[_Mapping, _Sequence, str, int],
         colors: _Optional[_Mapping[str, str]] = None
     ):
+        """Add data to root node."""
         self.root.add_to(data, indent=self.indent, colors=colors, mode=self.mode)
 
     def __str__(self, mode=None):
@@ -219,5 +233,13 @@ def tree_format(
     indent: int = 4,
     mode='-',
     colors: _Optional[_Mapping[str, str]] = None
-):
+) -> str:
+    """Return a tree representation of data.
+
+    :param data: data to be represented as a tree (dict, list, str, int)
+    :param indent: number of spaces to indent each level of the tree
+    :param mode: mode of tree representation ('-', '=')
+    :param colors: colors to use for each level of the tree
+    :return: tree representation of data
+    """
     return str(TreePrint(data, indent=indent, colors=colors, mode=mode))

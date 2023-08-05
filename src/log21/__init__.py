@@ -24,7 +24,7 @@ from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.6.0"
+__version__ = "2.6.1"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -118,8 +118,8 @@ def get_logger(
     >>> l.critical('CONTINUE READING!! please...')
     [14:50:08] [CRITICAL] CONTINUE READING!! please...
     >>>
-    >>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO, fmt='{asctime} -> [{levelname}]: {message}',
-    ... style='{', override=True)
+    >>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO,
+    ... fmt='{asctime} -> [{levelname}]: {message}', style='{', override=True)
     >>>
     >>> my_logger.info('FYI: My name is Mehrad.')
     14:56:12 -> [INFO]: FYI: My name is Mehrad.
@@ -127,7 +127,8 @@ def get_logger(
     14:56:29 -> [ERROR]: Oh no! Something went wrong D:
     >>>
     >>> my_logger.debug(1 ,2 ,3)
-    >>> # It prints Nothing because our logger level is INFO and DEBUG level is less than INFO.
+    >>> # It prints Nothing because our logger level is INFO and DEBUG level is lower
+    >>> # than INFO.
     >>> # So let's modify the my_logger's level
     >>> my_logger.setLevel(log21.DEBUG)
     >>> # Now we try again...
@@ -154,18 +155,23 @@ def get_logger(
     :param level: Union[int, str] = logging.NOTSET: The logging level of the logger
     :param show_time: bool = True: Show the time in the log
     :param show_level: bool = True: Show the level of logging in the log
-    :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
+    :param fmt: Optional[str]: Custom formatting for the logger - overrides the default
+        (show_time & show_level)
     :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
-    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of
-        %-formatting, :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format
-        string.
-    :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
-    :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
-    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything
-        else
-    :param override: bool = True: Overrides the logger attributes even if it already exists
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that
+        you want to use one of %-formatting, :meth:`str.format` (``{}``) formatting or
+        :class:`string.Template` formatting in your format string.
+    :param colorize_time_and_level: bool = True: Colorizes the time and level using the
+        default colors
+    :param handle_carriage_return: bool = True: Adds a line of space characters to
+        remove any text before the CR
+    :param handle_new_line: bool = True: Places the NewLine characters at the beginning
+        of the text before everything else
+    :param override: bool = True: Overrides the logger attributes even if it already
+        exists.
     :param level_names: Mapping[int, str] = None: You can specify custom level names.
-    :param level_colors: Mapping[int, Tuple[str, ...]] = None: You can specify custom level colors.
+    :param level_colors: Mapping[int, Tuple[str, ...]] = None: You can specify custom
+        level colors.
     :param file: Union[os.PathLike, str] = None: The file to log to
     :return: log21.Logger
     """
@@ -237,7 +243,8 @@ def get_logging_window(
     >>>
     >>> window.info('This works properly!')
     >>>
-    >>> # You can use HEX colors as well as the ANSI colors which are supported by normal loggers
+    >>> # You can use HEX colors as well as the ANSI colors which are supported by
+    >>> # normal loggers
     >>> # ANSI colors usage:
     >>> window.info('This is a \033[91mred\033[0m message.')
     >>> window.info('\033[102mThis is a message with green background.')
@@ -261,16 +268,20 @@ def get_logging_window(
     :param level: Union[int, str] = logging.NOTSET: The logging level of the logger
     :param show_time: bool = True: Show the time in the log
     :param show_level: bool = True: Show the level of logging in the log
-    :param fmt: Optional[str]: Custom formatting for the logger - overrides the default(show_time & show_level)
+    :param fmt: Optional[str]: Custom formatting for the logger - overrides the default
+        (show_time & show_level)
     :param datefmt: str = "%H:%M:%S": Custom date-time formatting for the logger
-    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that you want to use one of
-        %-formatting, :meth:`str.format` (``{}``) formatting or :class:`string.Template` formatting in your format
-        string.
-    :param colorize_time_and_level: bool = True: Colorizes the time and level using the default colors
-    :param handle_carriage_return: bool = True: Adds a line of space characters to remove any text before the CR
-    :param handle_new_line: bool = True: Places the NewLine characters at the beginning of the text before everything
-        else
-    :param override: bool = True: Overrides the logger attributes even if it already exists
+    :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that
+        you want to use one of %-formatting, :meth:`str.format` (``{}``) formatting or
+        :class:`string.Template` formatting in your format string.
+    :param colorize_time_and_level: bool = True: Colorizes the time and level using the
+        default colors
+    :param handle_carriage_return: bool = True: Adds a line of space characters to
+        remove any text before the CR
+    :param handle_new_line: bool = True: Places the NewLine characters at the beginning
+        of the text before everything else
+    :param override: bool = True: Overrides the logger attributes even if it already
+        exists
     :param level_names: Mapping[int, str] = None: You can specify custom level names.
     :param width: int = 80: The width of the window
     :param height: int = 20: The height of the window
@@ -306,17 +317,33 @@ def get_logging_window(
 getLogger = get_logger
 
 
-def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
+def print(  # pylint: disable=redefined-builtin
+    *msg,
+    args: tuple = (),
+    end='\033[0m\n',
+    **kwargs
+):
+    """Works like the print function but ANSI colors are supported (even on
+    Windows) and it ends with a new line and a reset color by default."""
     logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
     logger.print(*msg, args=args, end=end, **kwargs)
 
 
-def input(*msg, args: tuple = (), end='', **kwargs):
+def input(  # pylint: disable=redefined-builtin
+    *msg,
+    args: tuple = (),
+    end='',
+    **kwargs
+):
+    """Works like the input function but ANSI colors are supported (even on
+    Windows)."""
     logger = get_logger('log21.input', level=DEBUG, show_time=False, show_level=False)
     return logger.input(*msg, args=args, end=end, **kwargs)
 
 
 def getpass(*msg, args: tuple = (), end='', **kwargs):
+    """Works like the getpass.getpass function but ANSI colors are supported
+    (even on Windows)."""
     logger = get_logger('log21.getpass', level=DEBUG, show_time=False, show_level=False)
     return logger.getpass(*msg, args=args, end=end, **kwargs)
 
@@ -334,6 +361,24 @@ def pprint(
     end='\033[0m\n',
     **kwargs
 ):
+    """A colorful version of the pprint.pprint function.
+
+    :param obj: The object to print.
+    :param indent: The amount of indentation to use.
+    :param width: The maximum width in characters of the output.
+    :param depth: The maximum depth to print nested structures. None
+        means unlimited.
+    :param signs_colors: A mapping that lets you specify the colors of
+        the supported signs.
+    :param sort_dicts: If True, dictionaries are sorted by key.
+    :param underscore_numbers: If True, numbers are printed with an
+        underscore between each group of three digits.
+    :param compact: If True, lists and tuples are displayed on a single
+        line.
+    :param end: The string to append at the end of the output.
+    :param kwargs: Additional keyword arguments passed to the
+        Logger.print function.
+    """
     logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
     logger.print(
         pformat(
@@ -358,10 +403,21 @@ def tree_print(
     obj,
     indent: int = 4,
     mode='-',
-    colors: _Mapping[str, str] = None,
+    colors: _Optional[_Mapping[str, str]] = None,
     end='\033[0m\n',
     **kwargs
 ):
+    """Prints a tree representation of the given object. (e.g. a dictionary)
+
+    :param obj: The object to print.
+    :param indent: The number of spaces to indent each level.
+    :param mode: The mode to use for the tree. Can be '-' or '='.
+    :param colors: A mapping that lets you customize the colors of
+        branches and fruits.
+    :param end: The string to append at the end of the output.
+    :param kwargs: Additional keyword arguments passed to the
+        Logger.print function.
+    """
     logger = get_logger(
         'log21.tree_print', level=DEBUG, show_time=False, show_level=False
     )
@@ -377,7 +433,7 @@ root = Logger('root-logger', INFO)
 
 def basic_config(
     force: bool = False,
-    encoding: str = None,
+    encoding: _Optional[str] = None,
     errors: _Optional[str] = 'backslashreplace',
     handlers=None,
     stream=None,
@@ -385,9 +441,9 @@ def basic_config(
     filemode: str = 'a',
     date_format: str = "%H:%M:%S",
     style: str = '%',
-    format_: str = None,
-    level: _Union[int, str] = None
-):
+    format_: _Optional[str] = None,
+    level: _Optional[_Union[int, str]] = None
+):  # pylint: disable=too-many-branches
     """Do basic configuration for the logging system.
 
     This function does nothing if the root logger already has handlers
@@ -451,7 +507,8 @@ def basic_config(
         else:
             if stream or filename:
                 raise ValueError(
-                    "'stream' or 'filename' should not be specified together with 'handlers'"
+                    "'stream' or 'filename' should not be specified together with "
+                    "'handlers'"
                 )
         if handlers is None:
             if filename:
@@ -473,8 +530,6 @@ def basic_config(
                 '{': '[{asctime}] [{levelname}] {message}',
                 '$': '[${asctime}] [${levelname}] ${message}'
             }[style]
-        else:
-            format_ = format_
         formatter = ColorizingFormatter(format_, date_format, style=style)
         for handler in handlers:
             if handler.formatter is None:
@@ -536,6 +591,7 @@ def warning(*msg, args=(), **kwargs):
 
 
 def warn(*msg, args=(), **kwargs):
+    """An alias of warning()"""
     warning(*msg, args=args, **kwargs)
 
 
@@ -582,11 +638,11 @@ def progress_bar(
 ):
     """Print a progress bar to the console."""
 
-    bar = ProgressBar(
+    progress_bar_ = ProgressBar(
         width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage
     )
 
-    print(bar.get_bar(progress, total))
+    print(progress_bar_.get_bar(progress, total))
 
 
 console_reporter = CrashReporter.ConsoleReporter()

@@ -6,6 +6,13 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.6.1
+
+Added `encoding` to `log21.CrashReporter.FileReporter`.
+Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
+Added optional `dev` dependencies to `pyproject.toml`.
+Improved overall code quality.
+
 ### 2.6.0
 
 Added the `Argumentify` module. Check the examples.

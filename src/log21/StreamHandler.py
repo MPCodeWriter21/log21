@@ -4,10 +4,11 @@
 import os as _os
 import re as _re
 import shutil as _shutil
-
-from logging import StreamHandler as _StreamHandler
 from typing import Optional as _Optional
-from log21.Colors import ansi_escape as _ansi_escape, get_colors as _gc, hex_escape as _hex_escape
+from logging import StreamHandler as _StreamHandler
+
+from log21.Colors import (get_colors as _gc, hex_escape as _hex_escape,
+                          ansi_escape as _ansi_escape)
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
 
@@ -18,10 +19,26 @@ if IS_WINDOWS:
 
 
 class StreamHandler(_StreamHandler):
+    """A StreamHandler that can handle carriage returns and new lines."""
     terminator = ''
 
-    def __init__(self, handle_carriage_return: bool = True, handle_new_line: bool = True, stream=None, formatter=None,
-                 level=None):
+    def __init__(
+        self,
+        handle_carriage_return: bool = True,
+        handle_new_line: bool = True,
+        stream=None,
+        formatter=None,
+        level=None
+    ):
+        """Initialize the StreamHandler.
+
+        :param handle_carriage_return: Whether to handle carriage
+            returns.
+        :param handle_new_line: Whether to handle new lines.
+        :param stream: The stream to write to.
+        :param formatter: The formatter to use.
+        :param level: The level to log at.
+        """
         self.HandleCR = handle_carriage_return
         self.HandleNL = handle_new_line
         super().__init__(stream=stream)
@@ -31,20 +48,31 @@ class StreamHandler(_StreamHandler):
             self.setLevel(level)
 
     def check_cr(self, record):
+        """Check if the record contains a carriage return and handle it."""
         if record.msg:
-            msg = _hex_escape.sub('', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c')))
+            msg = _hex_escape.sub(
+                '', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c'))
+            )
             if '\r' in msg[1:-1]:
                 file_descriptor = getattr(self.stream, 'fileno', None)
                 if file_descriptor:
                     file_descriptor = file_descriptor()
                     if file_descriptor in (1, 2):  # stdout or stderr
                         self.stream.write(
-                            '\r' + (' ' * (_shutil.get_terminal_size(file_descriptor).columns - 1)) + '\r')
+                            '\r' + (
+                                ' ' * (
+                                    _shutil.get_terminal_size(file_descriptor).columns -
+                                    1
+                                )
+                            ) + '\r'
+                        )
                         index = record.msg.rfind('\r')
                         find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
-                        record.msg = _gc(*find.split(record.msg[:index])) + record.msg[index + 1:]
+                        record.msg = _gc(*find.split(record.msg[:index])
+                                         ) + record.msg[index + 1:]
 
     def check_nl(self, record):
+        """Check if the record contains a newline and handle it."""
         while record.msg and record.msg[0] == '\n':
             file_descriptor = getattr(self.stream, 'fileno', None)
             if file_descriptor:
@@ -61,8 +89,7 @@ class StreamHandler(_StreamHandler):
         super().emit(record)
 
     def clear_line(self, length: _Optional[int] = None):
-        """
-        Clear the current line.
+        """Clear the current line.
 
         :param length: The length of the line to clear.
         :return:
@@ -78,6 +105,8 @@ class StreamHandler(_StreamHandler):
 
 # A stream handler that supports colorizing.
 class ColorizingStreamHandler(StreamHandler):
+    """A stream handler that supports colorizing even in Windows."""
+
     def emit(self, record):
         try:
             if self.HandleCR:
@@ -92,11 +121,13 @@ class ColorizingStreamHandler(StreamHandler):
                 self.write(msg)
                 self.write(self.terminator)
             self.flush()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self.handleError(record)
 
     # Writes colorized text to the Windows console.
     def convert_and_write(self, message):
+        """Convert the message to a Windows console colorized message and write
+        it to the stream."""
         nt_color_map = {
             30: 0,  # foreground: black   - 0b00000000
             31: 4,  # foreground: red     - 0b00000100
@@ -157,9 +188,9 @@ class ColorizingStreamHandler(StreamHandler):
                     params = [int(p) for p in params.split(';')]
                     color = 0
 
-                    for p in params:
-                        if p in nt_color_map:
-                            color |= nt_color_map[p]
+                    for param in params:
+                        if param in nt_color_map:
+                            color |= nt_color_map[param]
                         else:
                             pass  # error condition ignored
 
@@ -167,5 +198,6 @@ class ColorizingStreamHandler(StreamHandler):
 
     # Writes the message to the console.
     def write(self, message):
+        """Write the message to the stream."""
         self.stream.write(message)
         self.flush()

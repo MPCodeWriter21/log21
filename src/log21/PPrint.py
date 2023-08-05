@@ -6,9 +6,8 @@ import sys as _sys
 import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
-
 from pprint import PrettyPrinter as _PrettyPrinter
-from typing import Mapping as _Mapping, Optional as _Optional, Dict as _Dict
+from typing import Dict as _Dict, Mapping as _Mapping, Optional as _Optional
 
 from log21.Colors import get_colors as _gc
 
@@ -20,7 +19,7 @@ def _recursion(obj):
 
 
 def _safe_tuple(t):
-    """Helper function for comparing 2-tuples"""
+    """Helper function for comparing 2-tuples."""
     return _SafeKey(t[0]), _SafeKey(t[1])
 
 
@@ -28,7 +27,7 @@ def _wrap_bytes_repr(obj, width, allowance):
     current = b''
     last = len(obj) // 4 * 4
     for i in range(0, len(obj), 4):
-        part = obj[i: i + 4]
+        part = obj[i:i + 4]
         candidate = current + part
         if i == last:
             width -= allowance
@@ -49,7 +48,6 @@ class _SafeKey:
     unorderable types (sorting first comparing the type name and then by
     the obj ids).  Does not work recursively, so dict.items() must have
     _safe_key applied to both the key and the value.
-
     """
 
     __slots__ = ['obj']
@@ -61,13 +59,33 @@ class _SafeKey:
         try:
             return self.obj < other.obj
         except TypeError:
-            return (str(type(self.obj)), id(self.obj)) < (str(type(other.obj)), id(other.obj))
+            return (str(type(self.obj)), id(self.obj
+                                            )) < (str(type(other.obj)), id(other.obj))
 
 
 class PrettyPrinter(_PrettyPrinter):
-    def __init__(self, indent=1, width=80, depth=None, stream=None, sign_colors: _Optional[_Mapping[str, str]] = None,
-                 *, compact=False, sort_dicts=True, underscore_numbers=False, **kwargs):
-        super().__init__(indent=indent, width=width, depth=depth, stream=stream, compact=compact, **kwargs)
+
+    def __init__(
+        self,
+        indent=1,
+        width=80,
+        depth=None,
+        stream=None,
+        sign_colors: _Optional[_Mapping[str, str]] = None,
+        *,
+        compact=False,
+        sort_dicts=True,
+        underscore_numbers=False,
+        **kwargs
+    ):
+        super().__init__(
+            indent=indent,
+            width=width,
+            depth=depth,
+            stream=stream,
+            compact=compact,
+            **kwargs
+        )
         self._depth = depth
         self._indent_per_level = indent
         self._width = width
@@ -108,14 +126,15 @@ class PrettyPrinter(_PrettyPrinter):
                 p(self, obj, stream, indent, allowance, context, level + 1)
                 del context[objid]
                 return
-            elif (_dataclasses.is_dataclass(obj) and
-                  not isinstance(obj, type) and
-                  obj.__dataclass_params__.repr and
-                  # Check dataclass has generated repr method.
-                  hasattr(obj.__repr__, "__wrapped__") and
-                  "__create_fn__" in obj.__repr__.__wrapped__.__qualname__):
+            elif (_dataclasses.is_dataclass(obj) and not isinstance(obj, type)
+                  and obj.__dataclass_params__.repr
+                  and  # Check dataclass has generated repr method.
+                  hasattr(obj.__repr__, "__wrapped__")
+                  and "__create_fn__" in obj.__repr__.__wrapped__.__qualname__):
                 context[objid] = 1
-                self._pprint_dataclass(obj, stream, indent, allowance, context, level + 1)
+                self._pprint_dataclass(
+                    obj, stream, indent, allowance, context, level + 1
+                )
                 del context[objid]
                 return
         stream.write(rep)
@@ -123,14 +142,15 @@ class PrettyPrinter(_PrettyPrinter):
     def _pprint_dataclass(self, obj, stream, indent, allowance, context, level):
         cls_name = obj.__class__.__name__
         indent += len(cls_name) + 1
-        items = [(f.name, getattr(obj, f.name)) for f in _dataclasses.fields(obj) if f.repr]
+        items = [
+            (f.name, getattr(obj, f.name)) for f in _dataclasses.fields(obj) if f.repr
+        ]
         stream.write(cls_name + '(')
         self._format_namespace_items(items, stream, indent, allowance, context, level)
         stream.write(')')
 
     def _repr(self, obj, context, level):
-        repr, readable, recursive = self.format(obj, context.copy(),
-                                                self._depth, level)
+        repr, readable, recursive = self.format(obj, context.copy(), self._depth, level)
         if not readable:
             self._readable = False
         if recursive:
@@ -153,7 +173,9 @@ class PrettyPrinter(_PrettyPrinter):
 
         if issubclass(type_, dict) and representation is dict.__repr__:
             if not object_:
-                return self.sign_colors.get('curly-braces') + "{}" + self.sign_colors.get('data'), True, False
+                return self.sign_colors.get(
+                    'curly-braces'
+                ) + "{}" + self.sign_colors.get('data'), True, False
             object_id = id(object_)
             if max_levels and level >= max_levels:
                 return self.sign_colors.get('curly-braces') + "{" + self.sign_colors.get('...') + "..." + \
@@ -174,7 +196,9 @@ class PrettyPrinter(_PrettyPrinter):
             for k, v in items:
                 krepr, kreadable, krecur = self.format(k, context, max_levels, level)
                 vrepr, vreadable, vrecur = self.format(v, context, max_levels, level)
-                append(f"{krepr}{self.sign_colors.get('colon')}:{self.sign_colors.get('data')} {vrepr}")
+                append(
+                    f"{krepr}{self.sign_colors.get('colon')}:{self.sign_colors.get('data')} {vrepr}"
+                )
                 readable = readable and kreadable and vreadable
                 if krecur or vrecur:
                     recursive = True
@@ -187,7 +211,9 @@ class PrettyPrinter(_PrettyPrinter):
                 (issubclass(type_, tuple) and representation is tuple.__repr__):
             if issubclass(type_, list):
                 if not object_:
-                    return self.sign_colors.get('square-brackets') + "[]" + self.sign_colors.get('data'), True, False
+                    return self.sign_colors.get(
+                        'square-brackets'
+                    ) + "[]" + self.sign_colors.get('data'), True, False
                 format_ = self.sign_colors.get('square-brackets') + "[" + self.sign_colors.get('data') + "%s" + \
                           self.sign_colors.get('square-brackets') + "]" + self.sign_colors.get('data')
             elif len(object_) == 1:
@@ -196,12 +222,16 @@ class PrettyPrinter(_PrettyPrinter):
                           self.sign_colors.get('data')
             else:
                 if not object_:
-                    return self.sign_colors.get('parenthesis') + "()" + self.sign_colors.get('data'), True, False
+                    return self.sign_colors.get(
+                        'parenthesis'
+                    ) + "()" + self.sign_colors.get('data'), True, False
                 format_ = self.sign_colors.get('parenthesis') + "(" + self.sign_colors.get('data') + "%s" + \
                           self.sign_colors.get('parenthesis') + ")" + self.sign_colors.get('data')
             object_id = id(object_)
             if max_levels and level >= max_levels:
-                return format_ % self.sign_colors.get('...') + "...", False, object_id in context
+                return format_ % self.sign_colors.get(
+                    '...'
+                ) + "...", False, object_id in context
             if object_id in context:
                 return _recursion(object_), False, True
             context[object_id] = 1
@@ -237,8 +267,9 @@ class PrettyPrinter(_PrettyPrinter):
                 items = sorted(obj.items(), key=_safe_tuple)
             else:
                 items = obj.items()
-            self._format_dict_items(items, stream, indent, allowance + 1,
-                                    context, level)
+            self._format_dict_items(
+                items, stream, indent, allowance + 1, context, level
+            )
         write(self.sign_colors.get('curly-braces') + '}' + self.sign_colors.get('data'))
 
     _dispatch[dict.__repr__] = _pprint_dict
@@ -248,29 +279,43 @@ class PrettyPrinter(_PrettyPrinter):
             stream.write(repr(obj))
             return
         cls = obj.__class__
-        stream.write(cls.__name__ + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
-        self._format(list(obj.items()), stream,
-                     indent + len(cls.__name__) + 1, allowance + 1,
-                     context, level)
-        stream.write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+        stream.write(
+            cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
+        self._format(
+            list(obj.items()), stream, indent + len(cls.__name__) + 1, allowance + 1,
+            context, level
+        )
+        stream.write(
+            self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data')
+        )
 
     _dispatch[_collections.OrderedDict.__repr__] = _pprint_ordered_dict
 
     def _pprint_list(self, obj, stream, indent, allowance, context, level):
-        stream.write(self.sign_colors.get('square-brackets') + '[' + self.sign_colors.get('data'))
-        self._format_items(obj, stream, indent, allowance + 1,
-                           context, level)
-        stream.write(self.sign_colors.get('square-brackets') + ']' + self.sign_colors.get('data'))
+        stream.write(
+            self.sign_colors.get('square-brackets') + '[' +
+            self.sign_colors.get('data')
+        )
+        self._format_items(obj, stream, indent, allowance + 1, context, level)
+        stream.write(
+            self.sign_colors.get('square-brackets') + ']' +
+            self.sign_colors.get('data')
+        )
 
     _dispatch[list.__repr__] = _pprint_list
 
     def _pprint_tuple(self, obj, stream, indent, allowance, context, level):
-        stream.write(self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+        stream.write(
+            self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data')
+        )
         endchar = self.sign_colors.get('comma') + ',' + self.sign_colors.get('parenthesis') + ')' + \
                   self.sign_colors.get('data') if len(obj) == 1 else self.sign_colors.get('parenthesis') + ')' + \
                                                                       self.sign_colors.get('data')
-        self._format_items(obj, stream, indent, allowance + len(endchar),
-                           context, level)
+        self._format_items(
+            obj, stream, indent, allowance + len(endchar), context, level
+        )
         stream.write(endchar)
 
     _dispatch[tuple.__repr__] = _pprint_tuple
@@ -281,17 +326,25 @@ class PrettyPrinter(_PrettyPrinter):
             return
         typ = obj.__class__
         if typ is set:
-            stream.write(self.sign_colors.get('curly-braces') + '{' + self.sign_colors.get('data'))
-            endchar = self.sign_colors.get('curly-braces') + '}' + self.sign_colors.get('data')
+            stream.write(
+                self.sign_colors.get('curly-braces') + '{' +
+                self.sign_colors.get('data')
+            )
+            endchar = self.sign_colors.get('curly-braces'
+                                           ) + '}' + self.sign_colors.get('data')
         else:
-            stream.write(typ.__name__ + self.sign_colors.get('parenthesis') + '(' +
-                         self.sign_colors.get('curly-braces') + '{' + self.sign_colors.get('data'))
+            stream.write(
+                typ.__name__ + self.sign_colors.get('parenthesis') + '(' +
+                self.sign_colors.get('curly-braces') + '{' +
+                self.sign_colors.get('data')
+            )
             endchar = self.sign_colors.get('curly-braces') + '}' + self.sign_colors.get('parenthesis') + ')' \
                       + self.sign_colors.get('data')
             indent += len(typ.__name__) + 1
         obj = sorted(obj, key=_SafeKey)
-        self._format_items(obj, stream, indent, allowance + len(endchar),
-                           context, level)
+        self._format_items(
+            obj, stream, indent, allowance + len(endchar), context, level
+        )
         stream.write(endchar)
 
     _dispatch[set.__repr__] = _pprint_set
@@ -339,13 +392,19 @@ class PrettyPrinter(_PrettyPrinter):
             write(representation)
             return
         if level == 1:
-            write(self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+            write(
+                self.sign_colors.get('parenthesis') + '(' +
+                self.sign_colors.get('data')
+            )
         for i, representation in enumerate(chunks):
             if i > 0:
                 write('\n' + ' ' * indent)
             write(representation)
         if level == 1:
-            write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+            write(
+                self.sign_colors.get('parenthesis') + ')' +
+                self.sign_colors.get('data')
+            )
 
     _dispatch[str.__repr__] = _pprint_str
 
@@ -358,7 +417,10 @@ class PrettyPrinter(_PrettyPrinter):
         if parens:
             indent += 1
             allowance += 1
-            write(self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+            write(
+                self.sign_colors.get('parenthesis') + '(' +
+                self.sign_colors.get('data')
+            )
         delim = ''
         for rep in _wrap_bytes_repr(obj, self._width - indent, allowance):
             write(delim)
@@ -366,24 +428,35 @@ class PrettyPrinter(_PrettyPrinter):
             if not delim:
                 delim = '\n' + ' ' * indent
         if parens:
-            write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+            write(
+                self.sign_colors.get('parenthesis') + ')' +
+                self.sign_colors.get('data')
+            )
 
     _dispatch[bytes.__repr__] = _pprint_bytes
 
     def _pprint_bytearray(self, obj, stream, indent, allowance, context, level):
         write = stream.write
-        write('bytearray' + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
-        self._pprint_bytes(bytes(obj), stream, indent + 10,
-                           allowance + 1, context, level + 1)
+        write(
+            'bytearray' + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
+        self._pprint_bytes(
+            bytes(obj), stream, indent + 10, allowance + 1, context, level + 1
+        )
         write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
 
     _dispatch[bytearray.__repr__] = _pprint_bytearray
 
     def _pprint_mappingproxy(self, obj, stream, indent, allowance, context, level):
-        stream.write('mappingproxy' + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
-        self._format(obj.copy(), stream, indent + 13, allowance + 1,
-                     context, level)
-        stream.write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+        stream.write(
+            'mappingproxy' + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
+        self._format(obj.copy(), stream, indent + 13, allowance + 1, context, level)
+        stream.write(
+            self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data')
+        )
 
     _dispatch[_types.MappingProxyType.__repr__] = _pprint_mappingproxy
 
@@ -396,31 +469,41 @@ class PrettyPrinter(_PrettyPrinter):
             cls_name = obj.__class__.__name__
         indent += len(cls_name) + 1
         items = obj.__dict__.items()
-        stream.write(cls_name + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+        stream.write(
+            cls_name + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
         self._format_namespace_items(items, stream, indent, allowance, context, level)
-        stream.write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+        stream.write(
+            self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data')
+        )
 
     _dispatch[_types.SimpleNamespace.__repr__] = _pprint_simplenamespace
 
     def _format_dict_items(self, items, stream, indent, allowance, context, level):
         write = stream.write
         indent += self._indent_per_level
-        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get('data') + ' ' * indent
+        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get(
+            'data'
+        ) + ' ' * indent
         last_index = len(items) - 1
         for i, (key, ent) in enumerate(items):
             last = i == last_index
             rep = self._repr(key, context, level)
             write(rep)
             write(self.sign_colors.get('colon') + ': ' + self.sign_colors.get('data'))
-            self._format(ent, stream, indent + len(rep) + 2,
-                         allowance if last else 1,
-                         context, level)
+            self._format(
+                ent, stream, indent + len(rep) + 2, allowance if last else 1, context,
+                level
+            )
             if not last:
                 write(delimnl)
 
     def _format_namespace_items(self, items, stream, indent, allowance, context, level):
         write = stream.write
-        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get('data') + ' ' * indent
+        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get(
+            'data'
+        ) + ' ' * indent
         last_index = len(items) - 1
         for i, (key, ent) in enumerate(items):
             last = i == last_index
@@ -429,9 +512,14 @@ class PrettyPrinter(_PrettyPrinter):
             if id(ent) in context:
                 # Special-case representation of recursion to match standard
                 # recursive dataclass repr.
-                write(self.sign_colors.get('...') + "..." + self.sign_colors.get('data'))
+                write(
+                    self.sign_colors.get('...') + "..." + self.sign_colors.get('data')
+                )
             else:
-                self._format(ent, stream, indent + len(key) + 1, allowance if last else 1, context, level)
+                self._format(
+                    ent, stream, indent + len(key) + 1, allowance if last else 1,
+                    context, level
+                )
             if not last:
                 write(delimnl)
 
@@ -440,7 +528,9 @@ class PrettyPrinter(_PrettyPrinter):
         indent += self._indent_per_level
         if self._indent_per_level > 1:
             write((self._indent_per_level - 1) * ' ')
-        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get('data') + ' ' * indent
+        delimnl = self.sign_colors.get('comma') + ',\n' + self.sign_colors.get(
+            'data'
+        ) + ' ' * indent
         delim = ''
         width = max_width = self._width - indent + 1
         it = iter(items)
@@ -467,7 +557,9 @@ class PrettyPrinter(_PrettyPrinter):
                 if width >= w:
                     width -= w
                     write(delim)
-                    delim = self.sign_colors.get('comma') + ', ' + self.sign_colors.get('data')
+                    delim = self.sign_colors.get('comma') + ', ' + self.sign_colors.get(
+                        'data'
+                    )
                     write(rep)
                     continue
             write(delim)
@@ -481,10 +573,15 @@ class PrettyPrinter(_PrettyPrinter):
         rdf = self._repr(obj.default_factory, context, level)
         cls = obj.__class__
         indent += len(cls.__name__) + 1
-        stream.write(cls.__name__ + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data') + rdf +
-                     self.sign_colors.get('comma') + ',\n' + self.sign_colors.get('data') + (' ' * indent))
+        stream.write(
+            cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data') + rdf + self.sign_colors.get('comma') + ',\n' +
+            self.sign_colors.get('data') + (' ' * indent)
+        )
         self._pprint_dict(obj, stream, indent, allowance + 1, context, level)
-        stream.write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+        stream.write(
+            self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data')
+        )
 
     _dispatch[_collections.defaultdict.__repr__] = _pprint_default_dict
 
@@ -493,16 +590,20 @@ class PrettyPrinter(_PrettyPrinter):
             stream.write(repr(obj))
             return
         cls = obj.__class__
-        stream.write(cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
-                     self.sign_colors.get('curly-braces') + '{' + self.sign_colors.get('data'))
+        stream.write(
+            cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('curly-braces') + '{' + self.sign_colors.get('data')
+        )
         if self._indent_per_level > 1:
             stream.write((self._indent_per_level - 1) * ' ')
         items = obj.most_common()
-        self._format_dict_items(items, stream,
-                                indent + len(cls.__name__) + 1, allowance + 2,
-                                context, level)
-        stream.write(self.sign_colors.get('curly-braces') + '}' +
-                     self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+        self._format_dict_items(
+            items, stream, indent + len(cls.__name__) + 1, allowance + 2, context, level
+        )
+        stream.write(
+            self.sign_colors.get('curly-braces') + '}' +
+            self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data')
+        )
 
     _dispatch[_collections.Counter.__repr__] = _pprint_counter
 
@@ -511,15 +612,24 @@ class PrettyPrinter(_PrettyPrinter):
             stream.write(repr(obj))
             return
         cls = obj.__class__
-        stream.write(cls.__name__ + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+        stream.write(
+            cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
         indent += len(cls.__name__) + 1
         for i, m in enumerate(obj.maps):
             if i == len(obj.maps) - 1:
                 self._format(m, stream, indent, allowance + 1, context, level)
-                stream.write(self.sign_colors.get('parenthesis') + ')' + self.sign_colors.get('data'))
+                stream.write(
+                    self.sign_colors.get('parenthesis') + ')' +
+                    self.sign_colors.get('data')
+                )
             else:
                 self._format(m, stream, indent, 1, context, level)
-                stream.write(self.sign_colors.get('comma') + ',\n' + self.sign_colors.get('data') + ' ' * indent)
+                stream.write(
+                    self.sign_colors.get('comma') + ',\n' +
+                    self.sign_colors.get('data') + ' ' * indent
+                )
 
     _dispatch[_collections.ChainMap.__repr__] = _pprint_chain_map
 
@@ -528,21 +638,31 @@ class PrettyPrinter(_PrettyPrinter):
             stream.write(repr(obj))
             return
         cls = obj.__class__
-        stream.write(cls.__name__ + self.sign_colors.get('parenthesis') + '(' + self.sign_colors.get('data'))
+        stream.write(
+            cls.__name__ + self.sign_colors.get('parenthesis') + '(' +
+            self.sign_colors.get('data')
+        )
         indent += len(cls.__name__) + 1
-        stream.write(self.sign_colors.get('square-brackets') + '[' + self.sign_colors.get('data'))
+        stream.write(
+            self.sign_colors.get('square-brackets') + '[' +
+            self.sign_colors.get('data')
+        )
         if obj.maxlen is None:
-            self._format_items(obj, stream, indent, allowance + 2,
-                               context, level)
-            stream.write(self.sign_colors.get('square-brackets') + ']' + self.sign_colors.get('parenthesis') + ')' +
-                         self.sign_colors.get('data'))
+            self._format_items(obj, stream, indent, allowance + 2, context, level)
+            stream.write(
+                self.sign_colors.get('square-brackets') + ']' +
+                self.sign_colors.get('parenthesis') + ')' +
+                self.sign_colors.get('data')
+            )
         else:
-            self._format_items(obj, stream, indent, 2,
-                               context, level)
+            self._format_items(obj, stream, indent, 2, context, level)
             rml = self._repr(obj.maxlen, context, level)
-            stream.write(self.sign_colors.get('square-brackets') + ']' + self.sign_colors.get('comma') +
-                         ',' + self.sign_colors.get('data') + '\n' + (' ' * indent) + 'maxlen=' + rml +
-                         self.sign_colors.get('parenthesis') + ')')
+            stream.write(
+                self.sign_colors.get('square-brackets') + ']' +
+                self.sign_colors.get('comma') + ',' + self.sign_colors.get('data') +
+                '\n' + (' ' * indent) + 'maxlen=' + rml +
+                self.sign_colors.get('parenthesis') + ')'
+            )
 
     _dispatch[_collections.deque.__repr__] = _pprint_deque
 
@@ -562,8 +682,26 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
-def pformat(obj, indent=1, width=80, depth=None, signs_colors: _Optional[_Mapping[str, str]] = None, *, compact=False,
-            sort_dicts=True, underscore_numbers=False, **kwargs):
+def pformat(
+    obj,
+    indent=1,
+    width=80,
+    depth=None,
+    signs_colors: _Optional[_Mapping[str, str]] = None,
+    *,
+    compact=False,
+    sort_dicts=True,
+    underscore_numbers=False,
+    **kwargs
+):
     """Format a Python object into a pretty-printed representation."""
-    return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, sign_colors=signs_colors,
-                         sort_dicts=sort_dicts, underscore_numbers=underscore_numbers, **kwargs).pformat(obj)
+    return PrettyPrinter(
+        indent=indent,
+        width=width,
+        depth=depth,
+        compact=compact,
+        sign_colors=signs_colors,
+        sort_dicts=sort_dicts,
+        underscore_numbers=underscore_numbers,
+        **kwargs
+    ).pformat(obj)

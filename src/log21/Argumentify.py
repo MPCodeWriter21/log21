@@ -179,7 +179,7 @@ class FunctionInfo:
                 self.arguments[parameter.arg_name].help = parameter.description
 
 
-def generate_flag(
+def generate_flag(  # pylint: disable=too-many-branches
     argument: Argument,
     no_dash: bool = False,
     reserved_flags: _Optional[_Set[str]] = None
@@ -210,9 +210,12 @@ def generate_flag(
         )
     if flag1 in reserved_flags:
         flag1 = flag1_base + normalize_name(argument.name, sep_char='-').upper()
-    if flag1 in reserved_flags and no_dash:
-        raise FlagGenerationError(f"Failed to generate a flag for argument: {argument}")
-    if flag1 not in reserved_flags:
+    if flag1 in reserved_flags:
+        if no_dash:
+            raise FlagGenerationError(
+                f"Failed to generate a flag for argument: {argument}"
+            )
+    else:
         flags.append(flag1)
 
     if not no_dash:

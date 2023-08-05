@@ -1,32 +1,38 @@
 # log21.CrashReporter.Reporters.py
 # CodeWriter21
 
+from __future__ import annotations
+
 import ssl as _ssl
 import smtplib as _smtplib  # This module is used to send emails.
-
 from os import PathLike as _PathLike
-from typing import Callable as _Callable, Any as _Any, Union as _Union, IO as _IO, Set as _Set, Iterable as _Iterable, \
-    Type as _Type
+from typing import (IO as _IO, Any as _Any, Set as _Set, Type as _Type, Union as _Union,
+                    Callable as _Callable, Iterable as _Iterable, Optional as _Optional)
 from functools import wraps as _wraps
 from email.mime.text import MIMEText as _MIMEText
 from email.mime.multipart import MIMEMultipart as _MIMEMultipart
 
 import log21 as _log21
 
-from .Formatters import CONSOLE_REPORTER_FORMAT as _CONSOLE_REPORTER_FORMAT, \
-    FILE_REPORTER_FORMAT as _FILE_REPORTER_FORMAT, EMAIL_REPORTER_FORMAT as _EMAIL_REPORTER_FORMAT
+from .Formatters import (FILE_REPORTER_FORMAT as _FILE_REPORTER_FORMAT,
+                         EMAIL_REPORTER_FORMAT as _EMAIL_REPORTER_FORMAT,
+                         CONSOLE_REPORTER_FORMAT as _CONSOLE_REPORTER_FORMAT)
 
 __all__ = ['Reporter', 'ConsoleReporter', 'FileReporter', 'EmailReporter']
 
 
+# pylint: disable=redefined-builtin
 def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
-    logger = _log21.get_logger('log21.print', level='DEBUG', show_time=False, show_level=False)
+    """Prints a message to the console using the log21.Logger."""
+    logger = _log21.get_logger(
+        'log21.print', level='DEBUG', show_time=False, show_level=False
+    )
     logger.print(*msg, args=args, end=end, **kwargs)
 
 
 class Reporter:
-    """
-    Reporter is a decorator that wraps a function and calls a function when an exception is raised.
+    """Reporter is a decorator that wraps a function and calls a function when
+    an exception is raised.
 
     Usage Example:
         >>>
@@ -40,7 +46,8 @@ class Reporter:
         >>>
         >>> # Define the function you want to wrap
         >>> # This function might raise an exception
-        >>> # You can wrap your main function, so that you get notified whenever your app crashes
+        >>> # You can wrap your main function, so that you get notified whenever your
+        >>> # app crashes
         >>> @reporter_object.reporter
         ... def divide(a, b):
         ...     return a / b
@@ -61,42 +68,57 @@ class Reporter:
         >>>
     """
 
-    _reporter_function: _Callable[[BaseException], _Any]  # A function that will be called when an exception is raised.
+    _reporter_function: _Callable[[
+        BaseException
+    ], _Any]  # A function that will be called when an exception is raised.
     _exceptions_to_catch: _Set = None
     _exceptions_to_ignore: _Set = None
     raise_after_report: bool
 
-    def __init__(self, report_function: _Callable[[BaseException], _Any], raise_after_report: bool = False,
-                 formatter: '_log21.CrashReporter.Formatter' = None,
-                 exceptions_to_catch: _Iterable[BaseException] = None,
-                 exceptions_to_ignore: _Iterable[BaseException] = None):
+    def __init__(
+        self,
+        report_function: _Optional[_Callable[[BaseException], _Any]],
+        raise_after_report: bool = False,
+        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
+        exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
+    ):
         """
         :param report_function: Function to call when an exception is raised.
-        :param raise_after_report: If True, the exception will be raised after the report_function is called.
+        :param raise_after_report: If True, the exception will be raised after the
+            report_function is called.
         """
         self._reporter_function = report_function
         self.raise_after_report = raise_after_report
         self.formatter = formatter
-        self._exceptions_to_catch = set(exceptions_to_catch) if exceptions_to_catch else None
-        self._exceptions_to_ignore = set(exceptions_to_ignore) if exceptions_to_ignore else None
+        self._exceptions_to_catch = set(
+            exceptions_to_catch
+        ) if exceptions_to_catch else None
+        self._exceptions_to_ignore = set(
+            exceptions_to_ignore
+        ) if exceptions_to_ignore else None
 
     def reporter(self, func):
-        """
-        It will wrap the function and call the report_function when an exception is raised.
+        """It will wrap the function and call the report_function when an
+        exception is raised.
 
         :param func: Function to wrap.
         :return: Wrapped function.
         """
 
-        exceptions_to_catch = tuple(self._exceptions_to_catch) if self._exceptions_to_catch else BaseException
-        exceptions_to_ignore = tuple(self._exceptions_to_ignore) if self._exceptions_to_ignore else tuple()
+        exceptions_to_catch = tuple(
+            self._exceptions_to_catch
+        ) if self._exceptions_to_catch else BaseException
+        exceptions_to_ignore = tuple(self._exceptions_to_ignore
+                                     ) if self._exceptions_to_ignore else tuple()
 
         @_wraps(func)
         def wrap(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except BaseException as e:
-                if isinstance(e, exceptions_to_catch) and not isinstance(e, exceptions_to_ignore):
+                if isinstance(e, exceptions_to_catch) and not isinstance(
+                        e, exceptions_to_ignore):
                     self._reporter_function(e)
                     if self.raise_after_report:
                         raise e
@@ -106,8 +128,7 @@ class Reporter:
         return wrap
 
     def catch(self, exception: _Type[BaseException]):
-        """
-        Add an exception to the list of exceptions to catch.
+        """Add an exception to the list of exceptions to catch.
 
         :param exception: Exception to catch.
         """
@@ -121,8 +142,7 @@ class Reporter:
             raise ValueError('exception is already in the list of exceptions to catch')
 
     def ignore(self, exception: _Type[BaseException]):
-        """
-        Add an exception to the list of exceptions to ignore.
+        """Add an exception to the list of exceptions to ignore.
 
         :param exception: Exception to ignore.
         """
@@ -140,8 +160,8 @@ class Reporter:
 
 
 class ConsoleReporter(Reporter):
-    """
-    ConsoleReporter is a Reporter that prints the exception to the console.
+    """ConsoleReporter is a Reporter that prints the exception to the console.
+
     Usage Example:
         >>>
         >>> # Define a ConsoleReporter object
@@ -186,14 +206,23 @@ class ConsoleReporter(Reporter):
         >>>
     """
 
-    def __init__(self, raise_after_report: bool = False, formatter: '_log21.CrashReporter.Formatter' = None,
-                 print_function: _Callable = print, exceptions_to_catch: _Iterable[BaseException] = None,
-                 exceptions_to_ignore: _Iterable[BaseException] = None):
+    def __init__(
+        self,
+        raise_after_report: bool = False,
+        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        print_function: _Optional[_Callable] = print,
+        exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
+        exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
+    ):
         """
-        :param raise_after_report: If True, the exception will be raised after the report_function is called.
+        :param raise_after_report: If True, the exception will be raised after the
+            report_function is called.
         :param print_function: Function to use to print the message.
         """
-        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
+        super().__init__(
+            self._report, raise_after_report, formatter, exceptions_to_catch,
+            exceptions_to_ignore
+        )
 
         if formatter:
             if isinstance(formatter, _log21.CrashReporter.Formatter):
@@ -201,13 +230,14 @@ class ConsoleReporter(Reporter):
             else:
                 raise ValueError('formatter must be a log21.CrashReporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(**_CONSOLE_REPORTER_FORMAT)
+            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+                **_CONSOLE_REPORTER_FORMAT
+            )
 
         self.print = print_function
 
     def _report(self, exception: BaseException):
-        """
-        Prints the exception to the console.
+        """Prints the exception to the console.
 
         :param exception: Exception to print.
         :return:
@@ -217,19 +247,27 @@ class ConsoleReporter(Reporter):
 
 
 class FileReporter(Reporter):
-    """
-    FileReporter is a Reporter that writes the exception to a file.
-    """
+    """FileReporter is a Reporter that writes the exception to a file."""
 
-    def __init__(self, file: _Union[str, _PathLike, _IO], raise_after_report: bool = True,
-                 formatter: '_log21.CrashReporter.Formatter' = None,
-                 exceptions_to_catch: _Iterable[BaseException] = None,
-                 exceptions_to_ignore: _Iterable[BaseException] = None):
-        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
+    def __init__(
+        self,
+        *,
+        file: _Union[str, _PathLike, _IO],
+        encoding: str = 'utf-8',
+        raise_after_report: bool = True,
+        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
+        exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
+    ):
+        super().__init__(
+            self._report, raise_after_report, formatter, exceptions_to_catch,
+            exceptions_to_ignore
+        )
+        # pylint: disable=consider-using-with
         if isinstance(file, str):
-            self.file = open(file, 'a')
+            self.file = open(file, 'a', encoding=encoding)
         elif isinstance(file, _PathLike):
-            self.file = open(file, 'a')
+            self.file = open(file, 'a', encoding=encoding)
         elif isinstance(file, _IO):
             if file.writable():
                 self.file = file
@@ -244,11 +282,12 @@ class FileReporter(Reporter):
             else:
                 raise ValueError('formatter must be a log21.CrashReporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(**_FILE_REPORTER_FORMAT)
+            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+                **_FILE_REPORTER_FORMAT
+            )
 
     def _report(self, exception: BaseException):
-        """
-        Writes the exception to the file.
+        """Writes the exception to the file.
 
         :param exception: Exception to write.
         :return:
@@ -258,9 +297,9 @@ class FileReporter(Reporter):
         self.file.flush()
 
 
-class EmailReporter(Reporter):
-    """
-    EmailReporter is a Reporter that sends an email with the exception.
+class EmailReporter(Reporter):  # pylint: disable=too-many-instance-attributes
+    """EmailReporter is a Reporter that sends an email with the exception.
+
     Usage Example:
         >>>
         >>> # Define a EmailReporter object
@@ -295,11 +334,24 @@ class EmailReporter(Reporter):
         >>>
     """
 
-    def __init__(self, mail_host: str, port: int, from_address: str, to_address: str, password: str, username: str = '',
-                 tls: bool = True, raise_after_report: bool = True, formatter: '_log21.CrashReporter.Formatter' = None,
-                 exceptions_to_catch: _Iterable[BaseException] = None,
-                 exceptions_to_ignore: _Iterable[BaseException] = None):
-        super().__init__(self._report, raise_after_report, formatter, exceptions_to_catch, exceptions_to_ignore)
+    def __init__(
+        self,
+        mail_host: str,
+        port: int,
+        from_address: str,
+        to_address: str,
+        password: str,
+        username: str = '',
+        tls: bool = True,
+        raise_after_report: bool = True,
+        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
+        exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
+    ):
+        super().__init__(
+            self._report, raise_after_report, formatter, exceptions_to_catch,
+            exceptions_to_ignore
+        )
         self.mail_host = mail_host
         self.port = port
         self.from_address = from_address
@@ -323,8 +375,8 @@ class EmailReporter(Reporter):
                     server.ehlo()
                     server.login(self.username, self.password)
                     server.ehlo()
-        except Exception as e:
-            raise e
+        except Exception as ex:  # pylint: disable=broad-except
+            raise ex
 
         if formatter:
             if isinstance(formatter, _log21.CrashReporter.Formatter):
@@ -332,11 +384,12 @@ class EmailReporter(Reporter):
             else:
                 raise ValueError('formatter must be a log21.CrashReporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(**_EMAIL_REPORTER_FORMAT)
+            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+                **_EMAIL_REPORTER_FORMAT
+            )
 
     def _report(self, exception: BaseException):
-        """
-        Sends an email with the exception.
+        """Sends an email with the exception.
 
         :param exception: Exception to send.
         :return:
@@ -348,7 +401,8 @@ class EmailReporter(Reporter):
         message.attach(_MIMEText(self.formatter.format(exception), 'html'))
         if self.tls:
             context = _ssl.create_default_context()
-            with _smtplib.SMTP_SSL(self.mail_host, port=self.port, context=context) as server:
+            with _smtplib.SMTP_SSL(self.mail_host, port=self.port,
+                                   context=context) as server:
                 server.login(self.username, self.password)
                 server.sendmail(self.from_address, self.to_address, message.as_string())
         else:
