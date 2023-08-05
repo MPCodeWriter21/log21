@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.6.2
+
+Change in README.md.
+
 ### 2.6.1
 
 Added `encoding` to `log21.CrashReporter.FileReporter`.

@@ -61,12 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.6.1
+### 2.6.2
 
-Added `encoding` to `log21.CrashReporter.FileReporter`.
-Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
-Added optional `dev` dependencies to `pyproject.toml`.
-Improved overall code quality.
+Change in README.md.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
@@ -258,7 +255,7 @@ for i in range(84):
 
 ------------------
 
-### Argumentify (Check out [the manual way](https://github.com/MPCodeWriter21/log21#argumentify-check-out-the-manual-way))
+### Argumentify (Check out [the manual way](https://github.com/MPCodeWriter21/log21#argument-parsing-see-also-argumentify))
 
 ```python
 # Common Section
