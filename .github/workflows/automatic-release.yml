@@ -29,7 +29,7 @@ jobs:
           echo "PACKAGE_VERSION=$(python -c 'import log21; print(log21.__version__)')" >> $GITHUB_ENV
 
       - name: check-version
-        uses: actions-ecosystem/action-regex-match@v2
+        uses: KyoriPowered/action-regex-match@v3
         id: check-version
         with:
           text: ${{ env.PACKAGE_VERSION }}
