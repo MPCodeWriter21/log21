@@ -3,18 +3,45 @@
 
 import re as _re
 import sys as _sys
+import types as _types
+import typing as _typing
 import argparse as _argparse
-from typing import Mapping as _Mapping, Optional as _Optional
+from enum import Enum as _Enum
 from gettext import gettext as _gettext
 from textwrap import TextWrapper as _TextWrapper
+from collections import OrderedDict as _OrderedDict
+from typing import (
+    Mapping as _Mapping, Optional as _Optional, Tuple as _Tuple, Sequence as _Sequence
+)
 
 import log21 as _log21
 from log21.Colors import get_colors as _gc
 from log21.Formatters import DecolorizingFormatter as _Formatter
 
 __all__ = [
-    'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper'
+    'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper',
+    'Literal'
 ]
+
+
+class Literal:
+    """A class for representing literals in argparse arguments."""
+
+    def __init__(self, literal: _typing._LiteralGenericAlias):
+        self.literal = literal
+
+    def __repr__(self):
+        return f'Literal[{", ".join(self.literal.__args__)}]'
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __call__(self, value):
+        if value not in self.literal.__args__:
+            raise ValueError(
+                f'Value must be one of [{", ".join(self.literal.__args__)}]'
+            )
+        return value
 
 
 class ColorizingHelpFormatter(_argparse.HelpFormatter):
@@ -70,8 +97,10 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
             # add the heading if the section was non-empty
             if self.heading is not _argparse.SUPPRESS and self.heading is not None:
                 current_indent = self.formatter._current_indent
-                heading = '%*s%s' % (current_indent, '', self.heading) + _gc(self.formatter.colors['colons']) + \
-                          ':\033[0m\n'
+                heading = (
+                    '%*s%s' % (current_indent, '', self.heading) +
+                    _gc(self.formatter.colors['colons']) + ':\033[0m\n'
+                )
             else:
                 heading = ''
 
@@ -380,9 +409,13 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
             result = action.metavar
         elif action.choices is not None:
             choice_strs = [str(choice) for choice in action.choices]
-            result = _gc(self.colors['brackets']) + '{ ' + (_gc(self.colors['commas']) + ', ').join(
-                _gc(self.colors['choices']) + choice_str for choice_str in choice_strs) + \
-                     _gc(self.colors['brackets']) + ' }'
+            result = (
+                _gc(self.colors['brackets']) + '{ ' +
+                (_gc(self.colors['commas']) + ', ').join(
+                    _gc(self.colors['choices']) + choice_str
+                    for choice_str in choice_strs
+                ) + _gc(self.colors['brackets']) + ' }'
+            )
         else:
             result = default_metavar
 
@@ -541,3 +574,162 @@ class ColorizingArgumentParser(_argparse.ArgumentParser):
             return self.formatter_class(prog=self.prog, colors=self.colors)
         else:
             return self.formatter_class(prog=self.prog)
+
+    def _validate_func_type(self, action, func_type, kwargs, level: int = 0) -> _Tuple:
+        # raise an error if the action type is not callable
+        if not callable(func_type) and not isinstance(func_type, _types.UnionType):
+            raise ValueError(f'{func_type} is not callable; level={level}')
+
+        # Handle `UnionType` as a type (e.g. `int|str`)
+        if isinstance(func_type, _types.UnionType):
+            func_type = func_type.__args__  # type: ignore
+
+        # Handle `Literal` as a type (e.g. `Literal[1, 2, 3]`)
+        elif isinstance(func_type, _typing._LiteralGenericAlias):
+            func_type = Literal(func_type)
+
+        # Handle `List` as a type (e.g. `List[int]`)
+        elif isinstance(func_type,
+                        _typing._GenericAlias) and func_type.__origin__ is list:
+            func_type = func_type.__args__[0]
+            if kwargs.get('nargs') is None:
+                action.nargs = '+'
+
+        # Handle `Union` and `Optional` as a type (e.g. `Union[int, str]` and
+        # `Optional[int]`)
+        elif isinstance(func_type, _typing._UnionGenericAlias):
+            # Optional[T] is just Union[T, NoneType]
+            # Optional
+            if (len(func_type.__args__) == 2
+                    and func_type.__args__[1] is _types.NoneType):
+                action.required = False
+                func_type = func_type.__args__[0]
+            # Union
+            else:
+                func_type = func_type.__args__  # type: ignore
+
+        # Handle Enum as a type
+        elif callable(func_type) and isinstance(func_type, type) and issubclass(
+                func_type, _Enum) and action.choices is None and level == 0:
+            action.choices = tuple(func_type.__members__.keys())
+
+        elif func_type is _argparse.FileType:
+            raise ValueError(
+                f'{func_type} is a FileType class object, instance of it must be passed'
+            )
+
+        if isinstance(func_type, _Sequence):
+            temp = []
+            for type_ in _OrderedDict(zip(func_type, [0] * len(func_type))):
+                temp.extend(self._validate_func_type(action, type_, kwargs, level + 1))
+            func_type = tuple(temp)
+        else:
+            if isinstance(func_type, (
+                    _typing._GenericAlias,
+                    _typing._UnionGenericAlias,
+                    _typing._LiteralGenericAlias,
+                    _types.UnionType,
+            )):
+                func_type = self._validate_func_type(
+                    action, func_type, kwargs, level + 1
+                )
+            else:
+                func_type = (func_type, )
+
+        return func_type
+
+    # Override the default add_argument method defined in argparse._ActionsContainer
+    # to add the support for different type annotations
+    def add_argument(self, *args, **kwargs):
+        """Add an argument to the parser.
+
+        Signature:
+            add_argument(dest, ..., name=value, ...)
+            add_argument(option_string, option_string, ..., name=value, ...)
+        """
+
+        # if no positional args are supplied or only one is supplied and
+        # it doesn't look like an option string, parse a positional
+        # argument
+        chars = self.prefix_chars
+        if not args or len(args) == 1 and args[0][0] not in chars:
+            if args and 'dest' in kwargs:
+                raise ValueError('dest supplied twice for positional argument')
+            kwargs = self._get_positional_kwargs(*args, **kwargs)
+
+        # otherwise, we're adding an optional argument
+        else:
+            kwargs = self._get_optional_kwargs(*args, **kwargs)
+
+        # if no default was supplied, use the parser-level default
+        if 'default' not in kwargs:
+            dest = kwargs['dest']
+            if dest in self._defaults:
+                kwargs['default'] = self._defaults[dest]
+            elif self.argument_default is not None:
+                kwargs['default'] = self.argument_default
+
+        # create the action object, and add it to the parser
+        action_class = self._pop_action_class(kwargs)
+        if not callable(action_class):
+            raise ValueError(f'unknown action "{action_class}"')
+        action = action_class(**kwargs)
+
+        func_type = self._registry_get('type', action.type, action.type)
+        action.type = self._validate_func_type(
+            action, func_type, kwargs
+        )  # type: ignore
+        print(action.type)
+
+        # raise an error if the metavar does not match the type
+        if hasattr(self, "_get_formatter"):
+            try:
+                self._get_formatter()._format_args(action, None)
+            except TypeError:
+                raise ValueError(
+                    "length of metavar tuple does not match nargs"
+                ) from None
+
+        return self._add_action(action)
+
+    def _get_value(self, action, arg_string):
+        """Override _get_value to add support for types such as Union and
+        Literal."""
+
+        func_type = self._registry_get('type', action.type, action.type)
+        if not callable(func_type) and not isinstance(func_type, tuple):
+            raise _argparse.ArgumentError(
+                action, _gettext(f'{func_type!r} is not callable')
+            )
+
+        name = getattr(action.type, '__name__', repr(action.type))
+
+        # convert the value to the appropriate type
+        try:
+            if callable(func_type):
+                result = func_type(arg_string)
+            else:
+                exception = ValueError()
+                for type_ in func_type:
+                    name = getattr(type_, '__name__', repr(type_))
+                    try:
+                        result = type_(arg_string)
+                        break
+                    except (ValueError, TypeError) as ex:
+                        exception = ex
+                else:
+                    raise exception
+
+        # ArgumentTypeErrors indicate errors
+        except _argparse.ArgumentTypeError as ex:
+            msg = str(ex)
+            raise _argparse.ArgumentError(action, msg)
+
+        # TypeErrors or ValueErrors also indicate errors
+        except (TypeError, ValueError):
+            raise _argparse.ArgumentError(
+                action, _gettext(f'invalid {name!s} value: {arg_string!r}')
+            ) from None
+
+        # return the converted value
+        return result

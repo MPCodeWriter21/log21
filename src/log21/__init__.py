@@ -24,7 +24,7 @@ from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.6.2"
+__version__ = "2.7.0rc0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -106,7 +106,7 @@ def get_logger(
     level_names: _Optional[_Mapping[int, str]] = None,
     level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
     file: _Optional[_Union[_os.PathLike, str]] = None
-) -> _Union[Logger, _logging.Logger]:
+) -> Logger:
     """
     Returns a logging.Logger with colorizing support.
     >>>

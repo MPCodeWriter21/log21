@@ -5,10 +5,11 @@ import re as _re
 import string as _string
 import inspect as _inspect
 import argparse as _argparse
-from typing import (Any as _Any, Set as _Set, Dict as _Dict, List as _List,
-                    Tuple as _Tuple, Union as _Union, Callable as _Callable,
-                    Optional as _Optional, Coroutine as _Coroutine,
-                    OrderedDict as _OrderedDict)
+from typing import (
+    Any as _Any, Set as _Set, Dict as _Dict, List as _List, Tuple as _Tuple, Union as
+    _Union, Callable as _Callable, Optional as _Optional, Coroutine as _Coroutine,
+    OrderedDict as _OrderedDict
+)
 from dataclasses import field as _field, dataclass as _dataclass
 
 from docstring_parser import Docstring as _Docstring, parse as _parse
