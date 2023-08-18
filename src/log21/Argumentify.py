@@ -4,7 +4,6 @@
 import re as _re
 import string as _string
 import inspect as _inspect
-import argparse as _argparse
 from typing import (
     Any as _Any, Set as _Set, Dict as _Dict, List as _List, Tuple as _Tuple, Union as
     _Union, Callable as _Callable, Optional as _Optional, Coroutine as _Coroutine,
@@ -14,7 +13,7 @@ from dataclasses import field as _field, dataclass as _dataclass
 
 from docstring_parser import Docstring as _Docstring, parse as _parse
 
-from log21.Argparse import ColorizingArgumentParser as _ColorizingArgumentParser
+import log21.Argparse as _Argparse
 
 __all__ = [
     'argumentify', 'ArgumentifyError', 'ArgumentTypeError', 'FlagGenerationError',
@@ -154,7 +153,7 @@ class FunctionInfo:
     name: str = _field(init=False)
     arguments: _Dict[str, Argument] = _field(init=False)
     docstring: _Docstring = _field(init=False)
-    parser: _ColorizingArgumentParser = _field(init=False)
+    parser: _Argparse.ColorizingArgumentParser = _field(init=False)
 
     def __post_init__(self):
         self.name = normalize_name_to_snake_case(
@@ -244,7 +243,7 @@ def generate_flag(  # pylint: disable=too-many-branches
 
 
 def _add_arguments(
-    parser: _Union[_ColorizingArgumentParser, _argparse._ArgumentGroup],
+    parser: _Union[_Argparse.ColorizingArgumentParser, _Argparse._ArgumentGroup],
     info: FunctionInfo,
     reserved_flags: _Optional[_Set[str]] = None
 ) -> None:
@@ -298,7 +297,9 @@ def _argumentify_one(func: Callable):
             )
 
     # Create the parser
-    parser = _ColorizingArgumentParser(description=info.docstring.short_description)
+    parser = _Argparse.ColorizingArgumentParser(
+        description=info.docstring.short_description
+    )
     # Add the arguments
     _add_arguments(parser, info)
     cli_args = parser.parse_args()
@@ -335,7 +336,7 @@ def _argumentify(functions: _Dict[str, Callable]):
                     "which is not supported.",
                     unsupported_arg=argument.name
                 )
-    parser = _ColorizingArgumentParser()
+    parser = _Argparse.ColorizingArgumentParser()
     subparsers = parser.add_subparsers(required=True)
     for name, (_, info) in functions_info.items():
         subparser = subparsers.add_parser(name, help=info.docstring.short_description)

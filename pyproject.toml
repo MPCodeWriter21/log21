@@ -26,7 +26,7 @@ dependencies = [
   "webcolors",
   "docstring-parser"
 ]
-version = "2.7.0rc0"
+version = "2.7.0rc1"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -37,7 +37,7 @@ Donations = "https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md"
 Source = "https://github.com/MPCodeWriter21/log21"
 
 [project.optional-dependencies]
-dev = ["yapf", "isort", "docformatter", "pylint"]
+dev = ["yapf", "isort", "docformatter", "pylint", "json5", "pytest"]
 
 [tool.pylint.messages_control]
 max-line-length = 88
