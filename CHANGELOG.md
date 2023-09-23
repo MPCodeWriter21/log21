@@ -6,6 +6,19 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.7.0
+
++ Modified `automatic-release.yml` and `pypi.yml` workflows to check the
+  version
++ Added the support for more `type`s to pass to
+  `ColorizingArgumentParser().add_argument(...)`: `typing.Union`, `typing.Optional`,
+  `typing.Literal`, `enum.Enum`, `tuple` and `typing.Required`.
++ Modified the way `Enum`s are handled in the Argument Parser.
++ Handled some `typing._SpecialForm`s.
++ A normal ArgumentGroup can now be required! (Unlike MutuallyExclusiveGroup it can 
+  have more than 1 option used at the same time)
++ `argumentify` now supports async functions as the entry point.
+
 ### 2.6.2
 
 Change in README.md.

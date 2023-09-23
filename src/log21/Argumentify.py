@@ -3,12 +3,12 @@
 
 import re as _re
 import string as _string
+import asyncio as _asyncio
 import inspect as _inspect
-from typing import (
-    Any as _Any, Set as _Set, Dict as _Dict, List as _List, Tuple as _Tuple, Union as
-    _Union, Callable as _Callable, Optional as _Optional, Coroutine as _Coroutine,
-    OrderedDict as _OrderedDict
-)
+from typing import (Any as _Any, Set as _Set, Dict as _Dict, List as _List,
+                    Tuple as _Tuple, Union as _Union, Callable as _Callable,
+                    Optional as _Optional, Awaitable as _Awaitable,
+                    Coroutine as _Coroutine, OrderedDict as _OrderedDict)
 from dataclasses import field as _field, dataclass as _dataclass
 
 from docstring_parser import Docstring as _Docstring, parse as _parse
@@ -151,7 +151,7 @@ class FunctionInfo:
     """Represents a function."""
     function: Callable
     name: str = _field(init=False)
-    arguments: _Dict[str, Argument] = _field(init=False)
+    arguments: _OrderedDict[str, Argument] = _field(init=False)
     docstring: _Docstring = _field(init=False)
     parser: _Argparse.ColorizingArgumentParser = _field(init=False)
 
@@ -313,7 +313,10 @@ def _argumentify_one(func: Callable):
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
-    func(*args, **kwargs)
+    result = func(*args, **kwargs)
+    # Check if the result is a coroutine
+    if isinstance(result, (_Coroutine, _Awaitable)):
+        _asyncio.run(result)
 
 
 def _argumentify(functions: _Dict[str, Callable]):
@@ -359,7 +362,10 @@ def _argumentify(functions: _Dict[str, Callable]):
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
-    function(*args, **kwargs)
+    result = function(*args, **kwargs)
+    # Check if the result is a coroutine
+    if isinstance(result, (_Coroutine, _Awaitable)):
+        _asyncio.run(result)
 
 
 def argumentify(entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]):
