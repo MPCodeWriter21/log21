@@ -322,10 +322,10 @@ class EmailReporter(Reporter):  # pylint: disable=too-many-instance-attributes
         >>> divide(10, 0)
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
-          File "%localappdata%\\Programs\\Python\\Python310\\lib\\site-packages\\log21\\CrashReporter\\Reporters.py",
+          File ".../site-packages/log21/CrashReporter/Reporters.py",
            line 81, in wrap
             raise e
-          File "%localappdata%\\Programs\\Python\\Python310\\lib\\site-packages\\log21\\CrashReporter\\Reporters.py",
+          File ".../site-packages/log21/CrashReporter/Reporters.py",
            line 77, in wrap
             return func(*args, **kwargs)
           File "<stdin>", line 3, in divide

@@ -1,18 +1,19 @@
 # log21.Argparse.py
 # CodeWriter21
 
+from __future__ import annotations
+
 import re as _re
 import sys as _sys
 import types as _types
 import typing as _typing
 import argparse as _argparse
 from enum import Enum as _Enum
+from typing import (Tuple as _Tuple, Mapping as _Mapping, Optional as _Optional,
+                    Sequence as _Sequence)
 from gettext import gettext as _gettext
 from textwrap import TextWrapper as _TextWrapper
 from collections import OrderedDict as _OrderedDict
-from typing import (
-    Mapping as _Mapping, Optional as _Optional, Tuple as _Tuple, Sequence as _Sequence
-)
 
 import log21 as _log21
 from log21.Colors import get_colors as _gc
@@ -485,11 +486,13 @@ class ColorizingTextWrapper(_TextWrapper):
                 del chunks[-1]
 
             while chunks:
-                # modified upstream code, not going to refactor for ambiguous variable name.
+                # modified upstream code, not going to refactor for ambiguous variable
+                # name.
                 length = len(_Formatter.decolorize(chunks[-1]))  # noqa: E741
 
                 # Can at least squeeze this chunk onto the current line.
-                # Modified upstream code, not going to refactor for ambiguous variable name.
+                # Modified upstream code, not going to refactor for ambiguous variable
+                # name.
                 if current_len + length <= width:  # noqa: E741
                     current_line.append(chunks.pop())
                     current_len += length
@@ -545,35 +548,38 @@ class _ActionsContainer(_argparse._ActionsContainer):
     # pylint: disable=too-many-branches
     def _validate_func_type(self, action, func_type, kwargs, level: int = 0) -> _Tuple:
         # raise an error if the action type is not callable
-        if not callable(func_type) and not isinstance(func_type,
-                                                      (_types.UnionType, tuple)):
+        if (hasattr(_types, 'UnionType') and not callable(func_type)
+                and not isinstance(func_type, (_types.UnionType, tuple))):
             raise ValueError(f'{func_type} is not callable; level={level}')
 
         # Handle `UnionType` as a type (e.g. `int|str`)
-        if isinstance(func_type, _types.UnionType):
+        if hasattr(_types, 'UnionType') and isinstance(func_type, _types.UnionType):
             func_type = func_type.__args__  # type: ignore
 
         # Handle `Literal` as a type (e.g. `Literal[1, 2, 3]`)
-        elif isinstance(func_type, _typing._LiteralGenericAlias):
+        elif (hasattr(_typing, '_LiteralGenericAlias')
+              and isinstance(func_type, _typing._LiteralGenericAlias)):  # type: ignore
             func_type = Literal(func_type)
 
         # Handle `List` as a type (e.g. `List[int]`)
-        elif isinstance(func_type,
-                        _typing._GenericAlias) and func_type.__origin__ is list:
+        elif (hasattr(_typing, '_GenericAlias')
+              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
+              and func_type.__origin__ is list):
             func_type = func_type.__args__[0]
             if kwargs.get('nargs') is None:
                 action.nargs = '+'
 
         # Handle `Required` as a type (e.g. `Required[int]`)
-        elif isinstance(
-                func_type,
-                _typing._GenericAlias) and func_type.__origin__ is _typing.Required:
+        elif (hasattr(_typing, 'Required') and hasattr(_typing, '_GenericAlias')
+              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
+              and func_type.__origin__ is _typing.Required):
             func_type = func_type.__args__[0]
             action.required = True
 
         # Handle `Union` and `Optional` as a type (e.g. `Union[int, str]` and
         # `Optional[int]`)
-        elif isinstance(func_type, _typing._UnionGenericAlias):
+        elif (hasattr(_types, 'NoneType') and hasattr(_typing, '_UnionGenericAlias')
+              and isinstance(func_type, _typing._UnionGenericAlias)):  # type: ignore
             # Optional[T] is just Union[T, NoneType]
             # Optional
             if (len(func_type.__args__) == 2
@@ -620,12 +626,16 @@ class _ActionsContainer(_argparse._ActionsContainer):
                 temp.extend(self._validate_func_type(action, type_, kwargs, level + 1))
             func_type = tuple(temp)
         else:
-            if isinstance(func_type, (
-                    _typing._GenericAlias,
-                    _typing._UnionGenericAlias,
-                    _typing._LiteralGenericAlias,
-                    _types.UnionType,
-            )):
+            if (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
+                    and hasattr(_typing, '_UnionGenericAlias')
+                    and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
+                        func_type,
+                        (
+                            _typing._GenericAlias,  # type: ignore
+                            _typing._UnionGenericAlias,  # type: ignore
+                            _typing._LiteralGenericAlias,  # type: ignore
+                            _types.UnionType,
+                        ))):
                 func_type = self._validate_func_type(
                     action, func_type, kwargs, level + 1
                 )
@@ -744,8 +754,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             return self.formatter_class(prog=self.prog)
 
     def _get_value(self, action, arg_string):
-        """Override _get_value to add support for types such as Union and
-        Literal."""
+        """Override _get_value to add support for types such as Union and Literal."""
 
         func_type = self._registry_get('type', action.type, action.type)
         if not callable(func_type) and not isinstance(func_type, tuple):
@@ -1079,7 +1088,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         if required_actions:
             self.error(
                 _gettext(
-                    f'the following arguments are required: {", ".join(required_actions)}'
+                    'the following arguments are required: ' +
+                    ", ".join(required_actions)
                 )
             )
 

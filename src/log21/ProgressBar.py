@@ -20,7 +20,8 @@ __all__ = ['ProgressBar']
 class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-long
     """
     Usage Example:
-        >>> pb = ProgressBar(width=20, show_percentage=False, prefix='[', suffix=']', fill='=', empty='-')
+        >>> pb = ProgressBar(width=20, show_percentage=False, prefix='[', suffix=']',
+        ... fill='=', empty='-')
         >>> pb(0, 10)
         [/-----------------]
         >>> pb(1, 10)
@@ -35,7 +36,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         ...     pb(i + 1, 500)
         ...     time.sleep(0.01)
         ...
-        |████████████████████████████████████████████████████████████████████████████████████████████| 100%
+        |███████████████████████████████████████████████████████████████████| 100%
         >>> # Of course, You should try it yourself to see the progress! XD
         >>>
     """
@@ -141,8 +142,10 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         if format_:
             self.format = format_
         else:
-            self.format = '%(prefix)s%(bar)s%(suffix)s %(percentage)s%%' if show_percentage else \
-                '%(prefix)s%(bar)s%(suffix)s'
+            self.format = (
+                '%(prefix)s%(bar)s%(suffix)s %(percentage)s%%'
+                if show_percentage else '%(prefix)s%(bar)s%(suffix)s'
+            )
             style = '%'
         self.style = style
         self.new_line_when_complete = new_line_when_complete
@@ -176,8 +179,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         return self.progress_in_progress(progress, total, **kwargs)
 
     def progress_in_progress(self, progress: float, total: float, **kwargs) -> str:
-        """Return the progress bar as a string when the progress is in
-        progress.
+        """Return the progress bar as a string when the progress is in progress.
 
         :param progress: The current progress. (e.g. 21)
         :param total: The total progress. (e.g. 100)
@@ -245,8 +247,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
     def progress_complete(self, **kwargs) -> str:
         """Prints the progress bar as complete.
 
-        :param kwargs: Additional variables to be passed to the format
-            string.
+        :param kwargs: Additional variables to be passed to the format string.
         :raises ValueError: If the style is not either `%` or `{`.
         :return: The formatted progress bar.
         """
@@ -384,8 +385,8 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
 
         :param progress: The current progress.
         :param total: The total progress.
-        :param logger: The logger to use. If not specified, the logger
-            specified in the constructor will be used.
+        :param logger: The logger to use. If not specified, the logger specified in the
+            constructor will be used.
         :param kwargs: Additional variables to be used in the format string.
         :raises ValueError: If the style is not `%` or `{`.
         """

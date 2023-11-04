@@ -17,14 +17,14 @@ from log21.PPrint import PrettyPrinter, pformat
 from log21.Manager import Manager
 from log21.Argparse import ColorizingArgumentParser
 from log21.TreePrint import TreePrint, tree_format
-from log21.Formatters import ColorizingFormatter, DecolorizingFormatter
+from log21.Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
 from log21.Argumentify import argumentify
-from log21.FileHandler import DecolorizingFileHandler
+from log21.FileHandler import FileHandler, DecolorizingFileHandler
 from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.7.0"
+__version__ = "2.7.1"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -67,7 +67,8 @@ def _prepare_formatter(
 
     if level_colors and not issubclass(formatter_class, ColorizingFormatter):
         warning(
-            '`formatter_class` should be a subclass of ColorizingFormatter when used with level_colors.'
+            '`formatter_class` should be a subclass of ColorizingFormatter when used '
+            'with level_colors.'
         )
         warning(
             f'Using `{formatter_class.__name__}` might lead to unexpected behaviour!'
@@ -76,12 +77,15 @@ def _prepare_formatter(
     # Defines the formatter
     if level_colors:
         formatter = formatter_class(
-            fmt, datefmt, style=style, level_colors=level_colors
+            fmt,
+            datefmt,
+            style=style,
+            level_colors=level_colors  # type: ignore
         )
     else:
-        formatter = formatter_class(fmt, datefmt, style=style)
+        formatter = formatter_class(fmt, datefmt, style=style)  # type: ignore
 
-    if isinstance(formatter, Formatters._Formatter) and level_names:
+    if isinstance(formatter, _Formatter) and level_names:
         formatter.level_names = level_names
     if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
         for key in formatter.level_colors:
@@ -107,38 +111,21 @@ def get_logger(
     level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
     file: _Optional[_Union[_os.PathLike, str]] = None
 ) -> Logger:
-    """
-    Returns a logging.Logger with colorizing support.
-    >>>
-    >>> import log21
-    >>>
-    >>> l = log21.get_logger()
-    >>> l.warning('Pretty basic, huh?')
-    [14:49:41] [WARNING] Pretty basic, huh?
-    >>> l.critical('CONTINUE READING!! please...')
-    [14:50:08] [CRITICAL] CONTINUE READING!! please...
-    >>>
-    >>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO,
-    ... fmt='{asctime} -> [{levelname}]: {message}', style='{', override=True)
-    >>>
-    >>> my_logger.info('FYI: My name is Mehrad.')
-    14:56:12 -> [INFO]: FYI: My name is Mehrad.
-    >>> my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
-    14:56:29 -> [ERROR]: Oh no! Something went wrong D:
-    >>>
-    >>> my_logger.debug(1 ,2 ,3)
+    """Returns a logging.Logger with colorizing support. >>> >>> import log21 >>> >>> l
+    = log21.get_logger() >>> l.warning('Pretty basic, huh?') [14:49:41] [WARNING] Pretty
+    basic, huh? >>> l.critical('CONTINUE READING!! please...') [14:50:08] [CRITICAL]
+    CONTINUE READING!! please... >>> >>> my_logger =
+    log21.get_logger(name='CodeWriter21', level=log21.INFO, ... fmt='{asctime} ->
+    [{levelname}]: {message}', style='{', override=True) >>> >>> my_logger.info('FYI: My
+    name is Mehrad.') 14:56:12 -> [INFO]: FYI: My name is Mehrad. >>>
+    my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
+    14:56:29 -> [ERROR]: Oh no! Something went wrong D: >>> >>> my_logger.debug(1 ,2 ,3)
     >>> # It prints Nothing because our logger level is INFO and DEBUG level is lower
-    >>> # than INFO.
-    >>> # So let's modify the my_logger's level
-    >>> my_logger.setLevel(log21.DEBUG)
-    >>> # Now we try again...
-    >>> my_logger.debug(1, 2, 3)
-    14:57:34 -> [DEBUG]: 1 2 3
-    >>> # Well Done. Right?
-    >>> # Let's see more
-    >>> my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n')
-    15:01:43 -> [DEBUG]: I like 21 number!
-
+    >>> # than INFO. >>> # So let's modify the my_logger's level >>>
+    my_logger.setLevel(log21.DEBUG) >>> # Now we try again... >>> my_logger.debug(1, 2,
+    3) 14:57:34 -> [DEBUG]: 1 2 3 >>> # Well Done. Right? >>> # Let's see more >>>
+    my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n') 15:01:43 ->
+    [DEBUG]: I like 21 number!
 
     >>> # Well, I've got a question...
     >>> # Do you know the name of this color?
@@ -197,7 +184,7 @@ def get_logger(
         _manager.addLogger(name, logger)
 
         if file:
-            file_handler = FileHandler.FileHandler(file)
+            file_handler = FileHandler(file)
             file_formatter = _prepare_formatter(
                 fmt,
                 style,
@@ -206,7 +193,7 @@ def get_logger(
                 show_time,
                 False,
                 level_names,
-                formatter_class=Formatters.DecolorizingFormatter
+                formatter_class=DecolorizingFormatter
             )
             file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
@@ -323,8 +310,8 @@ def print(  # pylint: disable=redefined-builtin
     end='\033[0m\n',
     **kwargs
 ):
-    """Works like the print function but ANSI colors are supported (even on
-    Windows) and it ends with a new line and a reset color by default."""
+    """Works like the print function but ANSI colors are supported (even on Windows) and
+    it ends with a new line and a reset color by default."""
     logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
     logger.print(*msg, args=args, end=end, **kwargs)
 
@@ -335,15 +322,14 @@ def input(  # pylint: disable=redefined-builtin
     end='',
     **kwargs
 ):
-    """Works like the input function but ANSI colors are supported (even on
-    Windows)."""
+    """Works like the input function but ANSI colors are supported (even on Windows)."""
     logger = get_logger('log21.input', level=DEBUG, show_time=False, show_level=False)
     return logger.input(*msg, args=args, end=end, **kwargs)
 
 
 def getpass(*msg, args: tuple = (), end='', **kwargs):
-    """Works like the getpass.getpass function but ANSI colors are supported
-    (even on Windows)."""
+    """Works like the getpass.getpass function but ANSI colors are supported (even on
+    Windows)."""
     logger = get_logger('log21.getpass', level=DEBUG, show_time=False, show_level=False)
     return logger.getpass(*msg, args=args, end=end, **kwargs)
 
@@ -366,18 +352,15 @@ def pprint(
     :param obj: The object to print.
     :param indent: The amount of indentation to use.
     :param width: The maximum width in characters of the output.
-    :param depth: The maximum depth to print nested structures. None
-        means unlimited.
-    :param signs_colors: A mapping that lets you specify the colors of
-        the supported signs.
+    :param depth: The maximum depth to print nested structures. None means unlimited.
+    :param signs_colors: A mapping that lets you specify the colors of the supported
+        signs.
     :param sort_dicts: If True, dictionaries are sorted by key.
-    :param underscore_numbers: If True, numbers are printed with an
-        underscore between each group of three digits.
-    :param compact: If True, lists and tuples are displayed on a single
-        line.
+    :param underscore_numbers: If True, numbers are printed with an underscore between
+        each group of three digits.
+    :param compact: If True, lists and tuples are displayed on a single line.
     :param end: The string to append at the end of the output.
-    :param kwargs: Additional keyword arguments passed to the
-        Logger.print function.
+    :param kwargs: Additional keyword arguments passed to the Logger.print function.
     """
     logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
     logger.print(
@@ -412,11 +395,9 @@ def tree_print(
     :param obj: The object to print.
     :param indent: The number of spaces to indent each level.
     :param mode: The mode to use for the tree. Can be '-' or '='.
-    :param colors: A mapping that lets you customize the colors of
-        branches and fruits.
+    :param colors: A mapping that lets you customize the colors of branches and fruits.
     :param end: The string to append at the end of the output.
-    :param kwargs: Additional keyword arguments passed to the
-        Logger.print function.
+    :param kwargs: Additional keyword arguments passed to the Logger.print function.
     """
     logger = get_logger(
         'log21.tree_print', level=DEBUG, show_time=False, show_level=False
@@ -515,7 +496,7 @@ def basic_config(
                 if 'b' in filemode:
                     errors = None
                 else:
-                    encoding = _io.text_encoding(encoding)
+                    encoding = encoding or 'utf-8'
                 handler = DecolorizingFileHandler(
                     filename, filemode, encoding=encoding, errors=errors
                 )
@@ -545,8 +526,8 @@ basicConfig = basic_config
 def critical(*msg, args=(), **kwargs):
     """Log a message with severity 'CRITICAL' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -561,8 +542,8 @@ def fatal(*msg, args=(), **kwargs):
 def error(*msg, args=(), **kwargs):
     """Log a message with severity 'ERROR' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -573,8 +554,8 @@ def exception(*msg, args=(), exc_info=True, **kwargs):
     """Log a message with severity 'ERROR' on the root logger, with exception
     information.
 
-    If the logger has no handlers, basicConfig() is called to add a
-    console handler with a pre-defined format.
+    If the logger has no handlers, basicConfig() is called to add a console handler with
+    a pre-defined format.
     """
     error(*msg, args=args, exc_info=exc_info, **kwargs)
 
@@ -582,8 +563,8 @@ def exception(*msg, args=(), exc_info=True, **kwargs):
 def warning(*msg, args=(), **kwargs):
     """Log a message with severity 'WARNING' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -598,8 +579,8 @@ def warn(*msg, args=(), **kwargs):
 def info(*msg, args=(), **kwargs):
     """Log a message with severity 'INFO' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -609,8 +590,8 @@ def info(*msg, args=(), **kwargs):
 def debug(*msg, args=(), **kwargs):
     """Log a message with severity 'DEBUG' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()
@@ -620,8 +601,8 @@ def debug(*msg, args=(), **kwargs):
 def log(level, *msg, args=(), **kwargs):
     """Log 'msg % args' with the integer severity 'level' on the root logger.
 
-    If the logger has no handlers, call basicConfig() to add a console
-    handler with a pre-defined format.
+    If the logger has no handlers, call basicConfig() to add a console handler with a
+    pre-defined format.
     """
     if len(root.handlers) == 0:
         basic_config()

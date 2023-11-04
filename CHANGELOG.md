@@ -5,6 +5,9 @@ Help this project by [Donation](DONATE.md)
 
 Changes
 -----------
+### 2.7.1
+
++ Improved compatibility
 
 ### 2.7.0
 
