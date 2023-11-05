@@ -1,9 +1,11 @@
 # log21.Logger.py
 # CodeWriter21
 
+import re as _re
 import logging as _logging
-from typing import (Union as _Union, Callable as _Callable, Optional as _Optional,
-                    Sequence as _Sequence)
+from types import MethodType as _MethodType
+from typing import (Union as _Union, Literal as _Literal, Mapping,
+                    Callable as _Callable, Optional as _Optional, Sequence as _Sequence)
 from getpass import getpass as _getpass
 from logging import raiseExceptions as _raiseExceptions
 
@@ -192,7 +194,10 @@ class Logger(_logging.Logger):
 
     @property
     def progress_bar(self):
-        """Return a progress bar instance. If not exists, create a new one."""
+        """Return a progress bar instance.
+
+        If not exists, create a new one.
+        """
         if not self._progress_bar:
             # avoid circular import; pylint: disable=import-outside-toplevel
             from log21.ProgressBar import ProgressBar
@@ -211,4 +216,76 @@ class Logger(_logging.Logger):
         """
         for handler in self.handlers:
             if isinstance(getattr(handler, 'clear_line', None), _Callable):
-                handler.clear_line(length)
+                handler.clear_line(length)  # type: ignore
+
+    def add_level(
+        self,
+        level: int,
+        name: str,
+        errors: _Literal['raise', 'ignore', 'handle'] = 'raise'
+    ) -> str:
+        """Adds a new method to the logger with a specific level and name.
+
+        :param level: The level of the new method.
+        :param name: The name of the new method.
+        :param errors: The action to take if the level already exists.
+        :return: The name of the new method.
+        """
+
+        def raise_(error: BaseException):
+            if errors == 'ignore':
+                return
+            raise error
+
+        if not isinstance(level, int):
+            raise_(TypeError('level must be an integer'))
+        if not isinstance(name, str):
+            raise_(TypeError('name must be a string'))
+        if errors not in ('raise', 'ignore', 'handle'):
+            raise_(ValueError('errors must be one of "raise", "ignore", or "handle"'))
+
+        name = _re.sub(r'\s', '_', name)
+        if _re.match(r'[0-9].*', name):
+            raise_(ValueError('level name cannot start with a number'))
+        if not _re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]*', name):
+            raise_(ValueError('level name must be a valid identifier'))
+
+        if hasattr(self, name):
+            if errors == 'raise':
+                raise AttributeError(f'level "{name}" already exists')
+            if errors == 'ignore':
+                return name
+            if errors == 'handle':
+                return self.add_level(level, _add_one(name), errors)
+
+        def log_for_level(self, level: int, *msg, args: tuple = (), end='\n', **kwargs):
+            self.log(level, *msg, args=args, end=end, **kwargs)
+
+        setattr(self, name, _MethodType(log_for_level, self))
+        return name
+
+    def add_levels(
+        self,
+        level_names: Mapping[int, str],
+        errors: _Literal['raise', 'ignore', 'handle'] = 'raise'
+    ) -> None:
+        """Adds new methods to the logger with specific levels and names.
+
+        :param level_names: A mapping of levels to names.
+        :param errors: The action to take if the level already exists
+        :return:
+        """
+        for level, name in level_names.items():
+            self.add_level(level, name, errors)
+
+
+def _add_one(name: str) -> str:
+    """Add one to the end of a string.
+
+    :param name: The string to add one to.
+    :return: The string with one added to the end.
+    """
+    match = _re.match(r'([\S]+)_([0-9]+)', name)
+    if not match:
+        return name + '_1'
+    return f'{match.group(1)}{int(match.group(2)) + 1}'

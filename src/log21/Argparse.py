@@ -572,7 +572,8 @@ class _ActionsContainer(_argparse._ActionsContainer):
         # Handle `Required` as a type (e.g. `Required[int]`)
         elif (hasattr(_typing, 'Required') and hasattr(_typing, '_GenericAlias')
               and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and func_type.__origin__ is _typing.Required):
+              and func_type.__origin__ is _typing.Required
+              ):
             func_type = func_type.__args__[0]
             action.required = True
 
@@ -754,7 +755,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             return self.formatter_class(prog=self.prog)
 
     def _get_value(self, action, arg_string):
-        """Override _get_value to add support for types such as Union and Literal."""
+        """Override _get_value to add support for types such as Union and
+        Literal."""
 
         func_type = self._registry_get('type', action.type, action.type)
         if not callable(func_type) and not isinstance(func_type, tuple):

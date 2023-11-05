@@ -61,9 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.7.1
+### 2.8.0a0
 
-+ Improved compatibility
++ Ability to add new methods to the Logger object for each custom level.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
