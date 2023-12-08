@@ -6,9 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
-### 2.8.0a0
+### 2.8.0a0-2
 
 + Ability to add new methods to the Logger object for each custom level.
++ Update python version
++ Added "force" error handling method to `Logger.add_level`.
 
 ### 2.7.1
 

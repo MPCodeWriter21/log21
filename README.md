@@ -61,9 +61,11 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.0a0
+### 2.8.0a0-2
 
 + Ability to add new methods to the Logger object for each custom level.
++ Update python version
++ Added "force" error handling method to `Logger.add_level`.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

@@ -26,7 +26,7 @@ dependencies = [
   "webcolors",
   "docstring-parser"
 ]
-version = "2.8.0a1"
+version = "2.8.0a2"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -43,9 +43,9 @@ dev = ["yapf", "isort", "docformatter", "pylint", "json5", "pytest"]
 max-line-length = 88
 
 disable = [
-  "protected-access",
   "too-few-public-methods",
   "too-many-arguments",
+  "protected-access",
   "too-many-locals",
   "fixme",
 ]
