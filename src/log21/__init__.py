@@ -24,7 +24,7 @@ from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.8.0a2"
+__version__ = "2.8.0b0"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -182,7 +182,7 @@ def get_logger(
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         if level_names:
-            logger.add_levels(level_names, errors='handle')
+            logger.add_levels(level_names, errors='ignore')
         _manager.addLogger(name, logger)
 
         if file:

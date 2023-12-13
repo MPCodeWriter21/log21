@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.8.0b0
+
++ Changed the adding level error handling method to "ignore".
+
 ### 2.8.0a0-2
 
 + Ability to add new methods to the Logger object for each custom level.
