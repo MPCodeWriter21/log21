@@ -61,13 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.0
+### 2.8.1a0
 
-+ Update python version
-+ Renamed `crash_report.log` to `.crash_report.log`.
-+ Added "force" error handling method to `Logger.add_level`.
-+ Changed the adding level error handling method to "ignore".
-+ Ability to add new methods to the Logger object for each custom level.
++ Fixed Carriage Return Handling.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

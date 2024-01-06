@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.8.1a0
+
++ Fixed Carriage Return Handling.
+
 ### 2.8.0
 
 + Update python version

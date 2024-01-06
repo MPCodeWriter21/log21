@@ -53,7 +53,7 @@ class StreamHandler(_StreamHandler):
             msg = _hex_escape.sub(
                 '', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c'))
             )
-            if '\r' in msg[1:-1]:
+            if '\r' == msg[:1]:
                 file_descriptor = getattr(self.stream, 'fileno', None)
                 if file_descriptor:
                     file_descriptor = file_descriptor()
