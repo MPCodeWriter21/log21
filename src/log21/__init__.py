@@ -1,7 +1,6 @@
 # log21.__init__.py
 # CodeWriter21
 
-import io as _io
 import os as _os
 import logging as _logging
 from typing import (Type as _Type, Tuple as _Tuple, Union as _Union,
@@ -24,7 +23,7 @@ from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.8.0b0"
+__version__ = "2.8.0b1"
 __author__ = "CodeWriter21 (Mehrad Pooryoussof)"
 __github__ = "Https://GitHub.com/MPCodeWriter21/log21"
 __all__ = [
@@ -630,4 +629,4 @@ def progress_bar(
 
 console_reporter = CrashReporter.ConsoleReporter()
 
-file_reporter = CrashReporter.FileReporter(file='crash_report.log')
+file_reporter = CrashReporter.FileReporter(file='.crash_report.log')

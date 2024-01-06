@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.8.0b1
+
++ Renamed `crash_report.log` to `.crash_report.log`.
+
 ### 2.8.0b0
 
 + Changed the adding level error handling method to "ignore".

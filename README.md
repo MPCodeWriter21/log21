@@ -61,9 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.0b0
+### 2.8.0b1
 
-+ Changed the adding level error handling method to "ignore".
++ Renamed `crash_report.log` to `.crash_report.log`.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
