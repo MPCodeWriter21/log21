@@ -6,6 +6,14 @@ Help this project by [Donation](DONATE.md)
 Changes
 -----------
 
+### 2.8.0
+
++ Update python version
++ Renamed `crash_report.log` to `.crash_report.log`.
++ Added "force" error handling method to `Logger.add_level`.
++ Changed the adding level error handling method to "ignore".
++ Ability to add new methods to the Logger object for each custom level.
+
 ### 2.8.0b1
 
 + Renamed `crash_report.log` to `.crash_report.log`.

@@ -18,7 +18,7 @@ Features
   modifications. It can also decolorize the output if you want to log into a file.
 + Pretty printing : Have you ever wanted to colorize the output of the pprint module? log21's pretty printer can do
   that.
-+ Tree printing : You can pass a dict or list to log21.tree_print function and it will print it in a tree-like
++ Tree printing : You can pass a dict or list to `log21.tree_print` function and it will print it in a tree-like
   structure. It's also colorized XD.
 + ProgressBar : log21's progress bar can be used to show progress of a process in a beautiful way.
 + LoggingWindow : Helps you to log messages and debug your code in a window other than the console.
@@ -61,9 +61,13 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.0b1
+### 2.8.0
 
++ Update python version
 + Renamed `crash_report.log` to `.crash_report.log`.
++ Added "force" error handling method to `Logger.add_level`.
++ Changed the adding level error handling method to "ignore".
++ Ability to add new methods to the Logger object for each custom level.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
