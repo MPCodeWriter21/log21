@@ -6,6 +6,13 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.8.1
+
++ Fixed Carriage Return Handling.
++ Fixed setting level using `log21.basic_config`
++ Added more configuration for developer tools to the `pyproject.toml` file.
++ Added pre-commit.
+
 ### 2.8.1b0
 
 + Fixed setting level using `log21.basic_config`
@@ -49,7 +56,7 @@ Changes
   `typing.Literal`, `enum.Enum`, `tuple` and `typing.Required`.
 + Modified the way `Enum`s are handled in the Argument Parser.
 + Handled some `typing._SpecialForm`s.
-+ A normal ArgumentGroup can now be required! (Unlike MutuallyExclusiveGroup it can 
++ A normal ArgumentGroup can now be required! (Unlike MutuallyExclusiveGroup it can
   have more than 1 option used at the same time)
 + `argumentify` now supports async functions as the entry point.
 

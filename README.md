@@ -61,9 +61,12 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.1b0
+### 2.8.1
 
++ Fixed Carriage Return Handling.
 + Fixed setting level using `log21.basic_config`
++ Added more configuration for developer tools to the `pyproject.toml` file.
++ Added pre-commit.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
@@ -202,7 +205,7 @@ for character in text:
 
 window.error(colored_text)
 
-# See more examples in 
+# See more examples in
 # https://github.com/MPCodeWriter21/log21/blob/066efc1e72542531012d36974bbf6cd4c5941378/log21/LoggingWindow.py#L155
 # and
 # https://github.com/MPCodeWriter21/log21/blob/066efc1e72542531012d36974bbf6cd4c5941378/log21/__init__.py#L144
