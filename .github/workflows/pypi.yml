@@ -34,7 +34,7 @@ jobs:
         id: check-version
         with:
           text: ${{ env.PACKAGE_VERSION }}
-          regex: '\d+\.\d+\.\d+\w+\d+'
+          regex: '\d+\.\d+\.\d+a\d+'
 
       - name: Publish
         uses: pypa/gh-action-pypi-publish@master
