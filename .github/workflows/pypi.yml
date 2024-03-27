@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m build
           pip install dist/*.whl
-          echo "PACKAGE_VERSION=$(pip show log21 | grep \"^Version: \" | cut -d \" \" -f 2)" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(pip show log21 | grep '^Version: ' | cut -d ' ' -f 2)" >> $GITHUB_ENV
 
       - name: check-version
         uses: KyoriPowered/action-regex-match@v3
