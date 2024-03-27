@@ -23,18 +23,17 @@ from log21.ProgressBar import ProgressBar
 from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
 from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__version__ = "2.8.1b0"
-__author__ = "CodeWriter21 (Mehrad Pooryoussof)"
-__github__ = "Https://GitHub.com/MPCodeWriter21/log21"
+__author__ =         'CodeWriter21 (Mehrad Pooryoussof)'
+__github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
     'DecolorizingFormatter', 'get_logger', 'Logger', 'Colors', 'get_color',
     'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG',
     'NOTSET', 'INPUT', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter',
     'pformat', 'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager',
-    'get_color_name', 'closest_color', 'ansi_escape', '__version__', '__author__',
-    '__github__', 'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal',
-    'exception', 'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
+    'get_color_name', 'closest_color', 'ansi_escape', '__author__', '__github__',
+    'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal', 'exception',
+    'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
     'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
     'console_reporter', 'file_reporter', 'argumentify'
 ]
@@ -46,7 +45,7 @@ _logging.setLoggerClass(Logger)
 def _prepare_formatter(
     fmt: _Optional[str] = None,
     style: str = '%',
-    datefmt: str = "%H:%M:%S",
+    datefmt: str = '%H:%M:%S',
     show_level: bool = True,
     show_time: bool = True,
     colorize_time_and_level: bool = True,
@@ -57,11 +56,11 @@ def _prepare_formatter(
     # Prepares a formatting if the fmt was None
     if not fmt:
         style = '%'
-        fmt = "%(message)s"
+        fmt = '%(message)s'
         if show_level:
-            fmt = "[%(levelname)s] " + fmt
+            fmt = '[%(levelname)s] ' + fmt
         if show_time:
-            fmt = "[%(asctime)s] " + fmt
+            fmt = '[%(asctime)s] ' + fmt
         fmt = '\r' + fmt
 
     if level_colors and not issubclass(formatter_class, ColorizingFormatter):
@@ -101,7 +100,7 @@ def get_logger(
     show_level: bool = True,
     colorize_time_and_level: bool = True,
     fmt: _Optional[str] = None,
-    datefmt: str = "%H:%M:%S",
+    datefmt: str = '%H:%M:%S',
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
@@ -209,7 +208,7 @@ def get_logging_window(
     show_level: bool = True,
     colorize_time_and_level: bool = True,
     fmt: _Optional[str] = None,
-    datefmt: str = "%H:%M:%S",
+    datefmt: str = '%H:%M:%S',
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
@@ -421,7 +420,7 @@ def basic_config(
     stream=None,
     filename=None,
     filemode: str = 'a',
-    date_format: str = "%H:%M:%S",
+    date_format: str = '%H:%M:%S',
     style: str = '%',
     format_: _Optional[str] = None,
     level: _Optional[_Union[int, str]] = None
