@@ -62,4 +62,5 @@ dedent_closing_brackets = true
 [tool.isort]
 line_length = 88
 combine_as_imports = true
+length_sort = true
 order_by_type = true
