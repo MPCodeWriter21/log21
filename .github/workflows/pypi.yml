@@ -37,7 +37,7 @@ jobs:
           regex: '\d+\.\d+\.\d+a\d+'
 
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         if: ${{ steps.check-version.outputs.match == '' }}  # If didn't match
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
