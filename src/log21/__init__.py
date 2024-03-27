@@ -517,8 +517,8 @@ def basic_config(
             if handler.formatter is None:
                 handler.setFormatter(formatter)
             root.addHandler(handler)
-        if level is not None:
-            root.setLevel(level)
+    if level is not None:
+        root.setLevel(level)
 
 
 basicConfig = basic_config

@@ -4,7 +4,11 @@ log21
 Help this project by [Donation](DONATE.md)
 
 Changes
------------
+-------
+
+### 2.8.1b0
+
++ Fixed setting level using `log21.basic_config`
 
 ### 2.8.1a0
 

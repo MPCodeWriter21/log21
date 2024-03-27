@@ -61,9 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.8.1a0
+### 2.8.1b0
 
-+ Fixed Carriage Return Handling.
++ Fixed setting level using `log21.basic_config`
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
