@@ -64,3 +64,8 @@ line_length = 88
 combine_as_imports = true
 length_sort = true
 order_by_type = true
+
+[tool.docformatter]
+recursive = true
+wrap-summaries = 88
+wrap-descriptions = 88
