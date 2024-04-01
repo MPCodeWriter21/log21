@@ -6,24 +6,24 @@ import logging as _logging
 from typing import (Type as _Type, Tuple as _Tuple, Union as _Union,
                     Mapping as _Mapping, Optional as _Optional)
 
-from log21 import CrashReporter
-from log21.Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
-                          get_color_name)
-from log21.Levels import (INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING,
-                          CRITICAL)
-from log21.Logger import Logger
-from log21.PPrint import PrettyPrinter, pformat
-from log21.Manager import Manager
-from log21.Argparse import ColorizingArgumentParser
-from log21.TreePrint import TreePrint, tree_format
-from log21.Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
-from log21.Argumentify import argumentify
-from log21.FileHandler import FileHandler, DecolorizingFileHandler
-from log21.ProgressBar import ProgressBar
-from log21.LoggingWindow import LoggingWindow, LoggingWindowHandler
-from log21.StreamHandler import StreamHandler, ColorizingStreamHandler
+from . import CrashReporter
+from .Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
+                     get_color_name)
+from .Levels import INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING, CRITICAL
+from .Logger import Logger
+from .PPrint import PrettyPrinter, pformat
+from .Manager import Manager
+from .Argparse import ColorizingArgumentParser
+from .TreePrint import TreePrint, tree_format
+from .Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
+from .Argumentify import argumentify
+from .FileHandler import FileHandler, DecolorizingFileHandler
+from .ProgressBar import ProgressBar
+from .LoggingWindow import LoggingWindow, LoggingWindowHandler
+from .StreamHandler import StreamHandler, ColorizingStreamHandler
 
-__author__ =         'CodeWriter21 (Mehrad Pooryoussof)'
+__author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
+__version__ = '2.9.0'
 __github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',

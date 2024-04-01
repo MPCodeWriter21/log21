@@ -2,9 +2,10 @@
 # CodeWriter21
 
 import re as _re
+import sys as _sys
 import logging as _logging
 from types import MethodType as _MethodType
-from typing import (Union as _Union, Literal as _Literal, Mapping,
+from typing import (Any, List, Union as _Union, Literal as _Literal, Mapping,
                     Callable as _Callable, Optional as _Optional, Sequence as _Sequence)
 from getpass import getpass as _getpass
 from logging import raiseExceptions as _raiseExceptions
@@ -40,7 +41,7 @@ class Logger(_logging.Logger):
                     handlers = [handlers]
                 else:
                     raise TypeError(
-                        "handlers must be a list of logging.Handler objects"
+                        'handlers must be a list of logging.Handler objects'
                     )
             for handler in handlers:
                 self.addHandler(handler)
@@ -61,7 +62,7 @@ class Logger(_logging.Logger):
         msg = ' '.join([str(m) for m in msg]) + end
         if not isinstance(level, int):
             if _raiseExceptions:
-                raise TypeError("level must be an integer")
+                raise TypeError('level must be an integer')
             return
         if self.isEnabledFor(level):
             self._log(level, msg, args, **kwargs)
@@ -161,8 +162,9 @@ class Logger(_logging.Logger):
         """Log 'msg % args'.
 
         To pass exception information, use the keyword argument exc_info with a true
-        value, e.g.
+        value.
 
+        Usage example:
         age = logger.input("Enter your age: ")
         """
         msg = ' '.join([str(m) for m in msg]) + end
@@ -170,10 +172,12 @@ class Logger(_logging.Logger):
         return input()
 
     def getpass(self, *msg, args: tuple = (), end='', **kwargs):
-        """
+        """Takes a password input from the user.
 
-
-        :return:
+        :param msg: The message to display to the user.
+        :param args: The arguments to pass to the message.
+        :param end: The ending character to append to the message.
+        :return: The password.
         """
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
@@ -213,7 +217,7 @@ class Logger(_logging.Logger):
         self,
         level: int,
         name: str,
-        errors: _Literal["raise", "ignore", "handle", "force"] = "raise"
+        errors: _Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
     ) -> str:
         """Adds a new method to the logger with a specific level and name.
 
@@ -276,7 +280,7 @@ class Logger(_logging.Logger):
     def add_levels(
         self,
         level_names: Mapping[int, str],
-        errors: _Literal["raise", "ignore", "handle", "force"] = "raise"
+        errors: _Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
     ) -> None:
         """Adds new methods to the logger with specific levels and names.
 
@@ -286,6 +290,67 @@ class Logger(_logging.Logger):
         """
         for level, name in level_names.items():
             self.add_level(level, name, errors)
+
+    def __lshift__(self, obj):
+        """Prints the object to the output stream.
+        This operator is meant to make the Logger object be usable in a
+        std::cout-like way.
+
+        :param obj: The object to print.
+        :return: The Logger object.
+        """
+        logger = self
+        found = 0
+        while logger:
+            for handler in logger.handlers:
+                if (isinstance(handler, _logging.StreamHandler)
+                        and hasattr(handler.stream, 'write')
+                        and hasattr(handler.stream, 'flush')):
+                    found = found + 1
+                    handler.stream.write(str(obj))
+                    handler.stream.flush()
+            if not logger.propagate:
+                break
+            logger = logger.parent
+        if found == 0:
+            _sys.stderr.write(
+                f"No handlers could be found for logger \"{self.name}\"\n"
+            )
+        return self
+
+    def __rshift__(self, obj: List[Any]):
+        """A way of receiving input from the stdin.
+        This operator is meant to make a std::cin-like operation possible in Python.
+
+        :param obj: The object to redirect the output to.
+        :return: The Logger object.
+        """
+        n = len(obj) - 1
+        if n >= 0:
+            data = []
+            while n >= 0:
+                tmp = _sys.stdin.readline()[:-1].split(maxsplit=n)
+                data.extend(tmp)
+                n -= len(tmp)
+                tmp = []
+                for i, item in enumerate(data):
+                    if obj[i] is None:
+                        tmp.append(item)
+                    elif isinstance(obj[i], type):
+                        try:
+                            tmp.append(obj[i](item))
+                        except ValueError:
+                            tmp.append(obj[i]())
+                    else:
+                        try:
+                            tmp.append(obj[i].__class__(item))
+                        except ValueError:
+                            tmp.append(obj[i])
+                obj[:] = tmp
+        else:
+            obj[:] = _sys.stdin.readline()[:-1].split()
+
+        return self
 
 
 def _add_one(name: str) -> str:
