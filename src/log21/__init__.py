@@ -626,6 +626,8 @@ def progress_bar(
     print(progress_bar_.get_bar(progress, total))
 
 
+endl = '\n'
+
 console_reporter = CrashReporter.ConsoleReporter()
 
 file_reporter = CrashReporter.FileReporter(file='.crash_report.log')
