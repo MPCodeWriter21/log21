@@ -322,6 +322,44 @@ class Logger(_logging.Logger):
         """A way of receiving input from the stdin.
         This operator is meant to make a std::cin-like operation possible in Python.
 
+        Usage examples:
+        >>> import log21
+        >>> cout = cin = log21.get_logger()
+        >>>
+        >>> # Example 1
+        >>> # Get three inputs of type: str, str or None, and float
+        >>> data = [str, None, float]  # first name, last name and age
+        >>> cout << "Please enter a first name, last name and age(separated by space): "
+        Please enter a first name, last name and age(separated by space): 
+        >>> cin >> data;
+        M  21
+        >>> name = data[0] + (data[1] if data[1] is not None else '')
+        >>> age = data[2]
+        >>> cout << name << " is " << age << " years old." << log21.endl;
+        M is 21.0 years old.
+        >>>
+        >>> # Example 2
+        >>> # Get any number of inputs
+        >>> data = []
+        >>> cout << "Enter something: ";
+        Enter something: 
+        >>> cin >> data;
+        What ever man 1 2 3 !
+        >>> cout << "Here are the items you chose: " << data << log21.endl;
+        Here are the items you chose: ['What', 'ever', 'man', '1', '2', '3', '!']
+        >>>
+        >>> # Example 3
+        >>> # Get two inputs of type int with defaults: 1280 and 720
+        >>> data = [1280, 720]
+        >>> cout << "Enter the width and the height: ";
+        Enter the width and the height: 
+        >>> cin >> data;
+        500
+
+        >>> cout << "Width: " << data[0] << " Height: " << data[1] << log21.endl;
+        Width: 500 Height: 720
+        >>>
+
         :param obj: The object to redirect the output to.
         :return: The Logger object.
         """
@@ -329,24 +367,27 @@ class Logger(_logging.Logger):
         if n >= 0:
             data = []
             while n >= 0:
-                tmp = _sys.stdin.readline()[:-1].split(maxsplit=n)
-                data.extend(tmp)
+                tmp = _sys.stdin.readline()[:-1].split(' ', maxsplit=n)
+                if tmp:
+                    data.extend(tmp)
+                else:
+                    data.append('')
                 n -= len(tmp)
-                tmp = []
-                for i, item in enumerate(data):
-                    if obj[i] is None:
-                        tmp.append(item)
-                    elif isinstance(obj[i], type):
-                        try:
-                            tmp.append(obj[i](item))
-                        except ValueError:
-                            tmp.append(obj[i]())
-                    else:
-                        try:
-                            tmp.append(obj[i].__class__(item))
-                        except ValueError:
-                            tmp.append(obj[i])
-                obj[:] = tmp
+            tmp = []
+            for i, item in enumerate(data):
+                if obj[i] is None:
+                    tmp.append(item or None)
+                elif isinstance(obj[i], type):
+                    try:
+                        tmp.append(obj[i](item))
+                    except ValueError:
+                        tmp.append(obj[i]())
+                else:
+                    try:
+                        tmp.append(obj[i].__class__(item))
+                    except ValueError:
+                        tmp.append(obj[i])
+            obj[:] = tmp
         else:
             obj[:] = _sys.stdin.readline()[:-1].split()
 
