@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.9.0
+
++ Added `<<` and `>>` (left shift and right shift operators) to `log21.Logger.Logger`.
+
 ### 2.8.1
 
 + Fixed Carriage Return Handling.
