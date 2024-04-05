@@ -61,17 +61,17 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.9.0
+### 2.9.1
 
-+ Added `<<` and `>>` (left shift and right shift operators) to `log21.Logger.Logger`.
++ Update `README.md`.
 
-[Full CHANGELOG](CHANGELOG.md)
+[Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
 
 Usage Examples:
 ---------------
 
-See [Examples.md](EXAMPLES.md)
+See [EXAMPLES.md](https://github.com/MPCodeWriter21/log21/blob/master/EXAMPLES.md)
 
 
 About
