@@ -61,9 +61,10 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.9.1
+### 2.9.2
 
-+ Update `README.md`.
++ Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.
++ Bug fixes.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

@@ -262,11 +262,10 @@ def _add_arguments(
             'dest': argument.name,
             'help': argument.help
         }
-        if isinstance(argument.annotation, type):
-            config['type'] = argument.annotation
         if argument.annotation == bool:
             config['action'] = 'store_true'
-            config.pop('type')
+        elif argument.annotation:
+            config['type'] = argument.annotation
         if argument.kind == _inspect._ParameterKind.POSITIONAL_ONLY:
             config['required'] = True
         if argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:

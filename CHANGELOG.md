@@ -6,6 +6,11 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.9.2
+
++ Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.
++ Bug fixes.
+
 ### 2.9.1
 
 + Update `README.md`.
