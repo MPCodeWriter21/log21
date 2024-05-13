@@ -61,10 +61,11 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.9.2
+### 2.10.0
 
-+ Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.
-+ Bug fixes.
++ Added some exception classes to raise in the "argumentified" functions to show 
+  *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
+  `RequiredArgument`, `TooFewArguments`
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

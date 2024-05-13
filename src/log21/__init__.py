@@ -16,14 +16,15 @@ from .Manager import Manager
 from .Argparse import ColorizingArgumentParser
 from .TreePrint import TreePrint, tree_format
 from .Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
-from .Argumentify import argumentify
+from .Argumentify import (ArgumentError, TooFewArguments, RequiredArgument,
+                          IncompatibleArguments, argumentify)
 from .FileHandler import FileHandler, DecolorizingFileHandler
 from .ProgressBar import ProgressBar
 from .LoggingWindow import LoggingWindow, LoggingWindowHandler
 from .StreamHandler import StreamHandler, ColorizingStreamHandler
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '2.9.2'
+__version__ = '2.10.0'
 __github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
@@ -35,7 +36,8 @@ __all__ = [
     'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal', 'exception',
     'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
     'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
-    'console_reporter', 'file_reporter', 'argumentify'
+    'console_reporter', 'file_reporter', 'argumentify', 'ArgumentError',
+    'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
 ]
 
 _manager = Manager()

@@ -6,6 +6,12 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.10.0
+
++ Added some exception classes to raise in the "argumentified" functions to show 
+  *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
+  `RequiredArgument`, `TooFewArguments`
+
 ### 2.9.2
 
 + Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.

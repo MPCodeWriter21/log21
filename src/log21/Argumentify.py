@@ -18,7 +18,8 @@ import log21.Argparse as _Argparse
 __all__ = [
     'argumentify', 'ArgumentifyError', 'ArgumentTypeError', 'FlagGenerationError',
     'RESERVED_FLAGS', 'Callable', 'Argument', 'FunctionInfo', 'generate_flag',
-    'normalize_name', 'normalize_name_to_snake_case'
+    'normalize_name', 'normalize_name_to_snake_case', 'ArgumentError',
+    'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
 ]
 
 Callable = _Union[_Callable[..., _Any], _Callable[..., _Coroutine[_Any, _Any, _Any]]]
@@ -74,6 +75,90 @@ class FlagGenerationError(ArgumentifyError, RuntimeError):
                 )
         self.message = message
         self.arg_name = arg_name
+
+
+class ArgumentError(ArgumentifyError):
+    """Base of errors to raise in the argumentified functions to raise parser errors."""
+
+    def __init__(self, *args, message: _Optional[str] = None):
+        """Initialize the exception.
+
+        :param args: The arguments that have a problem.
+        :param message: The error message to show.
+        """
+        if message is None:
+            if args:
+                if len(args) > 1:
+                    message = "There is a problem with the arguments: " + ', '.join(
+                        f"`{arg}`" for arg in args
+                    )
+                else:
+                    message = "The argument `" + args[0] + "` is invalid."
+        self.message = message
+        self.arguments = args
+
+
+class IncompatibleArguments(ArgumentError):
+    """Raise when the user has used arguments that are incompatible with each other."""
+
+    def __init__(self, *args, message: _Optional[str] = None):
+        """Initialize the exception.
+
+        :param args: The arguments that are incompatible.
+        :param message: The error message to show.
+        """
+        super().__init__(*args, message)
+        if message is None:
+            if args:
+                if len(args) > 1:
+                    message = "You cannot use all these together: " + ', '.join(
+                        f"`{arg}`" for arg in args
+                    )
+                else:
+                    message = "The argument `" + args[0] + "` is not compatible."
+        self.message = message
+
+
+class RequiredArgument(ArgumentError):
+    """Raise this when there is a required argument missing."""
+
+    def __init__(self, *args, message: _Optional[str] = None):
+        """Initialize the exception.
+
+        :param args: The arguments that are required.
+        :param message: The error message to show.
+        """
+        super().__init__(*args, message)
+        if message is None:
+            if args:
+                if len(args) > 1:
+                    message = "These arguments are required: " + ', '.join(
+                        f"`{arg}`" for arg in args
+                    )
+                else:
+                    message = "The argument `" + args[0] + "` is required."
+        self.message = message
+
+
+class TooFewArguments(ArgumentError):
+    """Raise this when there were not enough arguments passed."""
+
+    def __init__(self, *args, message: _Optional[str] = None):
+        """Initialize the exception.
+
+        :param args: The arguments that should be passed.
+        :param message: The error message to show.
+        """
+        super().__init__(*args, message)
+        if message is None:
+            if args:
+                if len(args) > 1:
+                    message = "You should use these arguments: " + ', '.join(
+                        f"`{arg}`" for arg in args
+                    )
+                else:
+                    message = "The argument `" + args[0] + "` should be used."
+        self.message = message
 
 
 def normalize_name_to_snake_case(name: str, sep_char: str = '_') -> str:
@@ -278,8 +363,7 @@ def _add_arguments(
 
 
 def _argumentify_one(func: Callable):
-    """This function argumentifies one function as the entry point of the
-    script.
+    """This function argumentifies one function as the entry point of the script.
 
     :param function: The function to argumentify.
     """
@@ -312,15 +396,18 @@ def _argumentify_one(func: Callable):
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
-    result = func(*args, **kwargs)
-    # Check if the result is a coroutine
-    if isinstance(result, (_Coroutine, _Awaitable)):
-        _asyncio.run(result)
+    try:
+        result = func(*args, **kwargs)
+        # Check if the result is a coroutine
+        if isinstance(result, (_Coroutine, _Awaitable)):
+            _asyncio.run(result)
+    except ArgumentError as error:
+        parser.error(error.message)
 
 
 def _argumentify(functions: _Dict[str, Callable]):
-    """This function argumentifies one or more functions as the entry point of
-    the script.
+    """This function argumentifies one or more functions as the entry point of the
+    script.
 
     :param functions: A dictionary of functions to argumentify.
     :raises RuntimeError:
@@ -361,15 +448,18 @@ def _argumentify(functions: _Dict[str, Callable]):
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
-    result = function(*args, **kwargs)
-    # Check if the result is a coroutine
-    if isinstance(result, (_Coroutine, _Awaitable)):
-        _asyncio.run(result)
+    try:
+        result = function(*args, **kwargs)
+        # Check if the result is a coroutine
+        if isinstance(result, (_Coroutine, _Awaitable)):
+            _asyncio.run(result)
+    except ArgumentError as error:
+        parser.error(error.message)
 
 
 def argumentify(entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]):
-    """This function argumentifies one or more functions as the entry point of
-    the script.
+    """This function argumentifies one or more functions as the entry point of the
+    script.
 
      1 #!/usr/bin/env python
      2 # argumentified.py

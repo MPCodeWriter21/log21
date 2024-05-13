@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "log21"
 authors = [
-  {name = "CodeWriter21(Mehrad Pooryoussof)", email = "CodeWriter21@gmail.com"}
+    {name = "CodeWriter21(Mehrad Pooryoussof)", email = "CodeWriter21@gmail.com"}
 ]
 description = "A simple logging package that helps you log colorized messages in Windows console."
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -13,20 +13,20 @@ requires-python = ">=3.8"
 keywords = ['python', 'log', 'colorize', 'color', 'logging', 'Python3', 'CodeWriter21']
 license = {text = "Apache License 2.0"}
 classifiers = [
-  "Intended Audience :: Developers",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Operating System :: Unix",
-  "Operating System :: Microsoft :: Windows",
-  "Operating System :: MacOS :: MacOS X"
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: Unix",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X"
 ]
 dependencies = [
-  "webcolors",
-  "docstring-parser"
+    "webcolors",
+    "docstring-parser"
 ]
-version = "2.9.2"
+version = "2.10.0"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -43,11 +43,11 @@ dev = ["yapf", "isort", "docformatter", "pylint", "json5", "pytest"]
 max-line-length = 88
 
 disable = [
-  "too-few-public-methods",
-  "too-many-arguments",
-  "protected-access",
-  "too-many-locals",
-  "fixme",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "protected-access",
+    "too-many-locals",
+    "fixme",
 ]
 
 [tool.pylint.design]
