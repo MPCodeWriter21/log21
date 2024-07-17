@@ -548,10 +548,33 @@ class _ActionsContainer(_argparse._ActionsContainer):
 
     # pylint: disable=too-many-branches
     def _validate_func_type(self, action, func_type, kwargs, level: int = 0) -> _Tuple:
+        if isinstance(func_type, str):
+            func_type = globals().get(func_type, func_type)
+        if isinstance(func_type, str):
+            func_type = {
+                'int': int,
+                'str': str,
+                'float': float,
+                'bool': bool,
+                'list': list,
+                'dict': dict,
+                'set': set,
+                'tuple': tuple,
+                'complex': complex,
+                'bytes': bytes,
+                'bytearray': bytearray,
+                'range': range,
+                'frozenset': frozenset,
+                'memoryview': memoryview,
+                'slice': slice,
+                'type': type,
+                'object': object
+            }.get(func_type, func_type)
+
         # raise an error if the action type is not callable
         if (hasattr(_types, 'UnionType') and not callable(func_type)
                 and not isinstance(func_type, (_types.UnionType, tuple))):
-            raise ValueError(f'{func_type} is not callable; level={level}')
+            raise ValueError(f'{func_type!r} is not callable; level={level}')
 
         # Handle `UnionType` as a type (e.g. `int|str`)
         if hasattr(_types, 'UnionType') and isinstance(func_type, _types.UnionType):
