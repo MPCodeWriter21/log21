@@ -280,15 +280,28 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         group_actions = set()
         inserts = {}
         for group in groups:
+            if not group._group_actions:
+                raise ValueError(f'empty group {group}')
+
             try:
                 start = actions.index(group._group_actions[0])
             except ValueError:
                 continue
             else:
-                end = start + len(group._group_actions)
+                group_action_count = len(group._group_actions)
+                end = start + group_action_count
                 if actions[start:end] == group._group_actions:
+
+                    suppressed_actions_count = 0
                     for action in group._group_actions:
                         group_actions.add(action)
+                        if action.help is _argparse.SUPPRESS:
+                            suppressed_actions_count += 1
+
+                    exposed_actions_count = group_action_count - suppressed_actions_count
+                    if not exposed_actions_count:
+                        continue
+
                     if not group.required:
                         if start in inserts:
                             inserts[start] += ' ['
@@ -298,7 +311,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                             inserts[end] += ']'
                         else:
                             inserts[end] = ']'
-                    else:
+                    elif exposed_actions_count > 1:
                         if start in inserts:
                             inserts[start] += ' ('
                         else:
@@ -941,7 +954,22 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
 
             # get the optional identified at this index
             option_tuple = option_string_indices[start_index]
-            action, option_string, explicit_arg = option_tuple
+            if len(option_tuple) == 3:
+                action, option_string, explicit_arg = option_tuple
+                sep = None
+            elif len(option_tuple) == 4:
+                action, option_string, sep, explicit_arg = option_tuple
+            else:
+                # Tell the user that there seem to have been a change in argparse module
+                # and if they see this error they should immediately report it in an
+                # issue at GitHub.com/MPCodeWriter21/log21 with their Python version
+                raise ValueError(
+                    'Unknown option tuple length, please report this issue at: '
+                    'https://GitHub.com/MPCodeWriter21/log21\n'
+                    f'Python version: {_sys.version}'
+                    f'Option tuple: {option_tuple}'
+                    f'log21 version: {_log21.__version__}'
+                )
 
             # identify additional optionals in the same arg string
             # (e.g. -xyz is the same as -x -y -z if no args are required)
@@ -964,20 +992,27 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                     # of the tail of the option string
                     chars = self.prefix_chars
                     if arg_count == 0 and option_string[1] not in chars:
+                        if sep or explicit_arg[0] in chars:
+                            msg = _gettext('ignored explicit argument %r')
+                            raise _argparse.ArgumentError(action, msg % explicit_arg)
                         action_tuples.append((action, [], option_string))
                         char = option_string[0]
                         option_string = char + explicit_arg[0]
-                        new_explicit_arg = explicit_arg[1:] or None
                         optionals_map = self._option_string_actions
                         if option_string in optionals_map:
                             action = optionals_map[option_string]
-                            explicit_arg = new_explicit_arg
+                            explicit_arg = explicit_arg[1:]
+                            if not explicit_arg:
+                                sep = explicit_arg = None
+                            elif explicit_arg[0] == '=':
+                                sep = '='
+                                explicit_arg = explicit_arg[1:]
+                            else:
+                                sep = ''
                         else:
-                            msg = _gettext(
-                                f'ignored explicit argument {explicit_arg!r}'
-                            )
-                            raise _argparse.ArgumentError(action, msg)
-
+                            extras.append(char + explicit_arg)
+                            stop = start_index + 1
+                            break
                     # if the action expect exactly one argument, we've
                     # successfully matched the option; exit the loop
                     elif arg_count == 1:
@@ -989,8 +1024,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                     # error if a double-dash option did not use the
                     # explicit argument
                     else:
-                        msg = _gettext(f'ignored explicit argument {explicit_arg!r}')
-                        raise _argparse.ArgumentError(action, msg)
+                        msg = _gettext('ignored explicit argument %r')
+                        raise _argparse.ArgumentError(action, msg % explicit_arg)
 
                 # if there is no explicit argument, try to match the
                 # optional's string arguments with the following strings
