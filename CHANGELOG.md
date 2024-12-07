@@ -6,9 +6,13 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.10.1
+
++ Updated the Argparse module to be usable with python 3.12.3.
+
 ### 2.10.0
 
-+ Added some exception classes to raise in the "argumentified" functions to show 
++ Added some exception classes to raise in the "argumentified" functions to show
   *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
   `RequiredArgument`, `TooFewArguments`
 
@@ -101,6 +105,7 @@ Fixed a bug in the `TreePrint` class.
 ### 2.5.4
 
 Added constant colors directly to the Colors module. Now you can do this:
+
 ```python
 from log21 import print
 from log21.colors import GREEN, WHITE, RED

@@ -61,11 +61,9 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changes
 -------
 
-### 2.10.0
+### 2.10.1
 
-+ Added some exception classes to raise in the "argumentified" functions to show 
-  *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
-  `RequiredArgument`, `TooFewArguments`
++ Updated the Argparse module to be usable with python 3.12.3.
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
