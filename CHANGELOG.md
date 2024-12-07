@@ -6,6 +6,10 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### 2.10.2
+
++ Update README.md and CHANGELOG.md.
+
 ### 2.10.1
 
 + Updated the Argparse module to be usable with python 3.12.3.
