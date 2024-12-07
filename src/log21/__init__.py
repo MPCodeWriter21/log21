@@ -24,7 +24,7 @@ from .LoggingWindow import LoggingWindow, LoggingWindowHandler
 from .StreamHandler import StreamHandler, ColorizingStreamHandler
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '2.10.1alpha0'
+__version__ = '2.10.1'
 __github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
