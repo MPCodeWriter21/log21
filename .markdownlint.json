@@ -1,0 +1,10 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/markdownlint-config-schema.json",
+    "MD003": {
+        "style": "setext_with_atx"
+    },
+    "MD013": {
+        "line_length": 88
+    },
+    "MD051": false
+}

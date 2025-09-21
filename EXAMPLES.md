@@ -25,7 +25,7 @@ logger.error(log21.get_colors('LightRed') + "I'm still here ;1")
 
 ![Basic Logging](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-1.png)
 
-----------------
+------------------
 
 ### Argument Parsing (See Also: [Argumentify](https://github.com/MPCodeWriter21/log21#argumentify-check-out-the-manual-way))
 

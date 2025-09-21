@@ -1,7 +1,8 @@
 CodeWriter21
 ============
 
-If you enjoyed my work, consider supporting me by donating a small amount of cryptocurrency to one of my addresses:
+If you enjoyed my work, consider supporting me by donating a small amount of
+cryptocurrency to one of my addresses:
 
 **Bitcoin** (BTC)             : bc1qgds5kek973y2wf9f39jw6esfcvatk883m52drt
 
