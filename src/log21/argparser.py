@@ -35,7 +35,7 @@ class LiteralArg:
             raise TypeError('Only str arguments are allowed for Literal.')
 
     def __repr__(self):
-        return f'Literal[{', '.join(map(str, self.literal.__args__))}]'
+        return f"Literal[{', '.join(map(str, self.literal.__args__))}]"
 
     def __str__(self):
         return self.__repr__()
@@ -43,7 +43,7 @@ class LiteralArg:
     def __call__(self, value):
         if value not in self.literal.__args__:
             raise ValueError(
-                f'Value must be one of [{', '.join(map(str, self.literal.__args__))}]'
+                f"Value must be one of [{', '.join(map(str, self.literal.__args__))}]"
             )
         return value
 
@@ -764,7 +764,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
         args = {'prog': self.prog, 'message': message}
         self.exit(
             2,
-            gettext(f'%(prog)s: {_gc('r')}error{_gc('lr')}:{_gc('rst')} %(message)s\n')
+            gettext(f"%(prog)s: {_gc('r')}error{_gc('lr')}:{_gc('rst')} %(message)s\n")
             % args
         )
         return NoReturn
@@ -851,7 +851,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                     action,
                     gettext(
                         f'invalid choice: {choice!r} '
-                        f'(choose from {', '.join(map(repr, action.choices))})'
+                        f"(choose from {', '.join(map(repr, action.choices))})"
                     )
                 )
 
