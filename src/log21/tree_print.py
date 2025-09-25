@@ -1,12 +1,14 @@
-# log21.TreePrint.py
+# log21.tree_print.py
 # CodeWriter21
 
 from __future__ import annotations
 
-from typing import (List as _List, Union as _Union, Mapping as _Mapping,
-                    Optional as _Optional, Sequence as _Sequence)
+import sys
+from typing import List, Union, Mapping, Optional, Sequence
 
-from log21.Colors import get_colors as _gc
+from log21.colors import get_colors as _gc
+
+from ._module_helper import FakeModule
 
 
 class TreePrint:
@@ -17,10 +19,10 @@ class TreePrint:
 
         def __init__(
             self,
-            value: _Union[str, int],
-            children: _Optional[_List[TreePrint.Node]] = None,
+            value: Union[str, int],
+            children: Optional[List[TreePrint.Node]] = None,
             indent: int = 4,
-            colors: _Optional[_Mapping[str, str]] = None,
+            colors: Optional[Mapping[str, str]] = None,
             mode: str = '-'
         ):
             """Initialize a node.
@@ -53,7 +55,7 @@ class TreePrint:
                 if self.mode == -1:
                     raise ValueError('`mode` must be - or =')
 
-        def _get_mode(self, mode: _Optional[_Union[str, int]] = None) -> int:
+        def _get_mode(self, mode: Optional[Union[str, int]] = None) -> int:
             if not mode:
                 mode = self.mode
             if isinstance(mode, int):
@@ -117,7 +119,7 @@ class TreePrint:
                 raise TypeError('`child` must be TreePrint.Node')
             self._children.append(child)
 
-        def get_child(self, value: _Optional[str] = None, index: _Optional[int] = None):
+        def get_child(self, value: Optional[str] = None, index: Optional[int] = None):
             """Get a child by value or index."""
             if value and index:
                 raise ValueError('`value` and `index` can not be both set')
@@ -133,13 +135,13 @@ class TreePrint:
 
         def add_to(
             self: TreePrint.Node,
-            data: _Union[_Mapping, _Sequence, str, int],
+            data: Union[Mapping, Sequence, str, int],
             indent: int = 4,
-            colors: _Optional[_Mapping[str, str]] = None,
+            colors: Optional[Mapping[str, str]] = None,
             mode='-'
         ):  # pylint: disable=too-many-branches
             """Add data to the node."""
-            if isinstance(data, _Mapping):
+            if isinstance(data, Mapping):
                 if len(data) == 1:
                     child = TreePrint.Node(
                         list(data.keys())[0], indent=indent, colors=colors, mode=mode
@@ -155,7 +157,7 @@ class TreePrint:
                         )
                         child.add_to(value, indent=indent, colors=colors, mode=mode)
                         self.add_child(child)
-            elif isinstance(data, _Sequence) and not isinstance(data, str):
+            elif isinstance(data, Sequence) and not isinstance(data, str):
                 if len(data) == 1:
                     self.add_child(
                         TreePrint.Node(
@@ -164,7 +166,7 @@ class TreePrint:
                     )
                 else:
                     for value in data:
-                        if isinstance(value, _Mapping):
+                        if isinstance(value, Mapping):
                             for key, dict_value in value.items():
                                 child = TreePrint.Node(
                                     key, indent=indent, colors=colors, mode=mode
@@ -173,7 +175,7 @@ class TreePrint:
                                     dict_value, indent=indent, colors=colors, mode=mode
                                 )
                                 self.add_child(child)
-                        elif isinstance(value, _Sequence):
+                        elif isinstance(value, Sequence):
                             child = TreePrint.Node(
                                 '>', indent=indent, colors=colors, mode=mode
                             )
@@ -192,14 +194,14 @@ class TreePrint:
 
     def __init__(
         self,
-        data: _Union[_Mapping, _Sequence, str, int],
+        data: Union[Mapping, Sequence, str, int],
         indent: int = 4,
-        colors: _Optional[_Mapping[str, str]] = None,
+        colors: Optional[Mapping[str, str]] = None,
         mode='-'
     ):
         self.indent = indent
         self.mode = mode
-        if isinstance(data, _Mapping):
+        if isinstance(data, Mapping):
             if len(data) == 1:
                 self.root = self.Node(
                     list(data.keys())[0], indent=indent, colors=colors
@@ -208,7 +210,7 @@ class TreePrint:
             else:
                 self.root = self.Node('root', indent=indent, colors=colors)
                 self.add_to_root(data, colors=colors)
-        elif isinstance(data, _Sequence):
+        elif isinstance(data, Sequence):
             self.root = self.Node('root', indent=indent, colors=colors)
             self.add_to_root(data, colors=colors)
         else:
@@ -216,8 +218,8 @@ class TreePrint:
 
     def add_to_root(
         self,
-        data: _Union[_Mapping, _Sequence, str, int],
-        colors: _Optional[_Mapping[str, str]] = None
+        data: Union[Mapping, Sequence, str, int],
+        colors: Optional[Mapping[str, str]] = None
     ):
         """Add data to root node."""
         self.root.add_to(data, indent=self.indent, colors=colors, mode=self.mode)
@@ -229,10 +231,10 @@ class TreePrint:
 
 
 def tree_format(
-    data: _Union[_Mapping, _Sequence, str, int],
+    data: Union[Mapping, Sequence, str, int],
     indent: int = 4,
     mode='-',
-    colors: _Optional[_Mapping[str, str]] = None
+    colors: Optional[Mapping[str, str]] = None
 ) -> str:
     """Return a tree representation of data.
 
@@ -243,3 +245,35 @@ def tree_format(
     :return: tree representation of data
     """
     return str(TreePrint(data, indent=indent, colors=colors, mode=mode))
+
+
+def tree_print(
+    obj,
+    indent: int = 4,
+    mode='-',
+    colors: Optional[Mapping[str, str]] = None,
+    end='\033[0m\n',
+    **kwargs
+) -> None:
+    """Prints a tree representation of the given object. (e.g. a dictionary)
+
+    :param obj: The object to print.
+    :param indent: The number of spaces to indent each level.
+    :param mode: The mode to use for the tree. Can be '-' or '='.
+    :param colors: A mapping that lets you customize the colors of branches and fruits.
+    :param end: The string to append at the end of the output.
+    :param kwargs: Additional keyword arguments passed to the Logger.print function.
+    """
+    from log21 import DEBUG, get_logger
+    logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
+    logger = get_logger(
+        'log21.tree_print', level=DEBUG, show_time=False, show_level=False
+    )
+    logger.print(
+        tree_format(obj, indent=indent, mode=mode, colors=colors), end=end, **kwargs
+    )
+
+
+tprint = tree_print
+
+sys.modules[__name__] = FakeModule(sys.modules[__name__], tree_print)

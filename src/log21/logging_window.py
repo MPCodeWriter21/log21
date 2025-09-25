@@ -1,23 +1,23 @@
-# log21.LoggingWindow.py
+# log21.logging_window.py
 # CodeWriter2
 
 from __future__ import annotations
 
-import re as _re
-import threading as _threading
-import subprocess as _subprocess
-from enum import Enum as _Enum
-from time import sleep as _sleep
-from uuid import uuid4 as _uuid4
-from string import printable as _printable
-from typing import Union as _Union
-from logging import FileHandler as _FileHandler
-from argparse import Namespace as _Namespace
+import re
+import threading
+import subprocess
+from enum import Enum
+from time import sleep
+from uuid import uuid4
+from string import printable
+from typing import Union
+from logging import FileHandler
+from argparse import Namespace
 
-from log21.Colors import hex_escape as _hex_escape, ansi_escape as _ansi_escape
-from log21.Levels import NOTSET as _NOTSET
-from log21.Logger import Logger as _Logger
-from log21.StreamHandler import StreamHandler as _StreamHandler
+from log21.colors import hex_escape, ansi_escape
+from log21.levels import NOTSET
+from log21.logger import Logger
+from log21.stream_handler import StreamHandler
 
 __all__ = ['LoggingWindow', 'LoggingWindowHandler']
 
@@ -62,10 +62,10 @@ ansi_to_hex_color_map = {
     '107': ('#ffffff', 'background'),  # Bright white background
 }
 
-_lock = _threading.RLock()
+_lock = threading.RLock()
 
 
-class GettingInputStatus(_Enum):
+class GettingInputStatus(Enum):
     """An enum for the status of getting input."""
     NOT_GETTING_INPUT = 0
     GETTING_INPUT = 1
@@ -76,7 +76,7 @@ class CancelledInputError(InterruptedError, Exception):
     """An exception raised when the input is cancelled."""
 
 
-class LoggingWindowHandler(_StreamHandler):
+class LoggingWindowHandler(StreamHandler):
     """A handler for logging to a LoggingWindow."""
 
     def __init__(
@@ -88,8 +88,7 @@ class LoggingWindowHandler(_StreamHandler):
         """Initialize the LoggingWindowHandler.
 
         :param logging_window: The LoggingWindow to log to.
-        :param handle_carriage_return: Whether to handle carriage
-            returns.
+        :param handle_carriage_return: Whether to handle carriage returns.
         :param handle_new_line: Whether to handle new lines.
         """
         self.HandleCR = handle_carriage_return
@@ -120,15 +119,15 @@ class LoggingWindowHandler(_StreamHandler):
             self.LoggingWindow.logs.config(state=_tkinter.NORMAL)
 
             # Handles carriage return
-            parts = _re.split(r'(\r)', message)
+            parts = re.split(r'(\r)', message)
 
             while parts:
                 part = parts.pop(0)
 
                 if self.__carriage_return:
                     # Checks if the part is printable
-                    if any((char in _printable[:-6])
-                           for char in _hex_escape.sub('', _ansi_escape.sub('', part))):
+                    if any((char in printable[:-6])
+                           for char in hex_escape.sub('', ansi_escape.sub('', part))):
                         # Removes the last line
                         self.LoggingWindow.logs.delete('end - 1 lines', _tkinter.END)
                         if self.LoggingWindow.logs.count('0.0', 'end')[0] != 1:
@@ -137,13 +136,13 @@ class LoggingWindowHandler(_StreamHandler):
 
                 tags = []
                 # Handles ANSI color codes
-                ansi_parts = _ansi_escape.split(part)
+                ansi_parts = ansi_escape.split(part)
                 while ansi_parts:
                     ansi_text = ansi_parts.pop(0)
 
                     if ansi_text:
                         # Handles HEX color codes
-                        hex_parts = _hex_escape.split(ansi_text)
+                        hex_parts = hex_escape.split(ansi_text)
                         while hex_parts:
                             hex_text = hex_parts.pop(0)
 
@@ -153,7 +152,7 @@ class LoggingWindowHandler(_StreamHandler):
                             if hex_parts:
                                 hex_color = hex_parts.pop(0)
 
-                                tag = str(_uuid4())
+                                tag = str(uuid4())
                                 # Foreground color
                                 if hex_parts.pop(0) == 'f':
                                     tags.append(
@@ -199,7 +198,7 @@ class LoggingWindowHandler(_StreamHandler):
                         if ansi_color['foreground'] or ansi_color['background']:
                             tags.append(
                                 {
-                                    'name': str(_uuid4()),
+                                    'name': str(uuid4()),
                                     'start': self.LoggingWindow.logs.index('end-1c'),
                                     'config': ansi_color
                                 }
@@ -218,7 +217,7 @@ class LoggingWindowHandler(_StreamHandler):
             self.LoggingWindow.logs.see(_tkinter.END)
 
 
-class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
+class LoggingWindow(Logger):  # pylint: disable=too-many-instance-attributes
     """
     Usage Example:
         >>> # Manual creation
@@ -262,7 +261,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         name,
-        level=_NOTSET,
+        level=NOTSET,
         width: int = 80,
         height: int = 20,
         default_foreground_color='white',
@@ -278,17 +277,17 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         :param level: The level of the logger.
         :param width: The width of the LoggingWindow.
         :param height: The height of the LoggingWindow.
-        :param default_foreground_color: The default foreground color of
-            the LoggingWindow.
-        :param default_background_color: The default background color of
-            the LoggingWindow.
+        :param default_foreground_color: The default foreground color of the
+            LoggingWindow.
+        :param default_background_color: The default background color of the
+            LoggingWindow.
         :param font: The font of the LoggingWindow.
         """
         super().__init__(name, level)
         self.window = _tkinter.Tk()
         self.window.title(name)
         # Hides window instead of closing it
-        self.window.protocol("WM_DELETE_WINDOW", self.hide)
+        self.window.protocol('WM_DELETE_WINDOW', self.hide)
 
         self.window.resizable(False, False)
 
@@ -312,7 +311,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         )
         # Hides the command entry if allow_python and allow_shell are False
         if not allow_python and not allow_shell:
-            self.command_entry.grid_remove()
+            self.command_entry.gridremove()
         if allow_python:
             raise NotImplementedError('Python commands are not supported yet!')
         self.__allow_python = False
@@ -365,9 +364,9 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.window.bind('<<SetWidth>>', self.__set_width)
         self.window.bind('<<SetHeight>>', self.__set_height)
 
-    def addHandler(self, hdlr: _Union[_FileHandler, LoggingWindowHandler]):
-        if not isinstance(hdlr, LoggingWindowHandler, _FileHandler):
-            raise TypeError("Handler must be a FileHandler or LoggingWindowHandler")
+    def addHandler(self, hdlr: Union[FileHandler, LoggingWindowHandler]):
+        if not isinstance(hdlr, LoggingWindowHandler, FileHandler):
+            raise TypeError('Handler must be a FileHandler or LoggingWindowHandler')
         super().addHandler(hdlr)
 
     def __hide(self, _):
@@ -397,7 +396,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         data = event.data
         msg = ' '.join([str(m) for m in data.msg]) + data.end
         self._log(
-            self.level if self.level >= _NOTSET else _NOTSET, msg, data.args,
+            self.level if self.level >= NOTSET else NOTSET, msg, data.args,
             **data.kwargs
         )
         self.input_text = ''
@@ -430,7 +429,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 'a value greater than 0.'
             )
         while self.getting_input_status != GettingInputStatus.GETTING_INPUT:
-            _sleep(data.wait)
+            sleep(data.wait)
         self.input_text += data.text
         self.logs.config(state=_tkinter.NORMAL)
         self.logs.delete(f'end-{len(self.input_text) + 1}c', 'end-1c')
@@ -442,7 +441,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         data = event.data
         msg = ' '.join([str(m) for m in data.msg]) + data.end
         self._log(
-            self.level if self.level >= _NOTSET else _NOTSET, msg, data.args,
+            self.level if self.level >= NOTSET else NOTSET, msg, data.args,
             **data.kwargs
         )
         self.input_text = ''
@@ -494,7 +493,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.window.event_generate(
             '<<log>>',
             when='tail',
-            data=_Namespace(
+            data=Namespace(
                 level=level,
                 msg=msg,
                 args=args,
@@ -519,13 +518,13 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         :param msg: The message to print.
         :param args: The arguments to pass to the message.
         :param end: The end of the message.
-        :param raise_error: If True, raises an error instead of
-            returning an empty string.
+        :param raise_error: If True, raises an error instead of returning an empty
+            string.
         :param kwargs:
         :return: The input.
         """
         _lock.acquire()
-        data = _Namespace(
+        data = Namespace(
             msg=msg, args=args, end=end, raise_error=raise_error, kwargs=kwargs
         )
         self.window.event_generate('<<input>>', when='tail', data=data)
@@ -545,17 +544,15 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.getting_input_status = GettingInputStatus.CANCELLED
         return self.input_text
 
-    def type_input(self, text: str, wait: _Union[int, float, bool] = False):
-        """Types some text as a part of the input that the user can edit and
-        enter.
+    def type_input(self, text: str, wait: Union[int, float, bool] = False):
+        """Types some text as a part of the input that the user can edit and enter.
 
         :param text: The text to type for the user
-        :param wait: Wait until the input function is called and then
-            type the text
+        :param wait: Wait until the input function is called and then type the text
         :return:
         """
         self.window.event_generate(
-            '<<type input>>', when='tail', data=_Namespace(text=text, wait=wait)
+            '<<type input>>', when='tail', data=Namespace(text=text, wait=wait)
         )
 
     def getpass(self, *msg, args: tuple = (), end='', **kwargs) -> str:
@@ -568,7 +565,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         :return: The input.
         """
         _lock.acquire()
-        data = _Namespace(msg=msg, args=args, end=end, kwargs=kwargs)
+        data = Namespace(msg=msg, args=args, end=end, kwargs=kwargs)
         self.window.event_generate('<<getpass>>', when='tail', data=data)
         _lock.release()
         return data.output
@@ -636,9 +633,9 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 try:
                     # TODO: Add the support of interactive programmes such as python
                     # shell and bash
-                    output = _subprocess.check_output(command[1:].strip(), shell=False)
+                    output = subprocess.check_output(command[1:].strip(), shell=False)
                     self.print(output.decode('utf-8').strip('\r\n'))
-                except _subprocess.CalledProcessError as ex:
+                except subprocess.CalledProcessError as ex:
                     self.error(
                         'Error code:', ex.returncode,
                         ex.output.decode('utf-8').strip('\r\n')
@@ -650,26 +647,25 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             else:
                 self.error('Shell commands are not allowed!')
         # Python commands:
+        elif self.allow_python:
+            try:
+                # TODO: Add the support of python commands
+                raise NotImplementedError
+            except Exception as ex:  # pylint: disable=broad-except
+                self.error(ex)
         else:
-            if self.allow_python:
-                try:
-                    # TODO: Add the support of python commands
-                    raise NotImplementedError
-                except Exception as ex:  # pylint: disable=broad-except
-                    self.error(ex)
-            else:
-                try:
-                    output = _subprocess.check_output(command.strip(), shell=False)
-                    self.print(output.decode('utf-8').strip('\r\n'))
-                except _subprocess.CalledProcessError as ex:
-                    self.error(
-                        'Error code:', ex.returncode,
-                        ex.output.decode('utf-8').strip('\r\n')
-                    )
-                except FileNotFoundError:
-                    self.error('File not found: Unrecognized command.')
-                except Exception as ex: # pylint: disable=broad-except
-                    self.error(ex)
+            try:
+                output = subprocess.check_output(command.strip(), shell=False)
+                self.print(output.decode('utf-8').strip('\r\n'))
+            except subprocess.CalledProcessError as ex:
+                self.error(
+                    'Error code:', ex.returncode,
+                    ex.output.decode('utf-8').strip('\r\n')
+                )
+            except FileNotFoundError:
+                self.error('File not found: Unrecognized command.')
+            except Exception as ex:  # pylint: disable=broad-except
+                self.error(ex)
         self.command_history_index = len(self.command_history)
 
     def history_up(self, _):
@@ -701,7 +697,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.__allow_python = event.data
         # Hides the command entry if allow_python and allow_shell are False
         if not self.__allow_python and not self.__allow_shell:
-            self.command_entry.grid_remove()
+            self.command_entry.gridremove()
         # Shows the command entry if allow_python or allow_shell are True
         else:
             self.command_entry.grid(row=1, column=0, sticky='nsew')
@@ -711,7 +707,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.__allow_shell = event.data
         # Hides the command entry if allow_python and allow_shell are False
         if not self.__allow_python and not self.__allow_shell:
-            self.command_entry.grid_remove()
+            self.command_entry.gridremove()
         # Shows the command entry if allow_python or allow_shell are True
         else:
             self.command_entry.grid(row=1, column=0, sticky='nsew')

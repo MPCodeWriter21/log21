@@ -1,13 +1,12 @@
-# log21.Formatters.py
+# log21.formatters.py
 # CodeWriter21
 
-import time as _time
-from typing import (Dict as _Dict, Tuple as _Tuple, Mapping as _Mapping,
-                    Optional as _Optional)
+import time
+from typing import Dict, Tuple, Mapping, Optional
 from logging import Formatter as __Formatter
 
-from log21.Colors import get_colors as _gc, ansi_escape
-from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
+from log21.colors import get_colors as _gc, ansi_escape
+from log21.levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
@@ -16,13 +15,13 @@ class _Formatter(__Formatter):
 
     def __init__(
         self,
-        fmt: _Optional[str] = None,
-        datefmt: _Optional[str] = None,
+        fmt: Optional[str] = None,
+        datefmt: Optional[str] = None,
         style: str = '%',
-        level_names: _Optional[_Mapping[int, str]] = None
+        level_names: Optional[Mapping[int, str]] = None
     ):
-        """
-        `level_names` usage:
+        """`level_names` usage:
+
         >>> import log21
         >>> logger = log21.Logger('MyLogger', log21.DEBUG)
         >>> stream_handler = log21.ColorizingStreamHandler()
@@ -54,7 +53,7 @@ class _Formatter(__Formatter):
         """
         super().__init__(fmt=fmt, datefmt=datefmt, style=style)
 
-        self._level_names: _Dict[int, str] = {
+        self._level_names: Dict[int, str] = {
             DEBUG: 'DEBUG',
             INFO: 'INFO',
             WARNING: 'WARNING',
@@ -74,9 +73,9 @@ class _Formatter(__Formatter):
         return self._level_names
 
     @level_names.setter
-    def level_names(self, level_names: _Mapping[int, str]):
+    def level_names(self, level_names: Mapping[int, str]):
         if level_names:
-            if not isinstance(level_names, _Mapping):
+            if not isinstance(level_names, Mapping):
                 raise TypeError(
                     '`level_names` must be a Mapping, a dictionary like object!'
                 )
@@ -96,65 +95,59 @@ class _Formatter(__Formatter):
             if not record.exc_text:
                 record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
-            if s[-1:] != "\n":
-                s = s + "\n"
+            if s[-1:] != '\n':
+                s = s + '\n'
             s = s + record.exc_text
         if record.stack_info:
-            if s[-1:] != "\n":
-                s = s + "\n"
+            if s[-1:] != '\n':
+                s = s + '\n'
             s = s + self.formatStack(record.stack_info)
         return s
 
 
 class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attributes
     """A formatter that helps adding colors to the log records."""
-    time_color: _Tuple[str, ...] = ('lightblue', )
+    time_color: Tuple[str, ...] = ('lightblue', )
     name_color = pathname_color = filename_color = module_color = func_name_color = \
         thread_name_color = message_color = tuple()
 
     def __init__(
         self,
-        fmt: _Optional[str] = None,
-        datefmt: _Optional[str] = None,
+        fmt: Optional[str] = None,
+        datefmt: Optional[str] = None,
         style: str = '%',
-        level_names: _Optional[_Mapping[int, str]] = None,
-        level_colors: _Optional[_Mapping[int, _Tuple[str]]] = None,
-        time_color: _Optional[_Tuple[str, ...]] = None,
-        name_color: _Optional[_Tuple[str, ...]] = None,
-        pathname_color: _Optional[_Tuple[str, ...]] = None,
-        filename_color: _Optional[_Tuple[str, ...]] = None,
-        module_color: _Optional[_Tuple[str, ...]] = None,
-        func_name_color: _Optional[_Tuple[str, ...]] = None,
-        thread_name_color: _Optional[_Tuple[str, ...]] = None,
-        message_color: _Optional[_Tuple[str, ...]] = None
+        level_names: Optional[Mapping[int, str]] = None,
+        level_colors: Optional[Mapping[int, Tuple[str]]] = None,
+        time_color: Optional[Tuple[str, ...]] = None,
+        name_color: Optional[Tuple[str, ...]] = None,
+        pathname_color: Optional[Tuple[str, ...]] = None,
+        filename_color: Optional[Tuple[str, ...]] = None,
+        module_color: Optional[Tuple[str, ...]] = None,
+        func_name_color: Optional[Tuple[str, ...]] = None,
+        thread_name_color: Optional[Tuple[str, ...]] = None,
+        message_color: Optional[Tuple[str, ...]] = None
     ):  # pylint: disable=too-many-branches
         """Initialize the formatter.
 
         :param fmt: The format string to use for the message.
-        :param datefmt: The format string to use for the date/time
-            portion of the message.
+        :param datefmt: The format string to use for the date/time portion of the
+            message.
         :param style: The format style to use.
         :param level_names: A mapping of level numbers to level names.
         :param level_colors: A mapping of level numbers to level colors.
-        :param time_color: The color to use for the time portion of the
+        :param time_color: The color to use for the time portion of the message.
+        :param name_color: The color to use for the logger name portion of the message.
+        :param pathname_color: The color to use for the pathname portion of the message.
+        :param filename_color: The color to use for the filename portion of the message.
+        :param module_color: The color to use for the module portion of the message.
+        :param func_name_color: The color to use for the function name portion of the
             message.
-        :param name_color: The color to use for the logger name portion
-            of the message.
-        :param pathname_color: The color to use for the pathname portion
-            of the message.
-        :param filename_color: The color to use for the filename portion
-            of the message.
-        :param module_color: The color to use for the module portion of
-            the message.
-        :param func_name_color: The color to use for the function name
-            portion of the message.
-        :param thread_name_color: The color to use for the thread name
-            portion of the message.
-        :param message_color: The color to use for the message portion
-            of the message.
+        :param thread_name_color: The color to use for the thread name portion of the
+            message.
+        :param message_color: The color to use for the message portion of the message.
         """
         super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
-        self.level_colors: _Dict[int, _Tuple[str, ...]] = {
+        self.level_colors: Dict[int, Tuple[str, ...]] = {
             DEBUG: ('lightblue', ),
             INFO: ('green', ),
             WARNING: ('lightyellow', ),
@@ -165,7 +158,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
         }
         # Checks and sets colors
         if level_colors:
-            if not isinstance(level_colors, _Mapping):
+            if not isinstance(level_colors, Mapping):
                 raise TypeError('`level_colors` must be a dictionary like object!')
             for level, color in level_colors.items():
                 self.level_colors[level] = (_gc(*color), )
@@ -219,12 +212,12 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
             if not record.exc_text:
                 record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
-            if s[-1:] != "\n":
-                s = s + "\n"
+            if s[-1:] != '\n':
+                s = s + '\n'
             s = s + record.exc_text
         if record.stack_info:
-            if s[-1:] != "\n":
-                s = s + "\n"
+            if s[-1:] != '\n':
+                s = s + '\n'
             s = s + self.formatStack(record.stack_info)
         return s
 
@@ -264,13 +257,12 @@ class DecolorizingFormatter(_Formatter):
     """Formatter that removes color codes from the log records."""
 
     def formatTime(self, record, datefmt=None):
-        """Returns the creation time of the specified LogRecord as formatted
-        text."""
+        """Returns the creation time of the specified LogRecord as formatted text."""
         ct = self.converter(int(record.created))
         if datefmt:
-            s = _time.strftime(datefmt, ct)
+            s = time.strftime(datefmt, ct)
         else:
-            t = _time.strftime(self.default_time_format, ct)
+            t = time.strftime(self.defaulttime_format, ct)
             s = self.default_msec_format % (t, record.msecs)
         return s
 

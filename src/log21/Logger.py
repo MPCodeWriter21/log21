@@ -1,30 +1,27 @@
-# log21.Logger.py
+# log21.logger.py
 # CodeWriter21
 
-import re as _re
-import sys as _sys
-import logging as _logging
-from types import MethodType as _MethodType
-from typing import (Any, List, Union as _Union, Literal as _Literal, Mapping,
-                    Callable as _Callable, Optional as _Optional, Sequence as _Sequence)
-from getpass import getpass as _getpass
-from logging import raiseExceptions as _raiseExceptions
+import re
+import sys
+import logging
+from types import MethodType
+from typing import Any, List, Union, Literal, Mapping, Callable, Optional, Sequence
+from getpass import getpass
+from logging import raiseExceptions
 
-import log21 as _log21
-from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, NOTSET, WARNING, CRITICAL
+from log21.levels import INFO, DEBUG, ERROR, INPUT, PRINT, NOTSET, WARNING, CRITICAL
 
 __all__ = ['Logger']
 
 
-class Logger(_logging.Logger):
+class Logger(logging.Logger):
     """A Logger that can print to the console and log to a file."""
 
     def __init__(
         self,
         name,
-        level: _Union[int, str] = NOTSET,
-        handlers: _Optional[_Union[_Sequence[_logging.Handler],
-                                   _logging.Handler]] = None
+        level: Union[int, str] = NOTSET,
+        handlers: Optional[Union[Sequence[logging.Handler], logging.Handler]] = None
     ):
         """Initialize a Logger object.
 
@@ -36,8 +33,8 @@ class Logger(_logging.Logger):
         self.setLevel(level)
         self._progress_bar = None
         if handlers:
-            if not isinstance(handlers, _Sequence):
-                if isinstance(handlers, _logging.Handler):
+            if not isinstance(handlers, Sequence):
+                if isinstance(handlers, logging.Handler):
                     handlers = [handlers]
                 else:
                     raise TypeError(
@@ -61,7 +58,7 @@ class Logger(_logging.Logger):
         """
         msg = ' '.join([str(m) for m in msg]) + end
         if not isinstance(level, int):
-            if _raiseExceptions:
+            if raiseExceptions:
                 raise TypeError('level must be an integer')
             return
         if self.isEnabledFor(level):
@@ -181,7 +178,7 @@ class Logger(_logging.Logger):
         """
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
-        return _getpass('')
+        return getpass('')
 
     def print_progress(self, progress: float, total: float, **kwargs):
         """Log progress."""
@@ -203,21 +200,21 @@ class Logger(_logging.Logger):
     def progress_bar(self, value: '_log21.ProgressBar'):
         self._progress_bar = value
 
-    def clear_line(self, length: _Optional[int] = None):
+    def clear_line(self, length: Optional[int] = None):
         """Clear the current line.
 
         :param length: The length of the line to clear.
         :return:
         """
         for handler in self.handlers:
-            if isinstance(getattr(handler, 'clear_line', None), _Callable):
+            if isinstance(getattr(handler, 'clear_line', None), Callable):
                 handler.clear_line(length)  # type: ignore
 
     def add_level(
         self,
         level: int,
         name: str,
-        errors: _Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
+        errors: Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
     ) -> str:
         """Adds a new method to the logger with a specific level and name.
 
@@ -257,10 +254,10 @@ class Logger(_logging.Logger):
                 )
             )
 
-        name = _re.sub(r'\s', '_', name)
-        if _re.match(r'[0-9].*', name):
+        name = re.sub(r'\s', '_', name)
+        if re.match(r'[0-9].*', name):
             raise_(ValueError(f'level name cannot start with a number: "{name}"'))
-        if not _re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]*', name):
+        if not re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]*', name):
             raise_(ValueError(f'level name must be a valid identifier: "{name}"'))
 
         if hasattr(self, name):
@@ -274,13 +271,13 @@ class Logger(_logging.Logger):
         def log_for_level(self, *msg, args: tuple = (), end='\n', **kwargs):
             self.log(level, *msg, args=args, end=end, **kwargs)
 
-        setattr(self, name, _MethodType(log_for_level, self))
+        setattr(self, name, MethodType(log_for_level, self))
         return name
 
     def add_levels(
         self,
         level_names: Mapping[int, str],
-        errors: _Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
+        errors: Literal['raise', 'ignore', 'handle', 'force'] = 'raise'
     ) -> None:
         """Adds new methods to the logger with specific levels and names.
 
@@ -303,7 +300,7 @@ class Logger(_logging.Logger):
         found = 0
         while logger:
             for handler in logger.handlers:
-                if (isinstance(handler, _logging.StreamHandler)
+                if (isinstance(handler, logging.StreamHandler)
                         and hasattr(handler.stream, 'write')
                         and hasattr(handler.stream, 'flush')):
                     found = found + 1
@@ -313,9 +310,7 @@ class Logger(_logging.Logger):
                 break
             logger = logger.parent
         if found == 0:
-            _sys.stderr.write(
-                f"No handlers could be found for logger \"{self.name}\"\n"
-            )
+            sys.stderr.write(f"No handlers could be found for logger \"{self.name}\"\n")
         return self
 
     def __rshift__(self, obj: List[Any]):
@@ -330,7 +325,7 @@ class Logger(_logging.Logger):
         >>> # Get three inputs of type: str, str or None, and float
         >>> data = [str, None, float]  # first name, last name and age
         >>> cout << "Please enter a first name, last name and age(separated by space): "
-        Please enter a first name, last name and age(separated by space): 
+        Please enter a first name, last name and age(separated by space):
         >>> cin >> data;
         M  21
         >>> name = data[0] + (data[1] if data[1] is not None else '')
@@ -342,7 +337,7 @@ class Logger(_logging.Logger):
         >>> # Get any number of inputs
         >>> data = []
         >>> cout << "Enter something: ";
-        Enter something: 
+        Enter something:
         >>> cin >> data;
         What ever man 1 2 3 !
         >>> cout << "Here are the items you chose: " << data << log21.endl;
@@ -352,7 +347,7 @@ class Logger(_logging.Logger):
         >>> # Get two inputs of type int with defaults: 1280 and 720
         >>> data = [1280, 720]
         >>> cout << "Enter the width and the height: ";
-        Enter the width and the height: 
+        Enter the width and the height:
         >>> cin >> data;
         500
 
@@ -367,7 +362,7 @@ class Logger(_logging.Logger):
         if n >= 0:
             data = []
             while n >= 0:
-                tmp = _sys.stdin.readline()[:-1].split(' ', maxsplit=n)
+                tmp = sys.stdin.readline()[:-1].split(' ', maxsplit=n)
                 if tmp:
                     data.extend(tmp)
                 else:
@@ -389,7 +384,7 @@ class Logger(_logging.Logger):
                         tmp.append(obj[i])
             obj[:] = tmp
         else:
-            obj[:] = _sys.stdin.readline()[:-1].split()
+            obj[:] = sys.stdin.readline()[:-1].split()
 
         return self
 
@@ -400,7 +395,7 @@ def _add_one(name: str) -> str:
     :param name: The string to add one to.
     :return: The string with one added to the end.
     """
-    match = _re.match(r'([\S]+)_([0-9]+)', name)
+    match = re.match(r'([\S]+)_([0-9]+)', name)
     if not match:
         return name + '_1'
     return f'{match.group(1)}{int(match.group(2)) + 1}'

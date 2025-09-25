@@ -1,14 +1,14 @@
-# log21.FileHandler.py
+# log21.file_handler.py
 # CodeWriter21
 
-from logging import FileHandler as _FileHandler
+from logging import FileHandler
 
-from log21.Formatters import DecolorizingFormatter as _DecolorizingFormatter
+from log21.formatters import DecolorizingFormatter
 
 
-class FileHandler(_FileHandler):
-    """A subclass of logging.FileHandler that allows you to specify a
-    formatter and a level when you initialize it."""
+class FileHandler(FileHandler):
+    """A subclass of logging.FileHandler that allows you to specify a formatter and a
+    level when you initialize it."""
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class DecolorizingFileHandler(FileHandler):
             self.stream = self._open()
         try:
             msg = self.format(record)
-            msg = _DecolorizingFormatter.decolorize(msg)
+            msg = DecolorizingFormatter.decolorize(msg)
             stream = self.stream
             stream.write(msg + self.terminator)
             self.flush()

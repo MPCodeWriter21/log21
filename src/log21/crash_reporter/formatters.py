@@ -2,8 +2,7 @@
 # CodeWriter21
 
 import traceback
-from typing import (Any as _Any, Union as _Union, Mapping as _Mapping,
-                    Callable as _Callable, Optional as _Optional)
+from typing import Any, Union, Mapping, Callable, Optional
 from datetime import datetime as _datetime
 
 __all__ = [
@@ -25,7 +24,7 @@ class Formatter:
         format_: str,
         style: str = '%',
         datefmt: str = '%Y-%m-%d %H:%M:%S',
-        extra_values: _Optional[_Mapping[str, _Union[str, _Callable, _Any]]] = None
+        extra_values: Optional[Mapping[str, Union[str, Callable, Any]]] = None
     ):
         """Initialize the formatter.
 

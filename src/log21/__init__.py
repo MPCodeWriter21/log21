@@ -1,59 +1,62 @@
 # log21.__init__.py
 # CodeWriter21
 
-import os as _os
-import logging as _logging
-from typing import (Type as _Type, Tuple as _Tuple, Union as _Union,
-                    Mapping as _Mapping, Optional as _Optional)
+import os
+import logging
+from typing import Type, Tuple, Union, Mapping, Optional
 
-from . import CrashReporter
-from .Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
+from . import crash_reporter
+from .colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
                      get_color_name)
-from .Levels import INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING, CRITICAL
-from .Logger import Logger
-from .PPrint import PrettyPrinter, pformat
-from .Manager import Manager
-from .Argparse import ColorizingArgumentParser
-from .TreePrint import TreePrint, tree_format
-from .Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
-from .Argumentify import (ArgumentError, TooFewArguments, RequiredArgument,
-                          IncompatibleArguments, argumentify)
-from .FileHandler import FileHandler, DecolorizingFileHandler
-from .ProgressBar import ProgressBar
-from .LoggingWindow import LoggingWindow, LoggingWindowHandler
-from .StreamHandler import StreamHandler, ColorizingStreamHandler
+from .levels import INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING, CRITICAL
+from .logger import Logger
+from .pprint import PrettyPrinter, pformat
+from .manager import Manager
+from .argparser import ColorizingArgumentParser
+from .formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
+from .tree_print import TreePrint, tree_format
+from .argumentify import (ArgumentError, TooFewArguments, RequiredArgument,
+                          IncompatibleArguments)
+from .file_handler import FileHandler, DecolorizingFileHandler
+from .progress_bar import ProgressBar
+from .logging_window import LoggingWindow, LoggingWindowHandler
+from .stream_handler import StreamHandler, ColorizingStreamHandler
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '2.10.2'
-__github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
+__version__ = '3.0.0a2'
+__github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
     'DecolorizingFormatter', 'get_logger', 'Logger', 'Colors', 'get_color',
     'get_colors', 'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG',
     'NOTSET', 'INPUT', 'StreamHandler', 'ColorizingArgumentParser', 'PrettyPrinter',
-    'pformat', 'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager',
+    'pformat', # 'pprint',
+    'pretty_print',
+    # 'tree_print',
+    'tree_format', 'TreePrint', 'Manager',
     'get_color_name', 'closest_color', 'ansi_escape', '__author__', '__github__',
     'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal', 'exception',
-    'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
-    'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
-    'console_reporter', 'file_reporter', 'argumentify', 'ArgumentError',
+    'log', 'basic_config', 'basicConfig', 'ProgressBar', # 'progress_bar',
+    'LoggingWindow', 'LoggingWindowHandler', 'getlogging_window', 'crash_reporter',
+    'console_reporter', 'file_reporter', # 'argumentify',
+    'ArgumentError',
     'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
 ]
 
 _manager = Manager()
-_logging.setLoggerClass(Logger)
+logging.setLoggerClass(Logger)
 
 
 def _prepare_formatter(
-    fmt: _Optional[str] = None,
+    fmt: Optional[str] = None,
     style: str = '%',
     datefmt: str = '%H:%M:%S',
     show_level: bool = True,
     show_time: bool = True,
-    colorize_time_and_level: bool = True,
-    level_names: _Optional[_Mapping[int, str]] = None,
-    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
-    formatter_class: _Type[_logging.Formatter] = ColorizingFormatter
+    colorizetime_and_level: bool = True,
+    level_names: Optional[Mapping[int, str]] = None,
+    level_colors: Optional[Mapping[int, Tuple[str, ...]]] = None,
+    formatter_class: Type[logging.Formatter] = ColorizingFormatter
 ):
     # Prepares a formatting if the fmt was None
     if not fmt:
@@ -87,7 +90,7 @@ def _prepare_formatter(
 
     if isinstance(formatter, _Formatter) and level_names:
         formatter.level_names = level_names
-    if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
+    if not colorizetime_and_level and isinstance(formatter, ColorizingFormatter):
         for key in formatter.level_colors:
             formatter.level_colors[key] = tuple()
         formatter.time_color = tuple()
@@ -97,19 +100,19 @@ def _prepare_formatter(
 
 def get_logger(
     name: str = '',
-    level: _Union[int, str] = NOTSET,
+    level: Union[int, str] = NOTSET,
     show_time: bool = True,
     show_level: bool = True,
-    colorize_time_and_level: bool = True,
-    fmt: _Optional[str] = None,
+    colorizetime_and_level: bool = True,
+    fmt: Optional[str] = None,
     datefmt: str = '%H:%M:%S',
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
     override=False,
-    level_names: _Optional[_Mapping[int, str]] = None,
-    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
-    file: _Optional[_Union[_os.PathLike, str]] = None
+    level_names: Optional[Mapping[int, str]] = None,
+    level_colors: Optional[Mapping[int, Tuple[str, ...]]] = None,
+    file: Optional[Union[os.PathLike, str]] = None
 ) -> Logger:
     """Returns a logging.Logger with colorizing support. >>> >>> import log21 >>> >>> l
     = log21.get_logger() >>> l.warning('Pretty basic, huh?') [14:49:41] [WARNING] Pretty
@@ -148,7 +151,7 @@ def get_logger(
     :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that
         you want to use one of %-formatting, :meth:`str.format` (``{}``) formatting or
         :class:`string.Template` formatting in your format string.
-    :param colorize_time_and_level: bool = True: Colorizes the time and level using the
+    :param colorizetime_and_level: bool = True: Colorizes the time and level using the
         default colors
     :param handle_carriage_return: bool = True: Adds a line of space characters to
         remove any text before the CR
@@ -170,7 +173,7 @@ def get_logger(
     if (not logger) or override:
         logger = Logger(name, level)
         formatter = _prepare_formatter(
-            fmt, style, datefmt, show_level, show_time, colorize_time_and_level,
+            fmt, style, datefmt, show_level, show_time, colorizetime_and_level,
             level_names, level_colors
         )
 
@@ -203,19 +206,19 @@ def get_logger(
     return logger
 
 
-def get_logging_window(
+def getlogging_window(
     name: str = '',
-    level: _Union[int, str] = NOTSET,
+    level: Union[int, str] = NOTSET,
     show_time: bool = True,
     show_level: bool = True,
-    colorize_time_and_level: bool = True,
-    fmt: _Optional[str] = None,
+    colorizetime_and_level: bool = True,
+    fmt: Optional[str] = None,
     datefmt: str = '%H:%M:%S',
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
     override=False,
-    level_names: _Optional[_Mapping[int, str]] = None,
+    level_names: Optional[Mapping[int, str]] = None,
     width: int = 80,
     height: int = 20,
     allow_shell: bool = False
@@ -226,7 +229,7 @@ def get_logging_window(
     >>> # Imports log21 and time modules
     >>> import log21, time
     >>> # Creates a new LoggingWindow object
-    >>> window = log21.get_logging_window('Test Window')
+    >>> window = log21.getlogging_window('Test Window')
     >>> # Now use it without any additional steps to add handlers and formatters!
     >>> # It works just like a normal logger but with some extra features
     >>>
@@ -263,7 +266,7 @@ def get_logging_window(
     :param style: str = '%': Use a style parameter of '%', '{' or '$' to specify that
         you want to use one of %-formatting, :meth:`str.format` (``{}``) formatting or
         :class:`string.Template` formatting in your format string.
-    :param colorize_time_and_level: bool = True: Colorizes the time and level using the
+    :param colorizetime_and_level: bool = True: Colorizes the time and level using the
         default colors
     :param handle_carriage_return: bool = True: Adds a line of space characters to
         remove any text before the CR
@@ -287,7 +290,7 @@ def get_logging_window(
             name, level=level, width=width, height=height, allow_shell=allow_shell
         )
         formatter = _prepare_formatter(
-            fmt, style, datefmt, show_level, show_time, colorize_time_and_level,
+            fmt, style, datefmt, show_level, show_time, colorizetime_and_level,
             level_names
         )
 
@@ -336,96 +339,21 @@ def getpass(*msg, args: tuple = (), end='', **kwargs):
     return logger.getpass(*msg, args=args, end=end, **kwargs)
 
 
-def pprint(
-    obj,
-    indent=1,
-    width=80,
-    depth=None,
-    signs_colors: _Optional[_Mapping[str, str]] = None,
-    *,
-    sort_dicts=True,
-    underscore_numbers=False,
-    compact=False,
-    end='\033[0m\n',
-    **kwargs
-):
-    """A colorful version of the pprint.pprint function.
-
-    :param obj: The object to print.
-    :param indent: The amount of indentation to use.
-    :param width: The maximum width in characters of the output.
-    :param depth: The maximum depth to print nested structures. None means unlimited.
-    :param signs_colors: A mapping that lets you specify the colors of the supported
-        signs.
-    :param sort_dicts: If True, dictionaries are sorted by key.
-    :param underscore_numbers: If True, numbers are printed with an underscore between
-        each group of three digits.
-    :param compact: If True, lists and tuples are displayed on a single line.
-    :param end: The string to append at the end of the output.
-    :param kwargs: Additional keyword arguments passed to the Logger.print function.
-    """
-    logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
-    logger.print(
-        pformat(
-            obj=obj,
-            indent=indent,
-            width=width,
-            depth=depth,
-            signs_colors=signs_colors,
-            compact=compact,
-            sort_dicts=sort_dicts,
-            underscore_numbers=underscore_numbers
-        ),
-        end=end,
-        **kwargs
-    )
-
-
-pretty_print = pprint
-
-
-def tree_print(
-    obj,
-    indent: int = 4,
-    mode='-',
-    colors: _Optional[_Mapping[str, str]] = None,
-    end='\033[0m\n',
-    **kwargs
-):
-    """Prints a tree representation of the given object. (e.g. a dictionary)
-
-    :param obj: The object to print.
-    :param indent: The number of spaces to indent each level.
-    :param mode: The mode to use for the tree. Can be '-' or '='.
-    :param colors: A mapping that lets you customize the colors of branches and fruits.
-    :param end: The string to append at the end of the output.
-    :param kwargs: Additional keyword arguments passed to the Logger.print function.
-    """
-    logger = get_logger(
-        'log21.tree_print', level=DEBUG, show_time=False, show_level=False
-    )
-    logger.print(
-        tree_format(obj, indent=indent, mode=mode, colors=colors), end=end, **kwargs
-    )
-
-
-tprint = tree_print
-
 root = Logger('root-logger', INFO)
 
 
 def basic_config(
     force: bool = False,
-    encoding: _Optional[str] = None,
-    errors: _Optional[str] = 'backslashreplace',
+    encoding: Optional[str] = None,
+    errors: Optional[str] = 'backslashreplace',
     handlers=None,
     stream=None,
     filename=None,
     filemode: str = 'a',
     date_format: str = '%H:%M:%S',
     style: str = '%',
-    format_: _Optional[str] = None,
-    level: _Optional[_Union[int, str]] = None
+    format_: Optional[str] = None,
+    level: Optional[Union[int, str]] = None
 ):  # pylint: disable=too-many-branches
     """Do basic configuration for the logging system.
 
@@ -611,25 +539,8 @@ def log(level, *msg, args=(), **kwargs):
     root.log(level, *msg, args=args, **kwargs)
 
 
-def progress_bar(
-    progress: float,
-    total: float,
-    width: _Optional[int] = None,
-    prefix: str = '|',
-    suffix: str = '|',
-    show_percentage: bool = True
-):
-    """Print a progress bar to the console."""
-
-    progress_bar_ = ProgressBar(
-        width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage
-    )
-
-    print(progress_bar_.get_bar(progress, total))
-
-
 endl = '\n'
 
-console_reporter = CrashReporter.ConsoleReporter()
+console_reporter = crash_reporter.ConsoleReporter()
 
-file_reporter = CrashReporter.FileReporter(file='.crash_report.log')
+file_reporter = crash_reporter.FileReporter(file='.crash_report.log')
