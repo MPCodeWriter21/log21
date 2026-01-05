@@ -1,25 +1,25 @@
-# log21.colors.py
+# log21.Colors.py
 # CodeWriter21
 
-import re
-from typing import Union, Sequence
+import re as _re
+from typing import Union as _Union, Sequence as _Sequence
 
-import webcolors
+import webcolors as _webcolors
 
 __all__ = [
     'Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name',
-    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW', 'BLUE',
-    'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN', 'BACK_YELLOW',
-    'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE', 'GREY', 'LIGHT_RED',
-    'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE', 'LIGHT_MAGENTA', 'LIGHT_CYAN',
-    'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED', 'BACK_LIGHT_GREEN',
-    'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE', 'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN',
-    'BACK_LIGHT_WHITE'
+    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW',
+    'BLUE', 'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN',
+    'BACK_YELLOW', 'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE',
+    'GREY', 'LIGHT_RED', 'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE',
+    'LIGHT_MAGENTA', 'LIGHT_CYAN', 'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED',
+    'BACK_LIGHT_GREEN', 'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE',
+    'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN', 'BACK_LIGHT_WHITE'
 ]
 
 # Regex pattern to find ansi colors in message
-ansi_escape = re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
-hex_escape = re.compile(r'\x1b(#[0-9a-fA-F]{6})h([f|b])')
+ansi_escape = _re.compile(r'\x1b\[((?:\d+)(?:;(?:\d+))*)m')
+hex_escape = _re.compile(r'\x1b(#[0-9a-fA-F]{6})h([f|b])')
 
 RESET = '\033[0m'
 BLACK = '\033[30m'
@@ -195,16 +195,17 @@ class Colors:
     }
 
 
-def closest_color(requested_color: Sequence[int]):
-    """Takes a color in RGB and returns the name of the closest color to the value. Uses
-    the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
+def closest_color(requested_color: _Sequence[int]):
+    """
+    Takes a color in RGB and returns the name of the closest color to the value.
+    Uses the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
 
     :param requested_color: Sequence[int, int, int]: The input color in RGB.
     :return: str: The name of the closest color.
     """
     min_colors = {}
-    for key, name in webcolors.CSS2_HEX_TO_NAMES.items():
-        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+    for key, name in _webcolors.CSS2_HEX_TO_NAMES.items():
+        r_c, g_c, b_c = _webcolors.hex_to_rgb(key)
         r_d = (r_c - requested_color[0])**2
         g_d = (g_c - requested_color[1])**2
         b_d = (b_c - requested_color[2])**2
@@ -213,7 +214,8 @@ def closest_color(requested_color: Sequence[int]):
 
 
 def get_color_name(
-    color: Union[str, Sequence[int], webcolors.IntegerRGB, webcolors.HTML5SimpleColor],
+    color: _Union[str, _Sequence[int], _webcolors.IntegerRGB,
+                  _webcolors.HTML5SimpleColor],
     raise_exceptions: bool = False
 ) -> str:
     """
@@ -236,7 +238,7 @@ def get_color_name(
     """
     # Makes sure that the input parameters has valid values.
     if not isinstance(color,
-                      (str, tuple, webcolors.IntegerRGB, webcolors.HTML5SimpleColor)):
+                      (str, tuple, _webcolors.IntegerRGB, _webcolors.HTML5SimpleColor)):
         if raise_exceptions:
             raise TypeError(
                 'Input color must be a str or Tuple[int, int, int] or '
@@ -245,14 +247,14 @@ def get_color_name(
         return ''
     if isinstance(color, str):
         if color.startswith('#') and len(color) == 7:
-            color = webcolors.hex_to_rgb(color)
+            color = _webcolors.hex_to_rgb(color)
         elif color.isdigit() and len(color) == 9:
             color = (int(color[:3]), int(color[3:6]), int(color[6:9]))
         else:
             if raise_exceptions:
                 raise TypeError('String color format must be `#0021ff` or `000033255`!')
             return ''
-    if isinstance(color, Sequence):
+    if isinstance(color, _Sequence):
         if len(color) == 3:
             if not (isinstance(color[0], int) and isinstance(color[1], int)
                     and isinstance(color[2], int)):
@@ -266,7 +268,7 @@ def get_color_name(
 
     # Looks for the name of the input RGB color.
     try:
-        closest_name = webcolors.rgb_to_name(tuple(color))
+        closest_name = _webcolors.rgb_to_name(tuple(color))
     except ValueError:
         closest_name = closest_color(color)
     if closest_name in Colors.change_map:
@@ -274,7 +276,7 @@ def get_color_name(
     return closest_name
 
 
-def get_color(color: Union[str, Sequence], raise_exceptions: bool = False) -> str:
+def get_color(color: _Union[str, _Sequence], raise_exceptions: bool = False) -> str:
     """Gets a color name and returns it in ansi format
 
     >>>
@@ -295,11 +297,11 @@ def get_color(color: Union[str, Sequence], raise_exceptions: bool = False) -> st
     :raises KeyError: `color` not found!
     :return: str: an ansi color
     """
-    if not isinstance(color, (str, Sequence)):
+    if not isinstance(color, (str, _Sequence)):
         if raise_exceptions:
             raise TypeError('`color` must be str or Sequence!')
         return ''
-    if isinstance(color, Sequence) and not isinstance(color, str):
+    if isinstance(color, _Sequence) and not isinstance(color, str):
         color = get_color_name(color)
         return get_color(color)
 

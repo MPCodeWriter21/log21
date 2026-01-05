@@ -1,23 +1,18 @@
-# log21.progress_bar.py
+# log21.ProgressBar.py
 # CodeWriter21
 
 from __future__ import annotations
 
-import sys
-import shutil
-from typing import TYPE_CHECKING, Any, Mapping, Optional
+import shutil as _shutil
+from typing import Any as _Any, Mapping as _Mapping, Optional as _Optional
 
-from log21.colors import get_colors as _gc
-from log21.logger import Logger
-from log21.stream_handler import ColorizingStreamHandler
+import log21 as _log21
+from log21.Colors import get_colors as _gc
+from log21.Logger import Logger as _Logger
+from log21.StreamHandler import ColorizingStreamHandler as _ColorizingStreamHandler
 
-from ._module_helper import FakeModule
-
-if TYPE_CHECKING:
-    import types
-
-_logger = Logger('ProgressBar')
-_logger.addHandler(ColorizingStreamHandler())
+_logger = _Logger('ProgressBar')
+_logger.addHandler(_ColorizingStreamHandler())
 
 __all__ = ['ProgressBar']
 
@@ -49,19 +44,19 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
     def __init__(
         self,
         *,
-        width: Optional[int] = None,
+        width: _Optional[int] = None,
         show_percentage: bool = True,
         prefix: str = '|',
         suffix: str = '|',
         fill: str = '█',
         empty: str = ' ',
-        format_: Optional[str] = None,
+        format_: _Optional[str] = None,
         style: str = '%',
         new_line_when_complete: bool = True,
-        colors: Optional[Mapping[str, str]] = None,
+        colors: _Optional[_Mapping[str, str]] = None,
         no_color: bool = False,
-        logger: log21.Logger = _logger,
-        additional_variables: Optional[Mapping[str, Any]] = None
+        logger: _log21.Logger = _logger,
+        additional_variables: _Optional[_Mapping[str, _Any]] = None
     ):  # pylint: disable=too-many-branches, too-many-statements
         """
         :param args: Prevents the use of positional arguments
@@ -84,7 +79,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         # Sets a default value for the width
         if width is None:
             try:
-                width = shutil.get_terminal_size().columns - 1
+                width = _shutil.get_terminal_size().columns - 1
             except OSError:
                 width = 50
             if width < 1:
@@ -111,7 +106,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
                 'You cannot use `no_color` and `colors` parameters together!'
             )
         if additional_variables:
-            if not isinstance(additional_variables, Mapping):
+            if not isinstance(additional_variables, _Mapping):
                 raise TypeError(
                     '`additional_variables` must be a dictionary like object.'
                 )
@@ -371,7 +366,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         self,
         progress: float,
         total: float,
-        logger: Optional[log21.Logger] = None,
+        logger: _Optional[_log21.Logger] = None,
         **kwargs
     ):
         if not logger:
@@ -383,7 +378,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         self,
         progress: float,
         total: float,
-        logger: Optional[log21.Logger] = None,
+        logger: _Optional[_log21.Logger] = None,
         **kwargs
     ):
         """Update the progress bar.
@@ -396,37 +391,3 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         :raises ValueError: If the style is not `%` or `{`.
         """
         self(progress, total, logger, **kwargs)
-
-
-class _Module(FakeModule):
-
-    def __init__(self, real_module: types.ModuleType) -> None:
-        super().__init__(real_module, None)
-        self.__progress_bar: Optional[ProgressBar] = None
-
-    def __call__(
-        self,
-        progress: float,
-        total: float,
-        width: Optional[int] = None,
-        prefix: str = '|',
-        suffix: str = '|',
-        show_percentage: bool = True
-    ) -> None:
-        """Print a progress bar to the console."""
-        if (not self.__progress_bar
-                or (self.__progress_bar.width != width and width is not None)
-                or self.__progress_bar.prefix != prefix
-                or self.__progress_bar.suffix != suffix
-                or self.__progress_bar.style != ('%' if show_percentage else '')):
-            self.__progress_bar = ProgressBar(
-                width=width,
-                prefix=prefix,
-                suffix=suffix,
-                show_percentage=show_percentage
-            )
-
-        print(self.__progress_bar.get_bar(progress, total))
-
-
-sys.modules[__name__] = _Module(sys.modules[__name__])

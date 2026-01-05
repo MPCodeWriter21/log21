@@ -1,34 +1,35 @@
-# log21.argparser.py
+# log21.Argparse.py
 # CodeWriter21
 
 from __future__ import annotations
 
-import re
-import sys
-import types
-import typing
-import argparse
+import re as _re
+import sys as _sys
+import types as _types
+import typing as _typing
+import argparse as _argparse
 import collections.abc
-from enum import Enum
-from typing import Tuple, Mapping, NoReturn, Optional, Sequence
-from gettext import gettext
-from textwrap import TextWrapper
-from collections import OrderedDict
+from enum import Enum as _Enum
+from typing import (Tuple as _Tuple, Mapping as _Mapping, NoReturn,
+                    Optional as _Optional, Sequence as _Sequence)
+from gettext import gettext as _gettext
+from textwrap import TextWrapper as _TextWrapper
+from collections import OrderedDict as _OrderedDict
 
 import log21 as _log21
-from log21.colors import get_colors as _gc
-from log21.formatters import DecolorizingFormatter as _Formatter
+from log21.Colors import get_colors as _gc
+from log21.Formatters import DecolorizingFormatter as _Formatter
 
 __all__ = [
     'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper',
-    'LiteralArg'
+    'Literal'
 ]
 
 
-class LiteralArg:
+class Literal:
     """A class for representing literals in argparse arguments."""
 
-    def __init__(self, literal: typing._LiteralGenericAlias):
+    def __init__(self, literal: _typing._LiteralGenericAlias):
         self.literal = literal
         # Only str arguments are allowed
         if not all(map(lambda x: isinstance(x, str), self.literal.__args__)):
@@ -48,7 +49,7 @@ class LiteralArg:
         return value
 
 
-class ColorizingHelpFormatter(argparse.HelpFormatter):
+class ColorizingHelpFormatter(_argparse.HelpFormatter):
     """A help formatter that supports colorizing help messages."""
 
     def __init__(
@@ -57,7 +58,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
         indent_increment=2,
         max_help_position=24,
         width=None,
-        colors: Optional[Mapping[str, str]] = None
+        colors: _Optional[_Mapping[str, str]] = None
     ):
         super().__init__(prog, indent_increment, max_help_position, width)
 
@@ -100,7 +101,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
                 return ''
 
             # add the heading if the section was non-empty
-            if self.heading is not argparse.SUPPRESS and self.heading is not None:
+            if self.heading is not _argparse.SUPPRESS and self.heading is not None:
                 current_indent = self.formatter._current_indent
                 heading = (
                     '%*s%s' % (current_indent, '', self.heading) +
@@ -183,7 +184,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
     # modified upstream code, not going to refactor for complexity.
     def _format_usage(self, usage, actions, groups, prefix):  # noqa: C901
         if prefix is None:
-            prefix = gettext('usage: ')
+            prefix = _gettext('usage: ')
 
         # if usage is specified, use that
         if usage is not None:
@@ -218,8 +219,8 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
                 part_regexp = r'\(.*?\)+|\[.*?\]+|\S+'
                 opt_usage = self._format_actions_usage(optionals, groups)
                 pos_usage = self._format_actions_usage(positionals, groups)
-                opt_parts = re.findall(part_regexp, opt_usage)
-                pos_parts = re.findall(part_regexp, pos_usage)
+                opt_parts = _re.findall(part_regexp, opt_usage)
+                pos_parts = _re.findall(part_regexp, pos_usage)
                 assert ' '.join(opt_parts) == opt_usage
                 assert ' '.join(pos_parts) == pos_usage
 
@@ -294,7 +295,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
                     suppressed_actions_count = 0
                     for action in group._group_actions:
                         group_actions.add(action)
-                        if action.help is argparse.SUPPRESS:
+                        if action.help is _argparse.SUPPRESS:
                             suppressed_actions_count += 1
 
                     exposed_actions_count = group_action_count - suppressed_actions_count
@@ -328,7 +329,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
 
             # suppressed arguments are marked with None
             # remove | separators for suppressed arguments
-            if action.help is argparse.SUPPRESS:
+            if action.help is _argparse.SUPPRESS:
                 parts.append(None)
                 if inserts.get(i) == '|':
                     inserts.pop(i)
@@ -385,10 +386,10 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
         # clean up separators for mutually exclusive groups
         open = r'[\[(]'
         close = r'[\])]'
-        text = re.sub(r'(%s) ' % open, r'\1', text)
-        text = re.sub(r' (%s)' % close, r'\1', text)
-        text = re.sub(r'%s *%s' % (open, close), r'', text)
-        text = re.sub(r'\(([^|]*)\)', r'\1', text)
+        text = _re.sub(r'(%s) ' % open, r'\1', text)
+        text = _re.sub(r' (%s)' % close, r'\1', text)
+        text = _re.sub(r'%s *%s' % (open, close), r'', text)
+        text = _re.sub(r'\(([^|]*)\)', r'\1', text)
         text = text.strip()
 
         # return the text
@@ -446,7 +447,7 @@ class ColorizingHelpFormatter(argparse.HelpFormatter):
         return format
 
 
-class ColorizingTextWrapper(TextWrapper):
+class ColorizingTextWrapper(_TextWrapper):
     # modified upstream code, not going to refactor for complexity.
     def _wrap_chunks(self, chunks):  # noqa: C901
         """_wrap_chunks(chunks : [string]) -> [string]
@@ -555,34 +556,34 @@ class ColorizingTextWrapper(TextWrapper):
         return lines
 
 
-class _ActionsContainer(argparse._ActionsContainer):
+class _ActionsContainer(_argparse._ActionsContainer):
     """Container for the actions for a single command line option."""
 
     # pylint: disable=too-many-branches
-    def _validate_func_type(self, action, func_type, kwargs, level: int = 0) -> Tuple:
+    def _validate_func_type(self, action, func_type, kwargs, level: int = 0) -> _Tuple:
         # raise an error if the action type is not callable
-        if (hasattr(types, 'UnionType') and not callable(func_type)  # novm
-                and not isinstance(func_type, (types.UnionType, tuple))):  # novm
+        if (hasattr(_types, 'UnionType') and not callable(func_type)
+                and not isinstance(func_type, (_types.UnionType, tuple))):  # novm
             raise ValueError(f'{func_type} is not callable; level={level}')
 
         # Handle `UnionType` as a type (e.g. `int|str`)
-        if hasattr(types, 'UnionType') and isinstance(func_type,  # novm
-                                                      types.UnionType):  # novm
+        if hasattr(_types, 'UnionType') and isinstance(func_type,
+                                                       _types.UnionType):  # novm
             func_type = func_type.__args__  # type: ignore
 
         # Handle `Literal` as a type (e.g. `Literal[1, 2, 3]`)
-        elif (hasattr(typing, '_LiteralGenericAlias')
-              and isinstance(func_type, typing._LiteralGenericAlias)):  # type: ignore
-            func_type = LiteralArg(func_type)
+        elif (hasattr(_typing, '_LiteralGenericAlias')
+              and isinstance(func_type, _typing._LiteralGenericAlias)):  # type: ignore
+            func_type = Literal(func_type)
 
         # Handle `Union` and `Optional` as a type (e.g. `Union[int, str]` and
         # `Optional[int]`)
-        elif (hasattr(typing, '_UnionGenericAlias')
-              and isinstance(func_type, typing._UnionGenericAlias)):  # type: ignore
+        elif (hasattr(_typing, '_UnionGenericAlias')
+              and isinstance(func_type, _typing._UnionGenericAlias)):  # type: ignore
             # Optional[T] is just Union[T, NoneType]
             # Optional
-            if (hasattr(types, 'NoneType') and len(func_type.__args__) == 2
-                    and func_type.__args__[1] is types.NoneType):
+            if (hasattr(_types, 'NoneType') and len(func_type.__args__) == 2
+                    and func_type.__args__[1] is _types.NoneType):  # novm
                 action.required = False
                 func_type = func_type.__args__[0]
             # Union
@@ -590,73 +591,73 @@ class _ActionsContainer(argparse._ActionsContainer):
                 func_type = func_type.__args__  # type: ignore
 
         # Handle `List` as a type (e.g. `List[int]`)
-        elif (hasattr(typing, '_GenericAlias')
-              and isinstance(func_type, typing._GenericAlias)  # type: ignore
+        elif (hasattr(_typing, '_GenericAlias')
+              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
               and getattr(func_type, '__origin__') is list):
             func_type = func_type.__args__[0]
             if kwargs.get('nargs') is None:
                 action.nargs = '+'
 
         # Handle `Sequence` as a type (e.g. `Sequence[int]`)
-        elif (hasattr(typing, '_GenericAlias')
-              and isinstance(func_type, typing._GenericAlias)  # type: ignore
+        elif (hasattr(_typing, '_GenericAlias')
+              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
               and getattr(func_type, '__origin__') is collections.abc.Sequence):
             func_type = func_type.__args__[0]
             if kwargs.get('nargs') is None:
                 action.nargs = '+'
 
         # Handle `Required` as a type (e.g. `Required[int]`)
-        elif (hasattr(typing, 'Required') and hasattr(typing, '_GenericAlias')
-              and isinstance(func_type, typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is typing.Required):
+        elif (hasattr(_typing, 'Required') and hasattr(_typing, '_GenericAlias')
+              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
+              and getattr(func_type, '__origin__') is _typing.Required):  # novm
             func_type = func_type.__args__[0]
             action.required = True
 
         # Handle Enum as a type
         elif callable(func_type) and isinstance(func_type, type) and issubclass(
-                func_type, Enum) and action.choices is None and level == 0:
+                func_type, _Enum) and action.choices is None and level == 0:
             action.choices = tuple(
                 map(lambda x: x.value, func_type.__members__.values())
             )
 
         # Handle SpecialForms
-        elif isinstance(func_type, typing._SpecialForm):
-            if func_type is typing.Any:
+        elif isinstance(func_type, _typing._SpecialForm):
+            if func_type is _typing.Any:
                 func_type = None
-            elif func_type is typing.ClassVar:
+            elif func_type is _typing.ClassVar:
                 func_type = None
-            elif func_type is typing.Union:
+            elif func_type is _typing.Union:
                 func_type = None
-            elif func_type is typing.Optional:
+            elif func_type is _typing.Optional:
                 func_type = None
                 action.required = False
-            elif func_type is typing.Type:
+            elif func_type is _typing.Type:
                 func_type = None
-            elif func_type is typing.TypeVar:
+            elif func_type is _typing.TypeVar:
                 func_type = None
             else:
                 raise ValueError(f'Unknown special form {func_type}')
 
-        elif func_type is argparse.FileType:
+        elif func_type is _argparse.FileType:
             raise ValueError(
                 f'{func_type} is a FileType class object, instance of it must be passed'
             )
 
-        if isinstance(func_type, Sequence):
+        if isinstance(func_type, _Sequence):
             temp = []
-            for type_ in OrderedDict(zip(func_type, [0] * len(func_type))):
+            for type_ in _OrderedDict(zip(func_type, [0] * len(func_type))):
                 temp.extend(self._validate_func_type(action, type_, kwargs, level + 1))
             func_type = tuple(temp)
         else:
-            if (hasattr(types, 'UnionType') and hasattr(typing, '_GenericAlias')  # novm
-                    and hasattr(typing, '_UnionGenericAlias')
-                    and hasattr(typing, '_LiteralGenericAlias') and isinstance(
+            if (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
+                    and hasattr(_typing, '_UnionGenericAlias')
+                    and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
                         func_type,
                         (
-                            typing._GenericAlias,  # type: ignore
-                            typing._UnionGenericAlias,  # type: ignore
-                            typing._LiteralGenericAlias,  # type: ignore
-                            types.UnionType,  # novm
+                            _typing._GenericAlias,  # type: ignore
+                            _typing._UnionGenericAlias,  # type: ignore
+                            _typing._LiteralGenericAlias,  # type: ignore
+                            _types.UnionType,  # novm
                         ))):
                 func_type = self._validate_func_type(
                     action, func_type, kwargs, level + 1
@@ -734,13 +735,13 @@ class _ActionsContainer(argparse._ActionsContainer):
         return group
 
 
-class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
+class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
     """An ArgumentParser that colorizes its output and more."""
 
     def __init__(
         self,
         formatter_class=ColorizingHelpFormatter,
-        colors: Optional[Mapping[str, str]] = None,
+        colors: _Optional[_Mapping[str, str]] = None,
         **kwargs
     ):
         self.logger = _log21.Logger('ArgumentParser')
@@ -756,11 +757,11 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
 
     def exit(self, status=0, message=None):
         if message:
-            self._print_message(_gc('lr') + message + _gc('rst'), sys.stderr)
-        sys.exit(status)
+            self._print_message(_gc('lr') + message + _gc('rst'), _sys.stderr)
+        _sys.exit(status)
 
     def error(self, message):
-        self.print_usage(sys.stderr)
+        self.print_usage(_sys.stderr)
         args = {'prog': self.prog, 'message': message}
         self.exit(
             2,
@@ -779,8 +780,8 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
 
         func_type = self._registry_get('type', action.type, action.type)
         if not callable(func_type) and not isinstance(func_type, tuple):
-            raise argparse.ArgumentError(
-                action, gettext(f'{func_type!r} is not callable')
+            raise _argparse.ArgumentError(
+                action, _gettext(f'{func_type!r} is not callable')
             )
 
         name = getattr(action.type, '__name__', repr(action.type))
@@ -802,14 +803,14 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                     raise exception
 
         # ArgumentTypeErrors indicate errors
-        except argparse.ArgumentTypeError as ex:
+        except _argparse.ArgumentTypeError as ex:
             msg = str(ex)
-            raise argparse.ArgumentError(action, msg)
+            raise _argparse.ArgumentError(action, msg)
 
         # TypeErrors or ValueErrors also indicate errors
         except (TypeError, ValueError):
-            raise argparse.ArgumentError(
-                action, gettext(f'invalid {name!s} value: {arg_string!r}')
+            raise _argparse.ArgumentError(
+                action, _gettext(f'invalid {name!s} value: {arg_string!r}')
             ) from None
 
         # return the converted value
@@ -839,17 +840,17 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
 
             func_type = self._registry_get('type', action.type, action.type)
             if not callable(func_type) and not isinstance(func_type, tuple):
-                raise argparse.ArgumentError(
-                    action, gettext(f'{func_type!r} is not callable')
+                raise _argparse.ArgumentError(
+                    action, _gettext(f'{func_type!r} is not callable')
                 )
 
             for value in action.choices:
                 choices.add(self.__convert_type(func_type, value))
 
             if choice not in choices:
-                raise argparse.ArgumentError(
+                raise _argparse.ArgumentError(
                     action,
-                    gettext(
+                    _gettext(
                         f'invalid choice: {choice!r} '
                         f"(choose from {', '.join(map(repr, action.choices))})"
                     )
@@ -939,13 +940,13 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                 seen_non_default_actions.add(action)
                 for conflict_action in action_conflicts.get(action, []):
                     if conflict_action in seen_non_default_actions:
-                        action_name = argparse._get_action_name(conflict_action)
-                        msg = gettext(f'not allowed with argument {action_name}')
-                        raise argparse.ArgumentError(action, msg)
+                        action_name = _argparse._get_action_name(conflict_action)
+                        msg = _gettext(f'not allowed with argument {action_name}')
+                        raise _argparse.ArgumentError(action, msg)
 
             # take the action if we didn't receive a SUPPRESS value
             # (e.g. from a default)
-            if argument_values is not argparse.SUPPRESS:
+            if argument_values is not _argparse.SUPPRESS:
                 action(self, namespace, argument_values, option_string)
 
         # function to convert arg_strings into an optional action
@@ -965,7 +966,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                 raise ValueError(
                     'Unknown option tuple length, please report this issue at: '
                     'https://GitHub.com/MPCodeWriter21/log21\n'
-                    f'Python version: {sys.version}'
+                    f'Python version: {_sys.version}'
                     f'Option tuple: {option_tuple}'
                     f'log21 version: {_log21.__version__}'
                 )
@@ -992,8 +993,8 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                     chars = self.prefix_chars
                     if arg_count == 0 and option_string[1] not in chars:
                         if sep or explicit_arg[0] in chars:
-                            msg = gettext('ignored explicit argument %r')
-                            raise argparse.ArgumentError(action, msg % explicit_arg)
+                            msg = _gettext('ignored explicit argument %r')
+                            raise _argparse.ArgumentError(action, msg % explicit_arg)
                         action_tuples.append((action, [], option_string))
                         char = option_string[0]
                         option_string = char + explicit_arg[0]
@@ -1023,8 +1024,8 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                     # error if a double-dash option did not use the
                     # explicit argument
                     else:
-                        msg = gettext('ignored explicit argument %r')
-                        raise argparse.ArgumentError(action, msg % explicit_arg)
+                        msg = _gettext('ignored explicit argument %r')
+                        raise _argparse.ArgumentError(action, msg % explicit_arg)
 
                 # if there is no explicit argument, try to match the
                 # optional's string arguments with the following strings
@@ -1115,7 +1116,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
         for action in self._actions:
             if action not in seen_actions:
                 if action.required:
-                    required_actions.append(argparse._get_action_name(action))
+                    required_actions.append(_argparse._get_action_name(action))
                 else:
                     # Convert action default now instead of doing it before
                     # parsing arguments to avoid calling convert functions
@@ -1131,7 +1132,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
 
         if required_actions:
             self.error(
-                gettext(
+                _gettext(
                     'the following arguments are required: ' +
                     ', '.join(required_actions)
                 )
@@ -1147,12 +1148,12 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                 # if no actions were used, report the error
                 else:
                     names = [
-                        argparse._get_action_name(action)
+                        _argparse._get_action_name(action)
                         for action in group._group_actions
-                        if action.help is not argparse.SUPPRESS
+                        if action.help is not _argparse.SUPPRESS
                     ]
                     self.error(
-                        gettext(
+                        _gettext(
                             'one of the arguments ' +
                             ' '.join(name for name in names if name is not None) +
                             ' is required'
@@ -1168,12 +1169,12 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
                 # if no actions were used, report the error
                 else:
                     names = [
-                        argparse._get_action_name(action)
+                        _argparse._get_action_name(action)
                         for action in group._group_actions
-                        if action.help is not argparse.SUPPRESS
+                        if action.help is not _argparse.SUPPRESS
                     ]
                     self.error(
-                        gettext(
+                        _gettext(
                             'one of the arguments ' +
                             ' '.join(name for name in names if name is not None) +
                             ' is required'
@@ -1184,7 +1185,7 @@ class ColorizingArgumentParser(argparse.ArgumentParser, _ActionsContainer):
         return namespace, extras
 
 
-class _ArgumentGroup(argparse._ArgumentGroup, _ActionsContainer):
+class _ArgumentGroup(_argparse._ArgumentGroup, _ActionsContainer):
 
     def __init__(
         self,
@@ -1199,5 +1200,5 @@ class _ArgumentGroup(argparse._ArgumentGroup, _ActionsContainer):
         self.required = required
 
 
-class _MutuallyExclusiveGroup(argparse._MutuallyExclusiveGroup, _ArgumentGroup):
+class _MutuallyExclusiveGroup(_argparse._MutuallyExclusiveGroup, _ArgumentGroup):
     pass

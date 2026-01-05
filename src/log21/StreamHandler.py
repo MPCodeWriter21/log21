@@ -1,23 +1,24 @@
-# log21.stream_handler.py
+# log21.StreamHandler.py
 # CodeWriter21
 
-import os
-import re
-import shutil
-import logging
-from typing import Optional
+import os as _os
+import re as _re
+import shutil as _shutil
+from typing import Optional as _Optional
+from logging import StreamHandler as _StreamHandler
 
-from log21.colors import get_colors as _gc, hex_escape, ansi_escape
+from log21.Colors import (get_colors as _gc, hex_escape as _hex_escape,
+                          ansi_escape as _ansi_escape)
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
 
-IS_WINDOWS = os.name == 'nt'
+IS_WINDOWS = _os.name == 'nt'
 
 if IS_WINDOWS:
     import ctypes
 
 
-class StreamHandler(logging.StreamHandler):
+class StreamHandler(_StreamHandler):
     """A StreamHandler that can handle carriage returns and new lines."""
     terminator = ''
 
@@ -31,7 +32,8 @@ class StreamHandler(logging.StreamHandler):
     ):
         """Initialize the StreamHandler.
 
-        :param handle_carriage_return: Whether to handle carriage returns.
+        :param handle_carriage_return: Whether to handle carriage
+            returns.
         :param handle_new_line: Whether to handle new lines.
         :param stream: The stream to write to.
         :param formatter: The formatter to use.
@@ -48,8 +50,8 @@ class StreamHandler(logging.StreamHandler):
     def check_cr(self, record):
         """Check if the record contains a carriage return and handle it."""
         if record.msg:
-            msg = hex_escape.sub(
-                '', ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c'))
+            msg = _hex_escape.sub(
+                '', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c'))
             )
             if '\r' == msg[:1]:
                 file_descriptor = getattr(self.stream, 'fileno', None)
@@ -58,12 +60,14 @@ class StreamHandler(logging.StreamHandler):
                     if file_descriptor in (1, 2):  # stdout or stderr
                         self.stream.write(
                             '\r' + (
-                                ' ' *
-                                (shutil.get_terminal_size(file_descriptor).columns - 1)
+                                ' ' * (
+                                    _shutil.get_terminal_size(file_descriptor).columns -
+                                    1
+                                )
                             ) + '\r'
                         )
                         index = record.msg.rfind('\r')
-                        find = re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
+                        find = _re.compile(r'(\x1b\[(?:\d+(?:;(?:\d+))*)m)')
                         record.msg = _gc(*find.split(record.msg[:index])
                                          ) + record.msg[index + 1:]
 
@@ -84,7 +88,7 @@ class StreamHandler(logging.StreamHandler):
             self.check_nl(record)
         super().emit(record)
 
-    def clear_line(self, length: Optional[int] = None):
+    def clear_line(self, length: _Optional[int] = None):
         """Clear the current line.
 
         :param length: The length of the line to clear.
@@ -95,7 +99,7 @@ class StreamHandler(logging.StreamHandler):
             file_descriptor = file_descriptor()
             if file_descriptor in (1, 2):
                 if length is None:
-                    length = shutil.get_terminal_size(file_descriptor).columns
+                    length = _shutil.get_terminal_size(file_descriptor).columns
                 self.stream.write('\r' + (' ' * (length - 1)) + '\r')
 
 
@@ -122,8 +126,8 @@ class ColorizingStreamHandler(StreamHandler):
 
     # Writes colorized text to the Windows console.
     def convert_and_write(self, message):
-        """Convert the message to a Windows console colorized message and write it to
-        the stream."""
+        """Convert the message to a Windows console colorized message and write
+        it to the stream."""
         nt_color_map = {
             30: 0,  # foreground: black   - 0b00000000
             31: 4,  # foreground: red     - 0b00000100
@@ -161,7 +165,7 @@ class ColorizingStreamHandler(StreamHandler):
             0: 7
         }
 
-        parts = ansi_escape.split(message)
+        parts = _ansi_escape.split(message)
         win_handle = None
         file_descriptor = getattr(self.stream, 'fileno', None)
 

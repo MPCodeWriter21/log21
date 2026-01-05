@@ -1,20 +1,19 @@
-# log21.argumentify.py
+# log21.Argparse.py
 # CodeWriter21
 
-import re
-import sys
-import string
-import asyncio
-import inspect
-from typing import (Any, Set, Dict, List, Tuple, Union, Callable, Optional, Awaitable,
-                    Coroutine, OrderedDict)
-from dataclasses import field, dataclass
+import re as _re
+import string as _string
+import asyncio as _asyncio
+import inspect as _inspect
+from typing import (Any as _Any, Set as _Set, Dict as _Dict, List as _List,
+                    Tuple as _Tuple, Union as _Union, Callable as _Callable,
+                    Optional as _Optional, Awaitable as _Awaitable,
+                    Coroutine as _Coroutine, OrderedDict as _OrderedDict)
+from dataclasses import field as _field, dataclass as _dataclass
 
-from docstring_parser import Docstring, parse
+from docstring_parser import Docstring as _Docstring, parse as _parse
 
-from log21 import argparser
-
-from ._module_helper import FakeModule
+import log21.Argparse as _Argparse
 
 __all__ = [
     'argumentify', 'ArgumentifyError', 'ArgumentTypeError', 'FlagGenerationError',
@@ -23,7 +22,7 @@ __all__ = [
     'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
 ]
 
-Callable = Union[Callable[..., Any], Callable[..., Coroutine[Any, Any, Any]]]
+Callable = _Union[_Callable[..., _Any], _Callable[..., _Coroutine[_Any, _Any, _Any]]]
 RESERVED_FLAGS = {'--help', '-h'}
 
 
@@ -38,7 +37,7 @@ class ArgumentTypeError(ArgumentifyError, TypeError):
     """
 
     def __init__(
-        self, message: Optional[str] = None, unsupported_arg: Optional[str] = None
+        self, message: _Optional[str] = None, unsupported_arg: _Optional[str] = None
     ):
         """Initialize the exception.
 
@@ -60,7 +59,7 @@ class FlagGenerationError(ArgumentifyError, RuntimeError):
     Most likely raised when there are arguments with the same name.
     """
 
-    def __init__(self, message: Optional[str] = None, arg_name: Optional[str] = None):
+    def __init__(self, message: _Optional[str] = None, arg_name: _Optional[str] = None):
         """Initialize the exception.
 
         :param message: The message to display.
@@ -81,7 +80,7 @@ class FlagGenerationError(ArgumentifyError, RuntimeError):
 class ArgumentError(ArgumentifyError):
     """Base of errors to raise in the argumentified functions to raise parser errors."""
 
-    def __init__(self, *args, message: Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None):
         """Initialize the exception.
 
         :param args: The arguments that have a problem.
@@ -102,7 +101,7 @@ class ArgumentError(ArgumentifyError):
 class IncompatibleArguments(ArgumentError):
     """Raise when the user has used arguments that are incompatible with each other."""
 
-    def __init__(self, *args, message: Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None):
         """Initialize the exception.
 
         :param args: The arguments that are incompatible.
@@ -123,7 +122,7 @@ class IncompatibleArguments(ArgumentError):
 class RequiredArgument(ArgumentError):
     """Raise this when there is a required argument missing."""
 
-    def __init__(self, *args, message: Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None):
         """Initialize the exception.
 
         :param args: The arguments that are required.
@@ -144,7 +143,7 @@ class RequiredArgument(ArgumentError):
 class TooFewArguments(ArgumentError):
     """Raise this when there were not enough arguments passed."""
 
-    def __init__(self, *args, message: Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None):
         """Initialize the exception.
 
         :param args: The arguments that should be passed.
@@ -182,10 +181,10 @@ def normalize_name_to_snake_case(name: str, sep_char: str = '_') -> str:
     :param sep_char: The character that will replace space and separate words
     :return: The normalized name.
     """
-    for char in string.punctuation:
+    for char in _string.punctuation:
         name = name.replace(char, sep_char)
-    name = re.sub(rf'([\s{sep_char}]+)|(([a-zA-z])([A-Z]))', rf'\3{sep_char}\4',
-                  name).lower()
+    name = _re.sub(rf'([\s{sep_char}]+)|(([a-zA-z])([A-Z]))', rf'\3{sep_char}\4',
+                   name).lower()
     return name
 
 
@@ -209,37 +208,37 @@ def normalize_name(name: str, sep_char: str = '_') -> str:
     :param sep_char: The character that will replace space and separate words
     :return: The normalized name.
     """
-    for char in string.punctuation:
+    for char in _string.punctuation:
         name = name.replace(char, sep_char)
-    name = re.sub(rf'([\s{sep_char}]+)', sep_char, name)
+    name = _re.sub(rf'([\s{sep_char}]+)', sep_char, name)
     return name
 
 
-@dataclass
+@_dataclass
 class Argument:
     """Represents a function argument."""
     name: str
-    kind: inspect._ParameterKind
-    annotation: Any = inspect._empty
-    default: Any = inspect._empty
-    help: Optional[str] = None
+    kind: _inspect._ParameterKind
+    annotation: _Any = _inspect._empty
+    default: _Any = _inspect._empty
+    help: _Optional[str] = None
 
     def __post_init__(self):
         """Sets the some values to None if they are empty."""
-        if self.annotation == inspect._empty:
+        if self.annotation == _inspect._empty:
             self.annotation = None
-        if self.default == inspect._empty:
+        if self.default == _inspect._empty:
             self.default = None
 
 
-@dataclass
+@_dataclass
 class FunctionInfo:
     """Represents a function."""
     function: Callable
-    name: str = field(init=False)
-    arguments: OrderedDict[str, Argument] = field(init=False)
-    docstring: Docstring = field(init=False)
-    parser: argparser.ColorizingArgumentParser = field(init=False)
+    name: str = _field(init=False)
+    arguments: _OrderedDict[str, Argument] = _field(init=False)
+    docstring: _Docstring = _field(init=False)
+    parser: _Argparse.ColorizingArgumentParser = _field(init=False)
 
     def __post_init__(self):
         self.name = normalize_name_to_snake_case(
@@ -250,8 +249,8 @@ class FunctionInfo:
             self.function, type
         ) else self.function
 
-        self.arguments: OrderedDict[str, Argument] = OrderedDict()
-        for parameter in inspect.signature(self.function).parameters.values():
+        self.arguments: _OrderedDict[str, Argument] = _OrderedDict()
+        for parameter in _inspect.signature(self.function).parameters.values():
             self.arguments[parameter.name] = Argument(
                 name=parameter.name,
                 kind=parameter.kind,
@@ -259,7 +258,7 @@ class FunctionInfo:
                 annotation=parameter.annotation,
             )
 
-        self.docstring = parse(self.function.__doc__ or '')
+        self.docstring = _parse(self.function.__doc__ or '')
         for parameter in self.docstring.params:
             if parameter.arg_name in self.arguments:
                 self.arguments[parameter.arg_name].help = parameter.description
@@ -268,8 +267,8 @@ class FunctionInfo:
 def generate_flag(  # pylint: disable=too-many-branches
     argument: Argument,
     no_dash: bool = False,
-    reserved_flags: Optional[Set[str]] = None
-) -> List[str]:
+    reserved_flags: _Optional[_Set[str]] = None
+) -> _List[str]:
     """Generates one or more flags for an argument based on its attributes.
 
     :param argument: The argument to generate flags for.
@@ -281,7 +280,7 @@ def generate_flag(  # pylint: disable=too-many-branches
     """
     if reserved_flags is None:
         reserved_flags = RESERVED_FLAGS
-    flags: List[str] = []
+    flags: _List[str] = []
     flag1_base = ('' if no_dash else '--')
     flag1 = flag1_base + normalize_name_to_snake_case(argument.name, '-')
     if flag1 in reserved_flags:
@@ -329,9 +328,9 @@ def generate_flag(  # pylint: disable=too-many-branches
 
 
 def _add_arguments(
-    parser: Union[argparser.ColorizingArgumentParser, argparser._ArgumentGroup],
+    parser: _Union[_Argparse.ColorizingArgumentParser, _Argparse._ArgumentGroup],
     info: FunctionInfo,
-    reserved_flags: Optional[Set[str]] = None
+    reserved_flags: _Optional[_Set[str]] = None
 ) -> None:
     """Add the arguments to the parser.
 
@@ -343,7 +342,7 @@ def _add_arguments(
         reserved_flags = RESERVED_FLAGS.copy()
     # Add the arguments
     for argument in info.arguments.values():
-        config: Dict[str, Any] = {
+        config: _Dict[str, _Any] = {
             'action': 'store',
             'dest': argument.name,
             'help': argument.help
@@ -352,9 +351,9 @@ def _add_arguments(
             config['action'] = 'store_true'
         elif argument.annotation:
             config['type'] = argument.annotation
-        if argument.kind == inspect._ParameterKind.POSITIONAL_ONLY:
+        if argument.kind == _inspect._ParameterKind.POSITIONAL_ONLY:
             config['required'] = True
-        if argument.kind == inspect._ParameterKind.VAR_POSITIONAL:
+        if argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:
             config['nargs'] = '*'
         if argument.default:
             config['default'] = argument.default
@@ -373,7 +372,7 @@ def _argumentify_one(func: Callable):
     # Check if the function has a VAR_KEYWORD argument
     # Raises a ArgumentTypeError if it does
     for argument in info.arguments.values():
-        if argument.kind == inspect._ParameterKind.VAR_KEYWORD:
+        if argument.kind == _inspect._ParameterKind.VAR_KEYWORD:
             raise ArgumentTypeError(
                 f"The function has a `**{argument.name}` argument, "
                 'which is not supported.',
@@ -381,7 +380,7 @@ def _argumentify_one(func: Callable):
             )
 
     # Create the parser
-    parser = argparser.ColorizingArgumentParser(
+    parser = _Argparse.ColorizingArgumentParser(
         description=info.docstring.short_description
     )
     # Add the arguments
@@ -390,46 +389,46 @@ def _argumentify_one(func: Callable):
     args = []
     kwargs = {}
     for argument in info.arguments.values():
-        if argument.kind in (inspect._ParameterKind.POSITIONAL_ONLY,
-                             inspect._ParameterKind.POSITIONAL_OR_KEYWORD):
+        if argument.kind in (_inspect._ParameterKind.POSITIONAL_ONLY,
+                             _inspect._ParameterKind.POSITIONAL_OR_KEYWORD):
             args.append(getattr(cli_args, argument.name))
-        elif argument.kind == inspect._ParameterKind.VAR_POSITIONAL:
+        elif argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
     try:
         result = func(*args, **kwargs)
         # Check if the result is a coroutine
-        if isinstance(result, (Coroutine, Awaitable)):
-            asyncio.run(result)
+        if isinstance(result, (_Coroutine, _Awaitable)):
+            _asyncio.run(result)
     except ArgumentError as error:
         parser.error(error.message)
 
 
-def _argumentify(functions: Dict[str, Callable]):
+def _argumentify(functions: _Dict[str, Callable]):
     """This function argumentifies one or more functions as the entry point of the
     script.
 
     :param functions: A dictionary of functions to argumentify.
     :raises RuntimeError:
     """
-    functions_info: Dict[str, Tuple[Callable, FunctionInfo]] = {}
+    functions_info: _Dict[str, _Tuple[Callable, FunctionInfo]] = {}
     for name, function in functions.items():
         functions_info[name] = (function, FunctionInfo(function))
 
         # Check if the function has a VAR_KEYWORD argument
         # Raises a ArgumentTypeError if it does
         for argument in functions_info[name][1].arguments.values():
-            if argument.kind == inspect._ParameterKind.VAR_KEYWORD:
+            if argument.kind == _inspect._ParameterKind.VAR_KEYWORD:
                 raise ArgumentTypeError(
                     f"Function {name} has `**{argument.name}` argument, "
                     'which is not supported.',
                     unsupported_arg=argument.name
                 )
-    parser = argparser.ColorizingArgumentParser()
+    parser = _Argparse.ColorizingArgumentParser()
     subparsers = parser.add_subparsers(required=True)
     for name, (_, info) in functions_info.items():
-        subparser = subparsers.addparser(name, help=info.docstring.short_description)
+        subparser = subparsers.add_parser(name, help=info.docstring.short_description)
         _add_arguments(subparser, info)
         subparser.set_defaults(func=info.function)
     cli_args = parser.parse_args()
@@ -442,23 +441,23 @@ def _argumentify(functions: Dict[str, Callable]):
     else:
         raise RuntimeError('No function found for the given arguments.')
     for argument in info.arguments.values():
-        if argument.kind in (inspect._ParameterKind.POSITIONAL_ONLY,
-                             inspect._ParameterKind.POSITIONAL_OR_KEYWORD):
+        if argument.kind in (_inspect._ParameterKind.POSITIONAL_ONLY,
+                             _inspect._ParameterKind.POSITIONAL_OR_KEYWORD):
             args.append(getattr(cli_args, argument.name))
-        elif argument.kind == inspect._ParameterKind.VAR_POSITIONAL:
+        elif argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:
             args.extend(getattr(cli_args, argument.name) or [])
         else:
             kwargs[argument.name] = getattr(cli_args, argument.name)
     try:
         result = function(*args, **kwargs)
         # Check if the result is a coroutine
-        if isinstance(result, (Coroutine, Awaitable)):
-            asyncio.run(result)
+        if isinstance(result, (_Coroutine, _Awaitable)):
+            _asyncio.run(result)
     except ArgumentError as error:
         parser.error(error.message)
 
 
-def argumentify(entry_point: Union[Callable, List[Callable], Dict[str, Callable]]):
+def argumentify(entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]):
     """This function argumentifies one or more functions as the entry point of the
     script.
 
@@ -491,7 +490,7 @@ def argumentify(entry_point: Union[Callable, List[Callable], Dict[str, Callable]
     if callable(entry_point):
         _argumentify_one(entry_point)
         return entry_point
-    if isinstance(entry_point, List):
+    if isinstance(entry_point, _List):
         for func in entry_point:
             if not callable(func):
                 raise TypeError(
@@ -499,7 +498,7 @@ def argumentify(entry_point: Union[Callable, List[Callable], Dict[str, Callable]
                     'dictionary of functions.'
                 )
             functions[func.__name__] = func
-    elif isinstance(entry_point, Dict):
+    elif isinstance(entry_point, _Dict):
         for func in entry_point.values():
             if not callable(func):
                 raise TypeError(
@@ -515,6 +514,3 @@ def argumentify(entry_point: Union[Callable, List[Callable], Dict[str, Callable]
 
     _argumentify(functions)
     return entry_point
-
-
-sys.modules[__name__] = FakeModule(sys.modules[__name__], argumentify)

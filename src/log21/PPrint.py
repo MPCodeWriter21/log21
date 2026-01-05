@@ -1,17 +1,15 @@
-# log21.pprint.py
+# log21.PPrint.py
 # CodeWriter21
 
-import re
-import sys
-import types
-import collections
-import dataclasses
+import re as _re
+import sys as _sys
+import types as _types
+import collections as _collections
+import dataclasses as _dataclasses
 from pprint import PrettyPrinter as _PrettyPrinter
-from typing import Dict, Mapping, Optional
+from typing import Dict as _Dict, Mapping as _Mapping, Optional as _Optional
 
-from log21.colors import get_colors as _gc
-
-from ._module_helper import FakeModule
+from log21.Colors import get_colors as _gc
 
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 
@@ -73,7 +71,7 @@ class PrettyPrinter(_PrettyPrinter):
         width=80,
         depth=None,
         stream=None,
-        sign_colors: Optional[Mapping[str, str]] = None,
+        sign_colors: _Optional[_Mapping[str, str]] = None,
         *,
         compact=False,
         sort_dicts=True,
@@ -94,12 +92,12 @@ class PrettyPrinter(_PrettyPrinter):
         if stream is not None:
             self._stream = stream
         else:
-            self._stream = sys.stdout
+            self._stream = _sys.stdout
         self._compact = bool(compact)
         self._sort_dicts = sort_dicts
         self._underscore_numbers = underscore_numbers
 
-        self.sign_colors: Dict[str, str] = {
+        self.sign_colors: _Dict[str, str] = {
             'square-brackets': _gc('LightCyan'),
             'curly-braces': _gc('LightBlue'),
             'parenthesis': _gc('LightGreen'),
@@ -128,24 +126,24 @@ class PrettyPrinter(_PrettyPrinter):
                 p(self, obj, stream, indent, allowance, context, level + 1)
                 del context[objid]
                 return
-            elif (dataclasses.isdataclass(obj) and not isinstance(obj, type)
-                  and obj._dataclass_params__.repr
+            elif (_dataclasses.is_dataclass(obj) and not isinstance(obj, type)
+                  and obj.__dataclass_params__.repr
                   and  # Check dataclass has generated repr method.
                   hasattr(obj.__repr__, '__wrapped__') and '__create_fn__'
                   in obj.__repr__.__wrapped__.__qualname__):
                 context[objid] = 1
-                self._pprintdataclass(
+                self._pprint_dataclass(
                     obj, stream, indent, allowance, context, level + 1
                 )
                 del context[objid]
                 return
         stream.write(rep)
 
-    def _pprintdataclass(self, obj, stream, indent, allowance, context, level):
+    def _pprint_dataclass(self, obj, stream, indent, allowance, context, level):
         cls_name = obj.__class__.__name__
         indent += len(cls_name) + 1
         items = [
-            (f.name, getattr(obj, f.name)) for f in dataclasses.fields(obj) if f.repr
+            (f.name, getattr(obj, f.name)) for f in _dataclasses.fields(obj) if f.repr
         ]
         stream.write(cls_name + '(')
         self._format_namespace_items(items, stream, indent, allowance, context, level)
@@ -325,7 +323,7 @@ class PrettyPrinter(_PrettyPrinter):
             self.sign_colors.get('data', '')
         )
 
-    _dispatch[collections.OrderedDict.__repr__] = _pprint_ordered_dict
+    _dispatch[_collections.OrderedDict.__repr__] = _pprint_ordered_dict
 
     def _pprint_list(self, obj, stream, indent, allowance, context, level):
         stream.write(
@@ -412,7 +410,7 @@ class PrettyPrinter(_PrettyPrinter):
                 chunks.append(representation)
             else:
                 # A list of alternating (non-space, space) strings
-                parts = re.findall(r'\S*\s*', line)
+                parts = _re.findall(r'\S*\s*', line)
                 assert parts
                 assert not parts[-1]
                 parts.pop()  # drop empty last part
@@ -504,10 +502,10 @@ class PrettyPrinter(_PrettyPrinter):
             self.sign_colors.get('data', '')
         )
 
-    _dispatch[types.MappingProxyType.__repr__] = _pprint_mappingproxy
+    _dispatch[_types.MappingProxyType.__repr__] = _pprint_mappingproxy
 
     def _pprint_simplenamespace(self, obj, stream, indent, allowance, context, level):
-        if isinstance(obj, types.SimpleNamespace):
+        if isinstance(obj, _types.SimpleNamespace):
             # The SimpleNamespace repr is "namespace" instead of the class
             # name, so we do the same here. For subclasses; use the class name.
             cls_name = 'namespace'
@@ -525,7 +523,7 @@ class PrettyPrinter(_PrettyPrinter):
             self.sign_colors.get('data', '')
         )
 
-    _dispatch[types.SimpleNamespace.__repr__] = _pprint_simplenamespace
+    _dispatch[_types.SimpleNamespace.__repr__] = _pprint_simplenamespace
 
     def _format_dict_items(self, items, stream, indent, allowance, context, level):
         write = stream.write
@@ -635,7 +633,7 @@ class PrettyPrinter(_PrettyPrinter):
             self.sign_colors.get('data', '')
         )
 
-    _dispatch[collections.defaultdict.__repr__] = _pprint_default_dict
+    _dispatch[_collections.defaultdict.__repr__] = _pprint_default_dict
 
     def _pprint_counter(self, obj, stream, indent, allowance, context, level):
         if not len(obj):
@@ -658,7 +656,7 @@ class PrettyPrinter(_PrettyPrinter):
             self.sign_colors.get('data', '')
         )
 
-    _dispatch[collections.Counter.__repr__] = _pprint_counter
+    _dispatch[_collections.Counter.__repr__] = _pprint_counter
 
     def _pprint_chain_map(self, obj, stream, indent, allowance, context, level):
         if not len(obj.maps):
@@ -684,7 +682,7 @@ class PrettyPrinter(_PrettyPrinter):
                     self.sign_colors.get('data', '') + ' ' * indent
                 )
 
-    _dispatch[collections.ChainMap.__repr__] = _pprint_chain_map
+    _dispatch[_collections.ChainMap.__repr__] = _pprint_chain_map
 
     def _pprint_deque(self, obj, stream, indent, allowance, context, level):
         if not len(obj):
@@ -717,22 +715,22 @@ class PrettyPrinter(_PrettyPrinter):
                 rml + self.sign_colors.get('parenthesis', '') + ')'
             )
 
-    _dispatch[collections.deque.__repr__] = _pprint_deque
+    _dispatch[_collections.deque.__repr__] = _pprint_deque
 
     def _pprint_user_dict(self, obj, stream, indent, allowance, context, level):
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
-    _dispatch[collections.UserDict.__repr__] = _pprint_user_dict
+    _dispatch[_collections.UserDict.__repr__] = _pprint_user_dict
 
     def _pprint_user_list(self, obj, stream, indent, allowance, context, level):
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
-    _dispatch[collections.UserList.__repr__] = _pprint_user_list
+    _dispatch[_collections.UserList.__repr__] = _pprint_user_list
 
-    def _pprint_userstring(self, obj, stream, indent, allowance, context, level):
+    def _pprint_user_string(self, obj, stream, indent, allowance, context, level):
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
-    _dispatch[collections.UserString.__repr__] = _pprint_userstring
+    _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
 def pformat(
@@ -740,7 +738,7 @@ def pformat(
     indent=1,
     width=80,
     depth=None,
-    signs_colors: Optional[Mapping[str, str]] = None,
+    signs_colors: _Optional[_Mapping[str, str]] = None,
     *,
     compact=False,
     sort_dicts=True,
@@ -769,58 +767,6 @@ def pformat(
         compact=compact,
         sign_colors=signs_colors,
         sort_dicts=sort_dicts,
-        underscore_numbers=underscore_numbers,
+        underscore_numbers=underscore_numbers,  # novm
         **kwargs
     ).pformat(obj)
-
-
-def pprint(
-    obj,
-    indent=1,
-    width=80,
-    depth=None,
-    signs_colors: Optional[Mapping[str, str]] = None,
-    *,
-    sort_dicts=True,
-    underscore_numbers=False,
-    compact=False,
-    end='\033[0m\n',
-    **kwargs
-) -> None:
-    """A colorful version of the pprint.pprint function.
-
-    :param obj: The object to print.
-    :param indent: The amount of indentation to use.
-    :param width: The maximum width in characters of the output.
-    :param depth: The maximum depth to print nested structures. None means unlimited.
-    :param signs_colors: A mapping that lets you specify the colors of the supported
-        signs.
-    :param sort_dicts: If True, dictionaries are sorted by key.
-    :param underscore_numbers: If True, numbers are printed with an underscore between
-        each group of three digits.
-    :param compact: If True, lists and tuples are displayed on a single line.
-    :param end: The string to append at the end of the output.
-    :param kwargs: Additional keyword arguments passed to the Logger.print function.
-    """
-    from log21 import DEBUG, get_logger
-    logger = get_logger('log21.pprint', level=DEBUG, show_time=False, show_level=False)
-    logger.print(
-        pformat(
-            obj=obj,
-            indent=indent,
-            width=width,
-            depth=depth,
-            signs_colors=signs_colors,
-            compact=compact,
-            sort_dicts=sort_dicts,
-            underscore_numbers=underscore_numbers
-        ),
-        end=end,
-        **kwargs
-    )
-
-
-pretty_print = pprint
-
-
-sys.modules[__name__] = FakeModule(sys.modules[__name__], pprint)

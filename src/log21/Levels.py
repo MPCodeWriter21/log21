@@ -1,7 +1,7 @@
-# log21.levels.py
+# log21.Levels.py
 # CodeWriter21
 
-import logging
+import logging as _logging
 
 __all__ = [
     'CRITICAL', 'FATAL', 'ERROR', 'WARNING', 'WARN', 'INFO', 'DEBUG', 'NOTSET', 'INPUT',
@@ -10,11 +10,11 @@ __all__ = [
 
 INPUT = 70
 PRINT = 60
-CRITICAL = logging.CRITICAL
+CRITICAL = _logging.CRITICAL
 FATAL = CRITICAL
-ERROR = logging.ERROR
-WARNING = logging.WARNING
+ERROR = _logging.ERROR
+WARNING = _logging.WARNING
 WARN = WARNING
-INFO = logging.INFO
-DEBUG = logging.DEBUG
-NOTSET = logging.NOTSET
+INFO = _logging.INFO
+DEBUG = _logging.DEBUG
+NOTSET = _logging.NOTSET
