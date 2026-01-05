@@ -27,3 +27,12 @@ repos:
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
+  - repo: https://github.com/netromdk/vermin
+    rev: v1.8.0
+    hooks:
+      - id: vermin
+        args: [
+          '--lint', '--no-make-paths-absolute', '--eval-annotations', '--backport',
+          'argparse', '--backport', 'typing', '--backport', 'asyncio', '--backport',
+          'dataclasses', '--backport', 'enum', '-t=3.9-', '--violations'
+        ]
