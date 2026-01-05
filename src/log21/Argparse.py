@@ -1,6 +1,8 @@
 # log21.Argparse.py
 # CodeWriter21
 
+# yapf: disable
+
 from __future__ import annotations
 
 import re as _re
@@ -20,6 +22,8 @@ import log21 as _log21
 from log21.Colors import get_colors as _gc
 from log21.Formatters import DecolorizingFormatter as _Formatter
 
+# yapf: enable
+
 __all__ = [
     'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper',
     'Literal'
@@ -29,16 +33,16 @@ __all__ = [
 class Literal:
     """A class for representing literals in argparse arguments."""
 
-    def __init__(self, literal: _typing._LiteralGenericAlias):
+    def __init__(self, literal: _typing._LiteralGenericAlias) -> None:
         self.literal = literal
         # Only str arguments are allowed
-        if not all(map(lambda x: isinstance(x, str), self.literal.__args__)):
+        if not all(isinstance(x, str) for x in self.literal.__args__):
             raise TypeError('Only str arguments are allowed for Literal.')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Literal[{", ".join(map(str, self.literal.__args__))}]'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
     def __call__(self, value):
@@ -592,15 +596,10 @@ class _ActionsContainer(_argparse._ActionsContainer):
         # Handle `List` as a type (e.g. `List[int]`)
         elif (hasattr(_typing, '_GenericAlias')
               and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is list):
-            func_type = func_type.__args__[0]
-            if kwargs.get('nargs') is None:
-                action.nargs = '+'
-
-        # Handle `Sequence` as a type (e.g. `Sequence[int]`)
-        elif (hasattr(_typing, '_GenericAlias')
-              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is collections.abc.Sequence):
+              and func_type.__origin__ is list) or (
+                  hasattr(_typing, '_GenericAlias')
+                  and isinstance(func_type, _typing._GenericAlias)  # type: ignore
+                  and func_type.__origin__ is collections.abc.Sequence):
             func_type = func_type.__args__[0]
             if kwargs.get('nargs') is None:
                 action.nargs = '+'
@@ -608,7 +607,7 @@ class _ActionsContainer(_argparse._ActionsContainer):
         # Handle `Required` as a type (e.g. `Required[int]`)
         elif (hasattr(_typing, 'Required') and hasattr(_typing, '_GenericAlias')
               and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is _typing.Required):
+              and func_type.__origin__ is _typing.Required):
             func_type = func_type.__args__[0]
             action.required = True
 
@@ -621,18 +620,12 @@ class _ActionsContainer(_argparse._ActionsContainer):
 
         # Handle SpecialForms
         elif isinstance(func_type, _typing._SpecialForm):
-            if func_type is _typing.Any:
-                func_type = None
-            elif func_type is _typing.ClassVar:
-                func_type = None
-            elif func_type is _typing.Union:
+            if func_type is _typing.Any or func_type is _typing.ClassVar or func_type is _typing.Union:
                 func_type = None
             elif func_type is _typing.Optional:
                 func_type = None
                 action.required = False
-            elif func_type is _typing.Type:
-                func_type = None
-            elif func_type is _typing.TypeVar:
+            elif func_type is _typing.Type or func_type is _typing.TypeVar:
                 func_type = None
             else:
                 raise ValueError(f'Unknown special form {func_type}')
@@ -647,22 +640,19 @@ class _ActionsContainer(_argparse._ActionsContainer):
             for type_ in _OrderedDict(zip(func_type, [0] * len(func_type))):
                 temp.extend(self._validate_func_type(action, type_, kwargs, level + 1))
             func_type = tuple(temp)
+        elif (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
+              and hasattr(_typing, '_UnionGenericAlias')
+              and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
+                  func_type,
+                  (
+                      _typing._GenericAlias,  # type: ignore
+                      _typing._UnionGenericAlias,  # type: ignore
+                      _typing._LiteralGenericAlias,  # type: ignore
+                      _types.UnionType,
+                  ))):
+            func_type = self._validate_func_type(action, func_type, kwargs, level + 1)
         else:
-            if (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
-                    and hasattr(_typing, '_UnionGenericAlias')
-                    and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
-                        func_type,
-                        (
-                            _typing._GenericAlias,  # type: ignore
-                            _typing._UnionGenericAlias,  # type: ignore
-                            _typing._LiteralGenericAlias,  # type: ignore
-                            _types.UnionType,
-                        ))):
-                func_type = self._validate_func_type(
-                    action, func_type, kwargs, level + 1
-                )
-            else:
-                func_type = (func_type, )
+            func_type = (func_type, )
 
         return func_type
 
@@ -1117,18 +1107,16 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             if action not in seen_actions:
                 if action.required:
                     required_actions.append(_argparse._get_action_name(action))
-                else:
-                    # Convert action default now instead of doing it before
-                    # parsing arguments to avoid calling convert functions
-                    # twice (which may fail) if the argument was given, but
-                    # only if it was defined already in the namespace
-                    if (action.default is not None and isinstance(action.default, str)
-                            and hasattr(namespace, action.dest)
-                            and action.default is getattr(namespace, action.dest)):
-                        setattr(
-                            namespace, action.dest,
-                            self._get_value(action, action.default)
-                        )
+                # Convert action default now instead of doing it before
+                # parsing arguments to avoid calling convert functions
+                # twice (which may fail) if the argument was given, but
+                # only if it was defined already in the namespace
+                elif (action.default is not None and isinstance(action.default, str)
+                      and hasattr(namespace, action.dest)
+                      and action.default is getattr(namespace, action.dest)):
+                    setattr(
+                        namespace, action.dest, self._get_value(action, action.default)
+                    )
 
         if required_actions:
             self.error(

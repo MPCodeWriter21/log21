@@ -650,26 +650,25 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             else:
                 self.error('Shell commands are not allowed!')
         # Python commands:
+        elif self.allow_python:
+            try:
+                # TODO: Add the support of python commands
+                raise NotImplementedError
+            except Exception as ex:  # pylint: disable=broad-except
+                self.error(ex)
         else:
-            if self.allow_python:
-                try:
-                    # TODO: Add the support of python commands
-                    raise NotImplementedError
-                except Exception as ex:  # pylint: disable=broad-except
-                    self.error(ex)
-            else:
-                try:
-                    output = _subprocess.check_output(command.strip(), shell=False)
-                    self.print(output.decode('utf-8').strip('\r\n'))
-                except _subprocess.CalledProcessError as ex:
-                    self.error(
-                        'Error code:', ex.returncode,
-                        ex.output.decode('utf-8').strip('\r\n')
-                    )
-                except FileNotFoundError:
-                    self.error('File not found: Unrecognized command.')
-                except Exception as ex: # pylint: disable=broad-except
-                    self.error(ex)
+            try:
+                output = _subprocess.check_output(command.strip(), shell=False)
+                self.print(output.decode('utf-8').strip('\r\n'))
+            except _subprocess.CalledProcessError as ex:
+                self.error(
+                    'Error code:', ex.returncode,
+                    ex.output.decode('utf-8').strip('\r\n')
+                )
+            except FileNotFoundError:
+                self.error('File not found: Unrecognized command.')
+            except Exception as ex:  # pylint: disable=broad-except
+                self.error(ex)
         self.command_history_index = len(self.command_history)
 
     def history_up(self, _):

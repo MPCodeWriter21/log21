@@ -120,10 +120,12 @@ print(GREEN + 'This' + WHITE + ' is' + RED + ' Red')
 ### 2.5.3
 
 Moved some dictionaries to `__init__` methods.
-`colors` in `Argparse.ColorizingHelpFormatter` class.
-`_level_name` in `Formatters._Formatter` class and `level_colors` in `Formatters.ColorizingFormatter` class.
-`sign_colors` in `PPrint.PrettyPrinter` class.
-`colors` in `TreePrint.TreePrint.Node` class.
+
++ `colors` in `Argparse.ColorizingHelpFormatter` class.
++ `_level_name` in `Formatters._Formatter` class and `level_colors` in
+  `Formatters.ColorizingFormatter` class.
++ `sign_colors` in `PPrint.PrettyPrinter` class.
++ `colors` in `TreePrint.TreePrint.Node` class.
 
 ### 2.5.2
 
@@ -135,17 +137,17 @@ Switched from `setup.py` build system to `pyproject.toml`
 
 ### 2.5.0
 
-Added `level_colors` argument to `log21.get_logger` function with will be passed to the formatter and allows
-user to set custom level colors while making a new logger.
-Also changed most `Dict` type hints to be `Mapping` and `list` to `Sequence` to make the functions more general
-and less strict.
+Added `level_colors` argument to `log21.get_logger` function with will be passed to the
+formatter and allows user to set custom level colors while making a new logger.
+Also changed most `Dict` type hints to be `Mapping` and `list` to `Sequence` to make the
+functions more general and less strict.
 
 ### 2.4.7
 
-Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra static or dynamic values to the
-report formatter.
-They can be used in the format string. For dynamic values you can pass a function that takes no
-arguments as the value.
+Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra
+static or dynamic values to the report formatter.
+They can be used in the format string. For dynamic values you can pass a function that
+takes no arguments as the value.
 
 ### 2.4.6
 
@@ -214,7 +216,8 @@ Added `catch` and `ignore` methods to `log21.CrashReporter.Reporter`.
 
 ### 2.3.7
 
-Added `exceptions_to_catch` and `exceptions_to_ignore` arguments to `log21.CrashReporter.Reporter` class.
+Added `exceptions_to_catch` and `exceptions_to_ignore` arguments to
+`log21.CrashReporter.Reporter` class.
 
 ### 2.3.6
 
@@ -226,35 +229,39 @@ Minor improvements.
 
 ### 2.3.4
 
-Added a new method to `log21.Logger` class: `log21.Logger.clear_line`. This method clears the current line in the
-console and moves the cursor to the beginning of the line.
+Added a new method to `log21.Logger` class: `log21.Logger.clear_line`. This method
+clears the current line in the console and moves the cursor to the beginning of the line.
 
 ### 2.3.3
 
-Fixed a bug that would cause an error creating a progress bar with no value set for width in systems without support for
-os.get_terminal_size().
+Fixed a bug that would cause an error creating a progress bar with no value set for
+width in systems without support for os.get_terminal_size().
 
 ### 2.3.2
 
-Added `additional_variables` argument to `log21.ProgressBar` class. You can use it in order to add additional variables
-to the progress bar:
+Added `additional_variables` argument to `log21.ProgressBar` class. You can use it in
+order to add additional variables to the progress bar:
 
 ```python3
 import log21, time
 
-progress_bar = log21.ProgressBar(format_='Iteration: {i} {prefix}{bar}{suffix} {percentage}%', style='{',
-                                 additional_variables={"i": 0})
+progress_bar = log21.ProgressBar(
+    format_='Iteration: {i} {prefix}{bar}{suffix} {percentage}%',
+    style='{',
+    additional_variables={"i": 0}
+)
 
 for i in range(100):
     progress_bar(i + 1, 100, i=i)
     time.sleep(0.1)
-# Iteration: 99 |██████████████████████████████████████████████████████████████████████████████| 100%
+# Iteration: 99 |████████████████████████████████████████████████████████████████| 100%
 ```
 
 ### 2.3.1
 
-Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set the formatter of the handler when
-you create it. Added `handlers` argument to `Logger`. You can use it to add handlers to the logger when you create it.
+Added `formatter` argument to `StreamHandler` and `FileHandler`. You can use it to set
+the formatter of the handler when you create it. Added `handlers` argument to `Logger`.
+You can use it to add handlers to the logger when you create it.
 
 ### 2.3.0
 
@@ -267,13 +274,15 @@ Let's see an example:
 ```python
 # We import the ProgressBar class from log21
 from log21 import ProgressBar
-# psutil is a module that can be used to get the current memory usage or cpu usage of your system
+# psutil is a module that can be used to get the current memory usage or cpu usage of
+# your system
 # If you want to try this example, you need to install psutil: pip install psutil
 import psutil
 # We use the time module to make a delay between the progressbar updates
 import time
 
-cpu_bar = ProgressBar(format_='CPU Usage: {prefix}{bar}{suffix} {percentage}%', style='{', new_line_when_complete=False)
+cpu_bar = ProgressBar(format_='CPU Usage: {prefix}{bar}{suffix} {percentage}%',
+                      style='{', new_line_when_complete=False)
 
 while True:
     cpu_bar.update(psutil.cpu_percent(), 100)
@@ -284,9 +293,9 @@ while True:
 
 Added CrashReporter!
 
-You can use Reporter classes to monitor your program and send crash reports to the developer. It can help you fix the
-bugs and improve your program before your users get upset about it. See some examples in
-the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
+You can use Reporter classes to monitor your program and send crash reports to the
+developer. It can help you fix the bugs and improve your program before your users get
+upset about it. See some examples in the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
 file.
 
 ### 2.1.8
@@ -325,7 +334,8 @@ Added LoggingWindow!
 
 Added `ProgressBar` class!
 
-You can directly print a progress bar to the console using `print_progress` method of `log21.Logger` class.
+You can directly print a progress bar to the console using `print_progress` method of
+`log21.Logger` class.
 
 OR
 
@@ -341,7 +351,8 @@ Minor changes.
 
 ### 1.5.8
 
-Added `log21.log`, `log21.debug`, `log21.info`, `log21.warning`, `log21.error` and some other functions.
+Added `log21.log`, `log21.debug`, `log21.info`, `log21.warning`, `log21.error` and some
+other functions.
 
 ### 1.5.7
 
@@ -354,7 +365,8 @@ Added `log21.pprint()` function. It is similar to `pprint.pprint()` function.
 ### 1.5.5
 
 Added `level_names` argument to Formatter classes.
-`level_names` can be used to change the name of logging level that appears while logging messages.
+`level_names` can be used to change the name of logging level that appears while logging
+messages.
 
 ### 1.5.3-4
 
@@ -374,11 +386,13 @@ More description added.
 
 ### 1.4.12
 
-Setting custom formatting style and custom date-time formatting added to `log21.get_logger` function.
+Setting custom formatting style and custom date-time formatting added to
+`log21.get_logger` function.
 
 ### 1.4.11
 
-`Logger.write` edited. It's same as `Logger.warning` but its default `end` argument value is an empty string.
+`Logger.write` edited. It's same as `Logger.warning` but its default `end` argument
+value is an empty string.
 
 ### 1.4.10
 
@@ -388,7 +402,7 @@ Setting custom formatting style and custom date-time formatting added to `log21.
 
 Bug fixed:
 
-```
+```python
 >>> log21.get_logger()
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -405,7 +419,8 @@ TypeError: A logger name must be a string
 
 `Logger.print` added.
 
-You can use `Logger.print` to print a message using the current level of the logger class.
+You can use `Logger.print` to print a message using the current level of the logger
+class.
 
 *It gets printed with any level.*
 

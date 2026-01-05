@@ -1,10 +1,12 @@
 # log21.__init__.py
 # CodeWriter21
 
+# yapf: disable
+
 import os as _os
 import logging as _logging
-from typing import (Type as _Type, Tuple as _Tuple, Union as _Union,
-                    Mapping as _Mapping, Optional as _Optional)
+from typing import (Type as _Type, Union as _Union, Literal as _Literal,
+                    Mapping as _Mapping, Iterable as _Iterable, Optional as _Optional)
 
 from . import CrashReporter
 from .Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
@@ -23,8 +25,10 @@ from .ProgressBar import ProgressBar
 from .LoggingWindow import LoggingWindow, LoggingWindowHandler
 from .StreamHandler import StreamHandler, ColorizingStreamHandler
 
+# yapf: enable
+
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '2.10.2'
+__version__ = '3.0.0a1'
 __github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
@@ -52,9 +56,9 @@ def _prepare_formatter(
     show_time: bool = True,
     colorize_time_and_level: bool = True,
     level_names: _Optional[_Mapping[int, str]] = None,
-    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
+    level_colors: _Optional[_Mapping[int, tuple[str, ...]]] = None,
     formatter_class: _Type[_logging.Formatter] = ColorizingFormatter
-):
+) -> _logging.Formatter:
     # Prepares a formatting if the fmt was None
     if not fmt:
         style = '%'
@@ -89,8 +93,8 @@ def _prepare_formatter(
         formatter.level_names = level_names
     if not colorize_time_and_level and isinstance(formatter, ColorizingFormatter):
         for key in formatter.level_colors:
-            formatter.level_colors[key] = tuple()
-        formatter.time_color = tuple()
+            formatter.level_colors[key] = ()
+        formatter.time_color = ()
 
     return formatter
 
@@ -106,26 +110,42 @@ def get_logger(
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
-    override=False,
+    override: bool = False,
     level_names: _Optional[_Mapping[int, str]] = None,
-    level_colors: _Optional[_Mapping[int, _Tuple[str, ...]]] = None,
+    level_colors: _Optional[_Mapping[int, tuple[str, ...]]] = None,
     file: _Optional[_Union[_os.PathLike, str]] = None
 ) -> Logger:
-    """Returns a logging.Logger with colorizing support. >>> >>> import log21 >>> >>> l
-    = log21.get_logger() >>> l.warning('Pretty basic, huh?') [14:49:41] [WARNING] Pretty
-    basic, huh? >>> l.critical('CONTINUE READING!! please...') [14:50:08] [CRITICAL]
-    CONTINUE READING!! please... >>> >>> my_logger =
-    log21.get_logger(name='CodeWriter21', level=log21.INFO, ... fmt='{asctime} ->
-    [{levelname}]: {message}', style='{', override=True) >>> >>> my_logger.info('FYI: My
-    name is Mehrad.') 14:56:12 -> [INFO]: FYI: My name is Mehrad. >>>
-    my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
-    14:56:29 -> [ERROR]: Oh no! Something went wrong D: >>> >>> my_logger.debug(1 ,2 ,3)
+    """Returns a logging.Logger with colorizing support.
+
+    >>>
+    >>> import log21
+    >>>
+    >>> l = log21.get_logger()
+    >>> l.warning('Pretty basic, huh?')
+    [14:49:41] [WARNING] Pretty basic, huh?
+    >>> l.critical('CONTINUE READING!! please...')
+    [14:50:08] [CRITICAL] CONTINUE READING!! please...
+    >>>
+    >>> my_logger = log21.get_logger(name='CodeWriter21', level=log21.INFO, ... fmt='{asctime} -> [{levelname}]: {message}', style='{', override=True)
+    >>>
+    >>> my_logger.info('FYI: My name is Mehrad.')
+    14:56:12 -> [INFO]: FYI: My name is Mehrad.
+    >>> my_logger.error(log21.get_color('LightRed') + 'Oh no! Something went wrong D:')
+    14:56:29 -> [ERROR]: Oh no! Something went wrong D:
+    >>>
+    >>> my_logger.debug(1 ,2 ,3)
     >>> # It prints Nothing because our logger level is INFO and DEBUG level is lower
-    >>> # than INFO. >>> # So let's modify the my_logger's level >>>
-    my_logger.setLevel(log21.DEBUG) >>> # Now we try again... >>> my_logger.debug(1, 2,
-    3) 14:57:34 -> [DEBUG]: 1 2 3 >>> # Well Done. Right? >>> # Let's see more >>>
-    my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n') 15:01:43 ->
-    [DEBUG]: I like 21 number!
+    >>> # than INFO.
+    >>> # So let's modify the my_logger's level
+    >>> my_logger.setLevel(log21.DEBUG)
+    >>> # Now we try again...
+    >>> my_logger.debug(1, 2, 3)
+    14:57:34 -> [DEBUG]: 1 2 3
+    >>> # Well Done. Right?
+    >>> # Let's see more
+    >>> my_logger.debug('I like %s number!', args=('21', ), end='\033[0m\n\n\n')
+    15:01:43 -> [DEBUG]: I like 21 number!
+
 
     >>> # Well, I've got a question...
     >>> # Do you know the name of this color?
@@ -214,7 +234,7 @@ def get_logging_window(
     style: str = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
-    override=False,
+    override: bool = False,
     level_names: _Optional[_Mapping[int, str]] = None,
     width: int = 80,
     height: int = 20,
@@ -309,9 +329,9 @@ getLogger = get_logger
 def print(  # pylint: disable=redefined-builtin
     *msg,
     args: tuple = (),
-    end='\033[0m\n',
+    end: str='\033[0m\n',
     **kwargs
-):
+) -> None:
     """Works like the print function but ANSI colors are supported (even on Windows) and
     it ends with a new line and a reset color by default."""
     logger = get_logger('log21.print', level=DEBUG, show_time=False, show_level=False)
@@ -321,15 +341,15 @@ def print(  # pylint: disable=redefined-builtin
 def input(  # pylint: disable=redefined-builtin
     *msg,
     args: tuple = (),
-    end='',
+          end: str='',
     **kwargs
-):
+) -> str:
     """Works like the input function but ANSI colors are supported (even on Windows)."""
     logger = get_logger('log21.input', level=DEBUG, show_time=False, show_level=False)
     return logger.input(*msg, args=args, end=end, **kwargs)
 
 
-def getpass(*msg, args: tuple = (), end='', **kwargs):
+def getpass(*msg, args: tuple = (), end: str = '', **kwargs) -> str:
     """Works like the getpass.getpass function but ANSI colors are supported (even on
     Windows)."""
     logger = get_logger('log21.getpass', level=DEBUG, show_time=False, show_level=False)
@@ -337,18 +357,18 @@ def getpass(*msg, args: tuple = (), end='', **kwargs):
 
 
 def pprint(
-    obj,
-    indent=1,
-    width=80,
-    depth=None,
+    obj,  # noqa: ANN001
+    indent: int = 1,
+    width: int = 80,
+    depth: _Optional[int] = None,
     signs_colors: _Optional[_Mapping[str, str]] = None,
     *,
-    sort_dicts=True,
-    underscore_numbers=False,
-    compact=False,
-    end='\033[0m\n',
+    sort_dicts: bool = True,
+    underscore_numbers: bool = False,
+    compact: bool = False,
+    end: str = '\033[0m\n',
     **kwargs
-):
+) -> None:
     """A colorful version of the pprint.pprint function.
 
     :param obj: The object to print.
@@ -385,13 +405,13 @@ pretty_print = pprint
 
 
 def tree_print(
-    obj,
+    obj,  # noqa: ANN001
     indent: int = 4,
-    mode='-',
+    mode: _Literal['-', '='] = '-',
     colors: _Optional[_Mapping[str, str]] = None,
-    end='\033[0m\n',
+    end: str = '\033[0m\n',
     **kwargs
-):
+) -> None:
     """Prints a tree representation of the given object. (e.g. a dictionary)
 
     :param obj: The object to print.
@@ -418,15 +438,15 @@ def basic_config(
     force: bool = False,
     encoding: _Optional[str] = None,
     errors: _Optional[str] = 'backslashreplace',
-    handlers=None,
-    stream=None,
-    filename=None,
+    handlers: _Optional[_Iterable[_logging.Handler]] = None,
+    stream=None,  # noqa: ANN001
+    filename: _Optional[_Union[str, _os.PathLike]] = None,
     filemode: str = 'a',
     date_format: str = '%H:%M:%S',
     style: str = '%',
     format_: _Optional[str] = None,
     level: _Optional[_Union[int, str]] = None
-):  # pylint: disable=too-many-branches
+) -> None:  # pylint: disable=too-many-branches
     """Do basic configuration for the logging system.
 
     This function does nothing if the root logger already has handlers
@@ -487,12 +507,11 @@ def basic_config(
                 raise ValueError(
                     "'stream' and 'filename' should not be specified together"
                 )
-        else:
-            if stream or filename:
-                raise ValueError(
-                    "'stream' or 'filename' should not be specified together with "
-                    "'handlers'"
-                )
+        elif stream or filename:
+            raise ValueError(
+                "'stream' or 'filename' should not be specified together with "
+                "'handlers'"
+            )
         if handlers is None:
             if filename:
                 if 'b' in filemode:
@@ -525,7 +544,7 @@ def basic_config(
 basicConfig = basic_config
 
 
-def critical(*msg, args=(), **kwargs):
+def critical(*msg, args: tuple = (), **kwargs) -> None:
     """Log a message with severity 'CRITICAL' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -536,12 +555,12 @@ def critical(*msg, args=(), **kwargs):
     root.critical(*msg, args=args, **kwargs)
 
 
-def fatal(*msg, args=(), **kwargs):
+def fatal(*msg, args: tuple = (), **kwargs) -> None:
     """Don't use this function, use critical() instead."""
     critical(*msg, args=args, **kwargs)
 
 
-def error(*msg, args=(), **kwargs):
+def error(*msg, args: tuple = (), **kwargs) -> None:
     """Log a message with severity 'ERROR' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -552,7 +571,7 @@ def error(*msg, args=(), **kwargs):
     root.error(*msg, args=args, **kwargs)
 
 
-def exception(*msg, args=(), exc_info=True, **kwargs):
+def exception(*msg, args: tuple = (), exc_info: bool = True, **kwargs) -> None:
     """Log a message with severity 'ERROR' on the root logger, with exception
     information.
 
@@ -562,7 +581,7 @@ def exception(*msg, args=(), exc_info=True, **kwargs):
     error(*msg, args=args, exc_info=exc_info, **kwargs)
 
 
-def warning(*msg, args=(), **kwargs):
+def warning(*msg, args: tuple = (), **kwargs) -> None:
     """Log a message with severity 'WARNING' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -573,12 +592,12 @@ def warning(*msg, args=(), **kwargs):
     root.warning(*msg, args=args, **kwargs)
 
 
-def warn(*msg, args=(), **kwargs):
+def warn(*msg, args: tuple = (), **kwargs) -> None:
     """An alias of warning()"""
     warning(*msg, args=args, **kwargs)
 
 
-def info(*msg, args=(), **kwargs):
+def info(*msg, args: tuple = (), **kwargs) -> None:
     """Log a message with severity 'INFO' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -589,7 +608,7 @@ def info(*msg, args=(), **kwargs):
     root.info(*msg, args=args, **kwargs)
 
 
-def debug(*msg, args=(), **kwargs):
+def debug(*msg, args: tuple = (), **kwargs) -> None:
     """Log a message with severity 'DEBUG' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -600,7 +619,7 @@ def debug(*msg, args=(), **kwargs):
     root.debug(*msg, args=args, **kwargs)
 
 
-def log(level, *msg, args=(), **kwargs):
+def log(level: _Union[str, int], *msg, args: tuple = (), **kwargs) -> None:
     """Log 'msg % args' with the integer severity 'level' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -618,7 +637,7 @@ def progress_bar(
     prefix: str = '|',
     suffix: str = '|',
     show_percentage: bool = True
-):
+) -> None:
     """Print a progress bar to the console."""
 
     progress_bar_ = ProgressBar(

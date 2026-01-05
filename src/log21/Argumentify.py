@@ -1,6 +1,8 @@
 # log21.Argparse.py
 # CodeWriter21
 
+# yapf: disable
+
 import re as _re
 import string as _string
 import asyncio as _asyncio
@@ -14,6 +16,8 @@ from dataclasses import field as _field, dataclass as _dataclass
 from docstring_parser import Docstring as _Docstring, parse as _parse
 
 import log21.Argparse as _Argparse
+
+# yapf: enable
 
 __all__ = [
     'argumentify', 'ArgumentifyError', 'ArgumentTypeError', 'FlagGenerationError',

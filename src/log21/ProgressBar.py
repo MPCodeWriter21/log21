@@ -153,7 +153,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
             for key, value in colors.items():
                 self.colors[key] = value
         if no_color:
-            self.colors = {name: '' for name in self.colors}
+            self.colors = dict.fromkeys(self.colors, '')
         self.logger = logger
         self.additional_variables = additional_variables
         self.i = 0

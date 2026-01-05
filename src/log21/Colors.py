@@ -8,13 +8,13 @@ import webcolors as _webcolors
 
 __all__ = [
     'Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name',
-    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW',
-    'BLUE', 'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN',
-    'BACK_YELLOW', 'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE',
-    'GREY', 'LIGHT_RED', 'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE',
-    'LIGHT_MAGENTA', 'LIGHT_CYAN', 'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED',
-    'BACK_LIGHT_GREEN', 'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE',
-    'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN', 'BACK_LIGHT_WHITE'
+    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW', 'BLUE',
+    'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN', 'BACK_YELLOW',
+    'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE', 'GREY', 'LIGHT_RED',
+    'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE', 'LIGHT_MAGENTA', 'LIGHT_CYAN',
+    'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED', 'BACK_LIGHT_GREEN',
+    'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE', 'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN',
+    'BACK_LIGHT_WHITE'
 ]
 
 # Regex pattern to find ansi colors in message

@@ -43,4 +43,3 @@ cryptocurrency to one of my addresses:
 **Stellar**                   : GCLCQJAJYA275PJAENWI5QM7K5ARXT3QBUDSKDIXJPFJZ4ZHYGNI3ZG7
 
 **Polygon**                   : 0x3818636C552B599149f1b050DacE01Fa5Fb11acA
-

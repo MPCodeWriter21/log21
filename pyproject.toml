@@ -58,4 +58,5 @@ line-length = 88
 
 [tool.ruff.lint]
 extend-select = ["C4", "SIM", "TCH", "PL", "ANN", "N", "B"]
-ignore = ["PLR0911", "PLR0912", "PLR0913", "PLR0914", "ANN101", "B008"]
+ignore = ["PLR0911", "PLR0912", "PLR0913", "PLR0914", "ANN101", "B008", "N816",
+          "ANN002", "ANN003"]

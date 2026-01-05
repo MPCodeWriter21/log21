@@ -1,6 +1,8 @@
 # log21.StreamHandler.py
 # CodeWriter21
 
+# yapf: disable
+
 import os as _os
 import re as _re
 import shutil as _shutil
@@ -9,6 +11,8 @@ from logging import StreamHandler as _StreamHandler
 
 from log21.Colors import (get_colors as _gc, hex_escape as _hex_escape,
                           ansi_escape as _ansi_escape)
+
+# yapf: enable
 
 __all__ = ['IS_WINDOWS', 'ColorizingStreamHandler', 'StreamHandler']
 
@@ -29,11 +33,10 @@ class StreamHandler(_StreamHandler):
         stream=None,
         formatter=None,
         level=None
-    ):
+    ) -> None:
         """Initialize the StreamHandler.
 
-        :param handle_carriage_return: Whether to handle carriage
-            returns.
+        :param handle_carriage_return: Whether to handle carriage returns.
         :param handle_new_line: Whether to handle new lines.
         :param stream: The stream to write to.
         :param formatter: The formatter to use.
@@ -53,7 +56,7 @@ class StreamHandler(_StreamHandler):
             msg = _hex_escape.sub(
                 '', _ansi_escape.sub('', record.msg.strip(' \t\n\x0b\x0c'))
             )
-            if '\r' == msg[:1]:
+            if msg[:1] == '\r':
                 file_descriptor = getattr(self.stream, 'fileno', None)
                 if file_descriptor:
                     file_descriptor = file_descriptor()
@@ -126,8 +129,8 @@ class ColorizingStreamHandler(StreamHandler):
 
     # Writes colorized text to the Windows console.
     def convert_and_write(self, message):
-        """Convert the message to a Windows console colorized message and write
-        it to the stream."""
+        """Convert the message to a Windows console colorized message and write it to
+        the stream."""
         nt_color_map = {
             30: 0,  # foreground: black   - 0b00000000
             31: 4,  # foreground: red     - 0b00000100

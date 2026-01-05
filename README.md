@@ -15,15 +15,15 @@ Features
 
 + Colors : The main reason for this package was to log text in the Windows console with
   the support of ANSI colors.
-+ Argument parsing : log21's argument parser can be used like python's argparse but it
++ Argument parsing : log21's argument parser can be used like python's argparse, but it
   also colorizes the output.
 + Logging : A similar logger to logging. Logger but with colorized output and other
   options such as levelname modifications. It can also decolorize the output if you want
   to log into a file.
 + Pretty printing : Have you ever wanted to colorize the output of the pprint module?
   log21's pretty printer can do that.
-+ Tree printing : You can pass a dict or list to `log21.tree_print` function and it will
-  print it in a tree-like structure. It's also colorized XD.
++ Tree printing : You can pass a dict or list to `log21.tree_print` function, and it
+  will print it in a tree-like structure. It's also colorized XD.
 + ProgressBar : log21's progress bar can be used to show progress of a process in a
   beautiful way.
 + LoggingWindow : Helps you to log messages and debug your code in a window other than

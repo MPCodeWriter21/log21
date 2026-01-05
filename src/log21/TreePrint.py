@@ -1,12 +1,16 @@
 # log21.TreePrint.py
 # CodeWriter21
 
+# yapf: disable
+
 from __future__ import annotations
 
 from typing import (List as _List, Union as _Union, Mapping as _Mapping,
                     Optional as _Optional, Sequence as _Sequence)
 
 from log21.Colors import get_colors as _gc
+
+# yapf: enable
 
 
 class TreePrint:
@@ -22,7 +26,7 @@ class TreePrint:
             indent: int = 4,
             colors: _Optional[_Mapping[str, str]] = None,
             mode: str = '-'
-        ):
+        ) -> None:
             """Initialize a node.
 
             :param value: The value of the node.
@@ -66,7 +70,7 @@ class TreePrint:
                     return 2
             return -1
 
-        def __str__(self, level=0, prefix='', mode=None):
+        def __str__(self, level: int = 0, prefix: str = '', mode=None) -> str:
             mode = self._get_mode(mode)
             if mode == -1:
                 raise ValueError('`mode` must be - or =')
@@ -107,11 +111,11 @@ class TreePrint:
 
             return text
 
-        def has_child(self):
+        def has_child(self) -> bool:
             """Return True if node has children, False otherwise."""
             return len(self._children) > 0
 
-        def add_child(self, child: TreePrint.Node):
+        def add_child(self, child: TreePrint.Node) -> None:
             """Add a child to the node."""
             if not isinstance(child, TreePrint.Node):
                 raise TypeError('`child` must be TreePrint.Node')
@@ -196,7 +200,7 @@ class TreePrint:
         indent: int = 4,
         colors: _Optional[_Mapping[str, str]] = None,
         mode='-'
-    ):
+    ) -> None:
         self.indent = indent
         self.mode = mode
         if isinstance(data, _Mapping):
@@ -218,11 +222,11 @@ class TreePrint:
         self,
         data: _Union[_Mapping, _Sequence, str, int],
         colors: _Optional[_Mapping[str, str]] = None
-    ):
+    ) -> None:
         """Add data to root node."""
         self.root.add_to(data, indent=self.indent, colors=colors, mode=self.mode)
 
-    def __str__(self, mode=None):
+    def __str__(self, mode=None) -> str:
         if not mode:
             mode = self.mode
         return self.root.__str__(mode=mode)

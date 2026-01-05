@@ -1,6 +1,8 @@
 # log21.CrashReporter.Reporters.py
 # CodeWriter21
 
+# yapf: disable
+
 from __future__ import annotations
 
 import ssl as _ssl
@@ -18,11 +20,13 @@ from .Formatters import (FILE_REPORTER_FORMAT as _FILE_REPORTER_FORMAT,
                          EMAIL_REPORTER_FORMAT as _EMAIL_REPORTER_FORMAT,
                          CONSOLE_REPORTER_FORMAT as _CONSOLE_REPORTER_FORMAT)
 
+# yapf: enable
+
 __all__ = ['Reporter', 'ConsoleReporter', 'FileReporter', 'EmailReporter']
 
 
 # pylint: disable=redefined-builtin
-def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
+def print(*msg, args: tuple = (), end: str = '\033[0m\n', **kwargs) -> None:
     """Prints a message to the console using the log21.Logger."""
     logger = _log21.get_logger(
         'log21.print', level='DEBUG', show_time=False, show_level=False
@@ -31,8 +35,8 @@ def print(*msg, args: tuple = (), end='\033[0m\n', **kwargs):
 
 
 class Reporter:
-    """Reporter is a decorator that wraps a function and calls a function when
-    an exception is raised.
+    """Reporter is a decorator that wraps a function and calls a function when an
+    exception is raised.
 
     Usage Example:
         >>>
@@ -82,7 +86,7 @@ class Reporter:
         formatter: _Optional[_log21.CrashReporter.Formatter] = None,
         exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
         exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
-    ):
+    ) -> None:
         """
         :param report_function: Function to call when an exception is raised.
         :param raise_after_report: If True, the exception will be raised after the
@@ -99,8 +103,8 @@ class Reporter:
         ) if exceptions_to_ignore else None
 
     def reporter(self, func):
-        """It will wrap the function and call the report_function when an
-        exception is raised.
+        """It will wrap the function and call the report_function when an exception is
+        raised.
 
         :param func: Function to wrap.
         :return: Wrapped function.
@@ -264,9 +268,7 @@ class FileReporter(Reporter):
             exceptions_to_ignore
         )
         # pylint: disable=consider-using-with
-        if isinstance(file, str):
-            self.file = open(file, 'a', encoding=encoding)
-        elif isinstance(file, _PathLike):
+        if isinstance(file, str) or isinstance(file, _PathLike):
             self.file = open(file, 'a', encoding=encoding)
         elif isinstance(file, _IO):
             if file.writable():

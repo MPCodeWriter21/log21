@@ -1,17 +1,24 @@
 # log21.Logger.py
 # CodeWriter21
 
+# yapf: disable
+
 import re as _re
 import sys as _sys
 import logging as _logging
 from types import MethodType as _MethodType
-from typing import (Any, List, Union as _Union, Literal as _Literal, Mapping,
-                    Callable as _Callable, Optional as _Optional, Sequence as _Sequence)
+from typing import (TYPE_CHECKING as _TYPE_CHECKING, Any, List, Union as _Union,
+                    Literal as _Literal, Mapping, Callable as _Callable,
+                    Optional as _Optional, Sequence as _Sequence)
 from getpass import getpass as _getpass
 from logging import raiseExceptions as _raiseExceptions
 
-import log21 as _log21
 from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, NOTSET, WARNING, CRITICAL
+
+if _TYPE_CHECKING:
+    import log21 as _log21
+
+# yapf: enable
 
 __all__ = ['Logger']
 
@@ -21,11 +28,11 @@ class Logger(_logging.Logger):
 
     def __init__(
         self,
-        name,
+        name: str,
         level: _Union[int, str] = NOTSET,
         handlers: _Optional[_Union[_Sequence[_logging.Handler],
                                    _logging.Handler]] = None
-    ):
+    ) -> None:
         """Initialize a Logger object.
 
         :param name: The name of the logger.
@@ -330,7 +337,7 @@ class Logger(_logging.Logger):
         >>> # Get three inputs of type: str, str or None, and float
         >>> data = [str, None, float]  # first name, last name and age
         >>> cout << "Please enter a first name, last name and age(separated by space): "
-        Please enter a first name, last name and age(separated by space): 
+        Please enter a first name, last name and age(separated by space):
         >>> cin >> data;
         M  21
         >>> name = data[0] + (data[1] if data[1] is not None else '')
@@ -342,7 +349,7 @@ class Logger(_logging.Logger):
         >>> # Get any number of inputs
         >>> data = []
         >>> cout << "Enter something: ";
-        Enter something: 
+        Enter something:
         >>> cin >> data;
         What ever man 1 2 3 !
         >>> cout << "Here are the items you chose: " << data << log21.endl;
@@ -352,7 +359,7 @@ class Logger(_logging.Logger):
         >>> # Get two inputs of type int with defaults: 1280 and 720
         >>> data = [1280, 720]
         >>> cout << "Enter the width and the height: ";
-        Enter the width and the height: 
+        Enter the width and the height:
         >>> cin >> data;
         500
 
