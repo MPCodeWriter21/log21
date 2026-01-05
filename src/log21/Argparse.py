@@ -560,7 +560,7 @@ class ColorizingTextWrapper(_TextWrapper):
         return lines
 
 
-class _ActionsContainer(_argparse._ActionsContainer):
+class _ActionsContainer(_argparse._ActionsContainer):  # novm
     """Container for the actions for a single command line option."""
 
     # pylint: disable=too-many-branches
