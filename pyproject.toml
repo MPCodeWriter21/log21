@@ -11,9 +11,10 @@ license = {text = "Apache License 2.0"}
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: Unix",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS :: MacOS X"
@@ -59,4 +60,4 @@ line-length = 88
 [tool.ruff.lint]
 extend-select = ["C4", "SIM", "TCH", "PL", "ANN", "N", "B"]
 ignore = ["PLR0911", "PLR0912", "PLR0913", "PLR0914", "ANN101", "B008", "N816",
-          "ANN002", "ANN003"]
+          "ANN002", "ANN003", "ANN401"]
