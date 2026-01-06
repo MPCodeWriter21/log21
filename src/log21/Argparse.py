@@ -9,7 +9,6 @@ import re as _re
 import sys as _sys
 import types as _types
 import typing as _typing
-import argparse as _argparse
 import collections.abc
 from enum import Enum as _Enum
 from typing import (Tuple as _Tuple, Mapping as _Mapping, NoReturn,
@@ -21,6 +20,8 @@ from collections import OrderedDict as _OrderedDict
 import log21 as _log21
 from log21.Colors import get_colors as _gc
 from log21.Formatters import DecolorizingFormatter as _Formatter
+
+from . import _argparse
 
 # yapf: enable
 
@@ -872,7 +873,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # return the modified argument list
         return new_arg_strings
 
-    def _parse_known_args(self, arg_strings, namespace):
+    def _parse_known_args(self, arg_strings, namespace, intermixed):
         # replace arg strings that are file references
         if self.fromfile_prefix_chars is not None:
             arg_strings = self._read_args_from_files(arg_strings)
@@ -904,11 +905,11 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             # otherwise, add the arg to the arg strings
             # and note the index if it was an option
             else:
-                option_tuple = self._parse_optional(arg_string)
-                if option_tuple is None:
+                option_tuples = self._parse_optional(arg_string)
+                if option_tuples is None:
                     pattern = 'A'
                 else:
-                    option_string_indices[i] = option_tuple
+                    option_string_indices[i] = option_tuples
                     pattern = 'O'
                 arg_string_pattern_parts.append(pattern)
 
@@ -918,15 +919,15 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # converts arg strings to the appropriate and then takes the action
         seen_actions = set()
         seen_non_default_actions = set()
+        warned = set()
 
         def take_action(action, argument_strings, option_string=None):
             seen_actions.add(action)
             argument_values = self._get_values(action, argument_strings)
 
             # error if this argument is not allowed with other previously
-            # seen arguments, assuming that actions that use the default
-            # value don't really count as "present"
-            if argument_values is not action.default:
+            # seen arguments
+            if action.option_strings or argument_strings:
                 seen_non_default_actions.add(action)
                 for conflict_action in action_conflicts.get(action, []):
                     if conflict_action in seen_non_default_actions:
@@ -943,23 +944,20 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         def consume_optional(start_index):
 
             # get the optional identified at this index
-            option_tuple = option_string_indices[start_index]
-            if len(option_tuple) == 3:
-                action, option_string, explicit_arg = option_tuple
-                sep = None
-            elif len(option_tuple) == 4:
-                action, option_string, sep, explicit_arg = option_tuple
-            else:
-                # Tell the user that there seem to have been a change in argparse module
-                # and if they see this error they should immediately report it in an
-                # issue at GitHub.com/MPCodeWriter21/log21 with their Python version
-                raise ValueError(
-                    'Unknown option tuple length, please report this issue at: '
-                    'https://GitHub.com/MPCodeWriter21/log21\n'
-                    f'Python version: {_sys.version}'
-                    f'Option tuple: {option_tuple}'
-                    f'log21 version: {_log21.__version__}'
+            option_tuples = option_string_indices[start_index]
+            # if multiple actions match, the option string was ambiguous
+            if len(option_tuples) > 1:
+                options = ', '.join(
+                    [
+                        option_string
+                        for action, option_string, sep, explicit_arg in option_tuples
+                    ]
                 )
+                args = {'option': arg_strings[start_index], 'matches': options}
+                msg = _gettext('ambiguous option: %(option)s could match %(matches)s')
+                raise _argparse.ArgumentError(None, msg % args)
+
+            action, option_string, sep, explicit_arg = option_tuples[0]
 
             # identify additional optionals in the same arg string
             # (e.g. -xyz is the same as -x -y -z if no args are required)
@@ -970,6 +968,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                 # if we found no optional action, skip it
                 if action is None:
                     extras.append(arg_strings[start_index])
+                    extras_pattern.append('O')
                     return start_index + 1
 
                 # if there is an explicit argument, try to match the
@@ -981,7 +980,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                     # arguments, try to parse more single-dash options out
                     # of the tail of the option string
                     chars = self.prefix_chars
-                    if arg_count == 0 and option_string[1] not in chars:
+                    if (arg_count == 0 and option_string[1] not in chars
+                            and explicit_arg != ''):
                         if sep or explicit_arg[0] in chars:
                             msg = _gettext('ignored explicit argument %r')
                             raise _argparse.ArgumentError(action, msg % explicit_arg)
@@ -1001,6 +1001,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                                 sep = ''
                         else:
                             extras.append(char + explicit_arg)
+                            extras_pattern.append('O')
                             stop = start_index + 1
                             break
                     # if the action expect exactly one argument, we've
@@ -1033,6 +1034,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             # the Optional's string args stopped
             assert action_tuples
             for action, args, option_string in action_tuples:
+                if action.deprecated and option_string not in warned:
+                    self._warning(
+                        _gettext("option '%(option)s' is deprecated") %
+                        {'option': option_string}
+                    )
+                    warned.add(option_string)
                 take_action(action, args, option_string)
             return stop
 
@@ -1052,6 +1059,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             for action, arg_count in zip(positionals, arg_counts):
                 args = arg_strings[start_index:start_index + arg_count]
                 start_index += arg_count
+                if args and action.deprecated and action.dest not in warned:
+                    self._warning(
+                        _gettext("argument '%(argument_name)s' is deprecated") %
+                        {'argument_name': action.dest}
+                    )
+                    warned.add(action.dest)
                 take_action(action, args)
 
             # slice off the Positionals that we just parsed and return the
@@ -1062,6 +1075,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # consume Positionals and Optionals alternately, until we have
         # passed the last option string
         extras = []
+        extras_pattern = []
         start_index = 0
         if option_string_indices:
             max_option_string_index = max(option_string_indices)
@@ -1070,10 +1084,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         while start_index <= max_option_string_index:
 
             # consume any Positionals preceding the next option
-            next_option_string_index = min(
-                [index for index in option_string_indices if index >= start_index]
-            )
-            if start_index != next_option_string_index:
+            next_option_string_index = start_index
+            while next_option_string_index <= max_option_string_index:
+                if next_option_string_index in option_string_indices:
+                    break
+                next_option_string_index += 1
+            if not intermixed and start_index != next_option_string_index:
                 positionals_end_index = consume_positionals(start_index)
 
                 # only try to parse the next optional if we didn't consume
@@ -1089,16 +1105,37 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             if start_index not in option_string_indices:
                 strings = arg_strings[start_index:next_option_string_index]
                 extras.extend(strings)
+                extras_pattern.extend(
+                    arg_strings_pattern[start_index:next_option_string_index]
+                )
                 start_index = next_option_string_index
 
             # consume the next optional and any arguments for it
             start_index = consume_optional(start_index)
 
-        # consume any positionals following the last Optional
-        stop_index = consume_positionals(start_index)
+        if not intermixed:
+            # consume any positionals following the last Optional
+            stop_index = consume_positionals(start_index)
 
-        # if we didn't consume all the argument strings, there were extras
-        extras.extend(arg_strings[stop_index:])
+            # if we didn't consume all the argument strings, there were extras
+            extras.extend(arg_strings[stop_index:])
+        else:
+            extras.extend(arg_strings[start_index:])
+            extras_pattern.extend(arg_strings_pattern[start_index:])
+            extras_pattern = ''.join(extras_pattern)
+            assert len(extras_pattern) == len(extras)
+            # consume all positionals
+            arg_strings = [s for s, c in zip(extras, extras_pattern) if c != 'O']
+            arg_strings_pattern = extras_pattern.replace('O', '')
+            stop_index = consume_positionals(0)
+            # leave unknown optionals and non-consumed positionals in extras
+            for i, c in enumerate(extras_pattern):
+                if not stop_index:
+                    break
+                if c != 'O':
+                    stop_index -= 1
+                    extras[i] = None
+            extras = [s for s in extras if s is not None]
 
         # make sure all required actions were present and also convert
         # action defaults which were not given as arguments

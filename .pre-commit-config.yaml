@@ -36,3 +36,8 @@ repos:
           'argparse', '--backport', 'typing', '--backport', 'asyncio', '--backport',
           'dataclasses', '--backport', 'enum', '-t=3.9-', '--violations'
         ]
+
+exclude: |
+  (?x)^(
+      src/log21/_argparse.py
+  )$
