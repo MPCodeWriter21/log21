@@ -9,8 +9,9 @@ import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
 from pprint import PrettyPrinter as _PrettyPrinter
-from typing import (Any as _Any, Dict as _Dict, Sized as _Sized, Mapping as _Mapping,
-                    Optional as _Optional, Generator as _Generator)
+from typing import (Any as _Any, Dict as _Dict, Mapping as _Mapping,
+                    Optional as _Optional, Sequence as _Sequence,
+                    Generator as _Generator)
 
 from log21.Colors import get_colors as _gc
 
@@ -645,7 +646,7 @@ class PrettyPrinter(_PrettyPrinter):
 
     def _format_dict_items(
         self,
-        items: _Sized[tuple[_Any, _Any]],
+        items: _Sequence[tuple[_Any, _Any]],
         stream,  # noqa: ANN001
         indent: int,
         allowance: int,
@@ -675,7 +676,7 @@ class PrettyPrinter(_PrettyPrinter):
 
     def _format_namespace_items(
         self,
-        items: _Sized[tuple[_Any, _Any]],
+        items: _Sequence[tuple[_Any, _Any]],
         stream,  # noqa: ANN001
         indent: int,
         allowance: int,
@@ -708,13 +709,13 @@ class PrettyPrinter(_PrettyPrinter):
 
     def _format_items(
         self,
-        items: _Sized[tuple[_Any, _Any]],
+        items: _Sequence[tuple[_Any, _Any]],
         stream,  # noqa: ANN001
         indent: int,
         allowance: int,
         context,  # noqa: ANN001
         level  # noqa: ANN001
-    ) -> None:
+    ) -> None:  # ty: ignore[invalid-method-override]
         write = stream.write
         indent += self._indent_per_level
         if self._indent_per_level > 1:
