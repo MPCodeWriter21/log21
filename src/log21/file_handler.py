@@ -1,25 +1,28 @@
-# log21.FileHandler.py
+# log21.file_handler.py
 # CodeWriter21
 
+from typing import Optional as _Optional
 from logging import FileHandler as _FileHandler
 
-from log21.Formatters import DecolorizingFormatter as _DecolorizingFormatter
+from log21.formatters import DecolorizingFormatter as _DecolorizingFormatter
+
+# ruff: noqa: ANN001
 
 
 class FileHandler(_FileHandler):
-    """A subclass of logging.FileHandler that allows you to specify a
-    formatter and a level when you initialize it."""
+    """A subclass of logging.FileHandler that allows you to specify a formatter and a
+    level when you initialize it."""
 
     def __init__(
         self,
         filename,
-        mode='a',
-        encoding=None,
-        delay=False,
+        mode: str = 'a',
+        encoding: _Optional[str] = None,
+        delay: bool = False,
         errors=None,
         formatter=None,
         level=None
-    ):
+    ) -> None:
         """Initialize the handler.
 
         :param filename: The filename of the log file.
@@ -42,7 +45,7 @@ class DecolorizingFileHandler(FileHandler):
     writing them to the file."""
     terminator = ''
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         """Emit a record."""
         if self.stream is None:
             self.stream = self._open()

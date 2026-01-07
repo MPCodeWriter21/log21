@@ -1,15 +1,22 @@
-# log21.ProgressBar.py
+# log21.progressbar.py
 # CodeWriter21
+
+# yapf: disable
 
 from __future__ import annotations
 
 import shutil as _shutil
-from typing import Any as _Any, Mapping as _Mapping, Optional as _Optional
+from typing import (TYPE_CHECKING as _TYPE_CHECKING, Any as _Any, Mapping as _Mapping,
+                    Optional as _Optional)
 
-import log21 as _log21
-from log21.Colors import get_colors as _gc
-from log21.Logger import Logger as _Logger
-from log21.StreamHandler import ColorizingStreamHandler as _ColorizingStreamHandler
+from log21.colors import get_colors as _gc
+from log21.logger import Logger as _Logger
+from log21.stream_handler import ColorizingStreamHandler as _ColorizingStreamHandler
+
+if _TYPE_CHECKING:
+    import log21 as _log21
+
+# yapf: enable
 
 _logger = _Logger('ProgressBar')
 _logger.addHandler(_ColorizingStreamHandler())
@@ -41,7 +48,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         >>>
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0915
         self,
         *,
         width: _Optional[int] = None,
@@ -57,7 +64,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         no_color: bool = False,
         logger: _log21.Logger = _logger,
         additional_variables: _Optional[_Mapping[str, _Any]] = None
-    ):  # pylint: disable=too-many-branches, too-many-statements
+    ) -> None:  # pylint: disable=too-many-branches, too-many-statements
         """
         :param args: Prevents the use of positional arguments
         :param width: The width of the progress bar
@@ -300,7 +307,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
             )
         raise ValueError('`style` must be either `%` or `{`')
 
-    def progress_failed(self, progress: float, total: float, **kwargs):
+    def progress_failed(self, progress: float, total: float, **kwargs) -> str:
         """Returns a progress bar with a failed state.
 
         :param progress: The current progress.
@@ -328,10 +335,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         else:
             raise ValueError('`style` must be either `%` or `{`')
 
-        if progress > total:
-            bar_char = self.fill
-        else:
-            bar_char = self.empty
+        bar_char = self.fill if progress > total else self.empty
 
         progress_dict = {
             'prefix':
@@ -368,7 +372,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         total: float,
         logger: _Optional[_log21.Logger] = None,
         **kwargs
-    ):
+    ) -> None:
         if not logger:
             logger = self.logger
 
@@ -380,7 +384,7 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         total: float,
         logger: _Optional[_log21.Logger] = None,
         **kwargs
-    ):
+    ) -> None:
         """Update the progress bar.
 
         :param progress: The current progress.

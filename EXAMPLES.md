@@ -424,7 +424,7 @@ def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: i
     :param quiet: Make the script quiet
     """
     if verbose and quiet:
-        raise log21.IncompatibleArguments(
+        raise log21.IncompatibleArgumentsError(
             '--verbose',
             '--quiet',
             message="You can not make the script quiet and except it to be more verbose!"

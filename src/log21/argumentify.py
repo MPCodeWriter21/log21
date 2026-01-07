@@ -1,4 +1,4 @@
-# log21.Argparse.py
+# log21.argumentify.py
 # CodeWriter21
 
 # yapf: disable
@@ -15,7 +15,7 @@ from dataclasses import field as _field, dataclass as _dataclass
 
 from docstring_parser import Docstring as _Docstring, parse as _parse
 
-import log21.Argparse as _Argparse
+import log21.argparse as _argparse
 
 # yapf: enable
 
@@ -23,7 +23,7 @@ __all__ = [
     'argumentify', 'ArgumentifyError', 'ArgumentTypeError', 'FlagGenerationError',
     'RESERVED_FLAGS', 'Callable', 'Argument', 'FunctionInfo', 'generate_flag',
     'normalize_name', 'normalize_name_to_snake_case', 'ArgumentError',
-    'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
+    'IncompatibleArgumentsError', 'RequiredArgumentError', 'TooFewArgumentsError'
 ]
 
 Callable = _Union[_Callable[..., _Any], _Callable[..., _Coroutine[_Any, _Any, _Any]]]
@@ -41,8 +41,10 @@ class ArgumentTypeError(ArgumentifyError, TypeError):
     """
 
     def __init__(
-        self, message: _Optional[str] = None, unsupported_arg: _Optional[str] = None
-    ):
+        self,
+        message: _Optional[str] = None,
+        unsupported_arg: _Optional[str] = None
+    ) -> None:
         """Initialize the exception.
 
         :param message: The message to display.
@@ -63,7 +65,9 @@ class FlagGenerationError(ArgumentifyError, RuntimeError):
     Most likely raised when there are arguments with the same name.
     """
 
-    def __init__(self, message: _Optional[str] = None, arg_name: _Optional[str] = None):
+    def __init__(
+        self, message: _Optional[str] = None, arg_name: _Optional[str] = None
+    ) -> None:
         """Initialize the exception.
 
         :param message: The message to display.
@@ -84,84 +88,80 @@ class FlagGenerationError(ArgumentifyError, RuntimeError):
 class ArgumentError(ArgumentifyError):
     """Base of errors to raise in the argumentified functions to raise parser errors."""
 
-    def __init__(self, *args, message: _Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None) -> None:
         """Initialize the exception.
 
         :param args: The arguments that have a problem.
         :param message: The error message to show.
         """
-        if message is None:
-            if args:
-                if len(args) > 1:
-                    message = "There is a problem with the arguments: " + ', '.join(
-                        f"`{arg}`" for arg in args
-                    )
-                else:
-                    message = "The argument `" + args[0] + "` is invalid."
+        if message is None and args:
+            if len(args) > 1:
+                message = "There is a problem with the arguments: " + ', '.join(
+                    f"`{arg}`" for arg in args
+                )
+            else:
+                message = "The argument `" + args[0] + "` is invalid."
         self.message = message
         self.arguments = args
 
 
-class IncompatibleArguments(ArgumentError):
+class IncompatibleArgumentsError(ArgumentError):
     """Raise when the user has used arguments that are incompatible with each other."""
 
-    def __init__(self, *args, message: _Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None) -> None:
         """Initialize the exception.
 
         :param args: The arguments that are incompatible.
         :param message: The error message to show.
         """
         super().__init__(*args, message)
-        if message is None:
-            if args:
-                if len(args) > 1:
-                    message = "You cannot use all these together: " + ', '.join(
-                        f"`{arg}`" for arg in args
-                    )
-                else:
-                    message = "The argument `" + args[0] + "` is not compatible."
+        if message is None and args:
+            if len(args) > 1:
+                message = "You cannot use all these together: " + ', '.join(
+                    f"`{arg}`" for arg in args
+                )
+            else:
+                message = "The argument `" + args[0] + "` is not compatible."
         self.message = message
 
 
-class RequiredArgument(ArgumentError):
+class RequiredArgumentError(ArgumentError):
     """Raise this when there is a required argument missing."""
 
-    def __init__(self, *args, message: _Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None) -> None:
         """Initialize the exception.
 
         :param args: The arguments that are required.
         :param message: The error message to show.
         """
         super().__init__(*args, message)
-        if message is None:
-            if args:
-                if len(args) > 1:
-                    message = "These arguments are required: " + ', '.join(
-                        f"`{arg}`" for arg in args
-                    )
-                else:
-                    message = "The argument `" + args[0] + "` is required."
+        if message is None and args:
+            if len(args) > 1:
+                message = "These arguments are required: " + ', '.join(
+                    f"`{arg}`" for arg in args
+                )
+            else:
+                message = "The argument `" + args[0] + "` is required."
         self.message = message
 
 
-class TooFewArguments(ArgumentError):
+class TooFewArgumentsError(ArgumentError):
     """Raise this when there were not enough arguments passed."""
 
-    def __init__(self, *args, message: _Optional[str] = None):
+    def __init__(self, *args, message: _Optional[str] = None) -> None:
         """Initialize the exception.
 
         :param args: The arguments that should be passed.
         :param message: The error message to show.
         """
         super().__init__(*args, message)
-        if message is None:
-            if args:
-                if len(args) > 1:
-                    message = "You should use these arguments: " + ', '.join(
-                        f"`{arg}`" for arg in args
-                    )
-                else:
-                    message = "The argument `" + args[0] + "` should be used."
+        if message is None and args:
+            if len(args) > 1:
+                message = "You should use these arguments: " + ', '.join(
+                    f"`{arg}`" for arg in args
+                )
+            else:
+                message = "The argument `" + args[0] + "` should be used."
         self.message = message
 
 
@@ -227,7 +227,7 @@ class Argument:
     default: _Any = _inspect._empty
     help: _Optional[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Sets the some values to None if they are empty."""
         if self.annotation == _inspect._empty:
             self.annotation = None
@@ -242,9 +242,9 @@ class FunctionInfo:
     name: str = _field(init=False)
     arguments: _OrderedDict[str, Argument] = _field(init=False)
     docstring: _Docstring = _field(init=False)
-    parser: _Argparse.ColorizingArgumentParser = _field(init=False)
+    parser: _argparse.ColorizingArgumentParser = _field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = normalize_name_to_snake_case(
             self.function.__init__.__name__
         ) if isinstance(self.function,
@@ -332,7 +332,7 @@ def generate_flag(  # pylint: disable=too-many-branches
 
 
 def _add_arguments(
-    parser: _Union[_Argparse.ColorizingArgumentParser, _Argparse._ArgumentGroup],
+    parser: _Union[_argparse.ColorizingArgumentParser, _argparse._ArgumentGroup],
     info: FunctionInfo,
     reserved_flags: _Optional[_Set[str]] = None
 ) -> None:
@@ -351,7 +351,7 @@ def _add_arguments(
             'dest': argument.name,
             'help': argument.help
         }
-        if argument.annotation == bool:
+        if argument.annotation is bool:
             config['action'] = 'store_true'
         elif argument.annotation:
             config['type'] = argument.annotation
@@ -366,7 +366,7 @@ def _add_arguments(
         )
 
 
-def _argumentify_one(func: Callable):
+def _argumentify_one(func: Callable) -> None:
     """This function argumentifies one function as the entry point of the script.
 
     :param function: The function to argumentify.
@@ -384,7 +384,7 @@ def _argumentify_one(func: Callable):
             )
 
     # Create the parser
-    parser = _Argparse.ColorizingArgumentParser(
+    parser = _argparse.ColorizingArgumentParser(
         description=info.docstring.short_description
     )
     # Add the arguments
@@ -409,7 +409,7 @@ def _argumentify_one(func: Callable):
         parser.error(error.message)
 
 
-def _argumentify(functions: _Dict[str, Callable]):
+def _argumentify(functions: _Dict[str, Callable]) -> None:
     """This function argumentifies one or more functions as the entry point of the
     script.
 
@@ -429,7 +429,7 @@ def _argumentify(functions: _Dict[str, Callable]):
                     "which is not supported.",
                     unsupported_arg=argument.name
                 )
-    parser = _Argparse.ColorizingArgumentParser()
+    parser = _argparse.ColorizingArgumentParser()
     subparsers = parser.add_subparsers(required=True)
     for name, (_, info) in functions_info.items():
         subparser = subparsers.add_parser(name, help=info.docstring.short_description)
@@ -439,7 +439,7 @@ def _argumentify(functions: _Dict[str, Callable]):
     args = []
     kwargs = {}
     info = None
-    for name, (function, info) in functions_info.items():
+    for name, (function, info) in functions_info.items():  # noqa: B007
         if function == cli_args.func:
             break
     else:
@@ -461,7 +461,9 @@ def _argumentify(functions: _Dict[str, Callable]):
         parser.error(error.message)
 
 
-def argumentify(entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]):
+def argumentify(
+    entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]
+) -> _Callable:
     """This function argumentifies one or more functions as the entry point of the
     script.
 

@@ -93,7 +93,7 @@ Change in README.md.
 
 ### 2.6.1
 
-+ Added `encoding` to `log21.CrashReporter.FileReporter`.
++ Added `encoding` to `log21.crash_reporter.FileReporter`.
 + Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
 + Added optional `dev` dependencies to `pyproject.toml`.
 + Improved overall code quality.
@@ -144,7 +144,7 @@ functions more general and less strict.
 
 ### 2.4.7
 
-Added `extra_values` argument to `CrashReporter.Formatter` which will let you pass extra
+Added `extra_values` argument to `crash_reporter.Formatter` which will let you pass extra
 static or dynamic values to the report formatter.
 They can be used in the format string. For dynamic values you can pass a function that
 takes no arguments as the value.
@@ -157,10 +157,10 @@ Shortened the usage syntax for the CrashReporters:
 import log21
 
 # Define a ConsoleReporter object
-console_reporter = log21.CrashReporter.ConsoleReporter()
+console_reporter = log21.crash_reporter.ConsoleReporter()
 
 
-# This works with other `log21.CrashReporter.Reporter` subclasses as well.
+# This works with other `log21.crash_reporter.reporter` subclasses as well.
 
 # Old syntax (still supported)
 @console_reporter.reporter
@@ -295,7 +295,7 @@ Added CrashReporter!
 
 You can use Reporter classes to monitor your program and send crash reports to the
 developer. It can help you fix the bugs and improve your program before your users get
-upset about it. See some examples in the [log21/CrashReporter/Reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
+upset about it. See some examples in the [log21/crash\_reporter/reporters.py](https://github.com/MPCodeWriter21/log21/blob/master/log21/CrashReporter/Reporters.py)
 file.
 
 ### 2.1.8

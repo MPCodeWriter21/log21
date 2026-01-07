@@ -1,4 +1,4 @@
-# log21.Formatters.py
+# log21.formatters.py
 # CodeWriter21
 
 # yapf: disable
@@ -8,8 +8,8 @@ from typing import (Dict as _Dict, Tuple as _Tuple, Literal as _Literal,
                     Mapping as _Mapping, Optional as _Optional)
 from logging import Formatter as __Formatter
 
-from log21.Colors import get_colors as _gc, ansi_escape
-from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
+from log21.colors import get_colors as _gc, ansi_escape
+from log21.levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
 
 # yapf: enable
 
@@ -73,12 +73,12 @@ class _Formatter(__Formatter):
                 self.level_names[level] = name
 
     @property
-    def level_names(self):
+    def level_names(self) -> _Dict[int, str]:
         """Get the level names mapping."""
         return self._level_names
 
     @level_names.setter
-    def level_names(self, level_names: _Mapping[int, str]):
+    def level_names(self, level_names: _Mapping[int, str]) -> None:
         if level_names:
             if not isinstance(level_names, _Mapping):
                 raise TypeError(
@@ -88,7 +88,7 @@ class _Formatter(__Formatter):
         else:
             self._level_names = {}
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         record.message = record.getMessage()
         if self.usesTime():
             record.asctime = self.formatTime(record, self.datefmt)
@@ -96,9 +96,8 @@ class _Formatter(__Formatter):
         record.levelname = self.level_names.get(record.levelno, 'NOTSET')
 
         s = self.formatMessage(record)  # pylint: disable=invalid-name
-        if record.exc_info:
-            if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
             if s[-1:] != "\n":
                 s = s + "\n"
@@ -200,7 +199,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
                 raise TypeError('`message_color` must be a tuple!')
             self.message_color = message_color
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         """Colorizes the record and returns the formatted message."""
         record.message = record.getMessage()
         if self.usesTime():
@@ -225,7 +224,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
             s = s + self.formatStack(record.stack_info)
         return s
 
-    def colorize(self, record):
+    def colorize(self, record):  # noqa: ANN001, ANN201
         """Colorizes the record attributes.
 
         :param record:
@@ -260,7 +259,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
 class DecolorizingFormatter(_Formatter):
     """Formatter that removes color codes from the log records."""
 
-    def formatTime(self, record, datefmt=None):
+    def formatTime(self, record, datefmt=None) -> str:  # noqa: ANN001
         """Returns the creation time of the specified LogRecord as formatted text."""
         ct = self.converter(int(record.created))
         if datefmt:
@@ -270,7 +269,7 @@ class DecolorizingFormatter(_Formatter):
             s = self.default_msec_format % (t, record.msecs)
         return s
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         """Decolorizes the record and returns the formatted message.
 
         :param record:
@@ -279,7 +278,7 @@ class DecolorizingFormatter(_Formatter):
         return self.decolorize(super().format(record))
 
     @staticmethod
-    def decolorize(text: str):
+    def decolorize(text: str) -> str:
         """Removes all ansi colors in the text.
 
         :param text: str: Input text

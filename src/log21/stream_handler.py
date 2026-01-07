@@ -1,4 +1,4 @@
-# log21.StreamHandler.py
+# log21.stream_handler.py
 # CodeWriter21
 
 # yapf: disable
@@ -9,7 +9,7 @@ import shutil as _shutil
 from typing import Optional as _Optional
 from logging import StreamHandler as _StreamHandler
 
-from log21.Colors import (get_colors as _gc, hex_escape as _hex_escape,
+from log21.colors import (get_colors as _gc, hex_escape as _hex_escape,
                           ansi_escape as _ansi_escape)
 
 # yapf: enable
@@ -20,6 +20,8 @@ IS_WINDOWS = _os.name == 'nt'
 
 if IS_WINDOWS:
     import ctypes
+
+# ruff: noqa: ANN001
 
 
 class StreamHandler(_StreamHandler):
@@ -50,7 +52,7 @@ class StreamHandler(_StreamHandler):
         if level is not None:
             self.setLevel(level)
 
-    def check_cr(self, record):
+    def check_cr(self, record) -> None:
         """Check if the record contains a carriage return and handle it."""
         if record.msg:
             msg = _hex_escape.sub(
@@ -74,7 +76,7 @@ class StreamHandler(_StreamHandler):
                         record.msg = _gc(*find.split(record.msg[:index])
                                          ) + record.msg[index + 1:]
 
-    def check_nl(self, record):
+    def check_nl(self, record) -> None:
         """Check if the record contains a newline and handle it."""
         while record.msg and record.msg[0] == '\n':
             file_descriptor = getattr(self.stream, 'fileno', None)
@@ -84,14 +86,14 @@ class StreamHandler(_StreamHandler):
                     self.stream.write('\n')
                     record.msg = record.msg[1:]
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         if self.HandleCR:
             self.check_cr(record)
         if self.HandleNL:
             self.check_nl(record)
         super().emit(record)
 
-    def clear_line(self, length: _Optional[int] = None):
+    def clear_line(self, length: _Optional[int] = None) -> None:
         """Clear the current line.
 
         :param length: The length of the line to clear.
@@ -110,7 +112,7 @@ class StreamHandler(_StreamHandler):
 class ColorizingStreamHandler(StreamHandler):
     """A stream handler that supports colorizing even in Windows."""
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         try:
             if self.HandleCR:
                 self.check_cr(record)
@@ -128,7 +130,7 @@ class ColorizingStreamHandler(StreamHandler):
             self.handleError(record)
 
     # Writes colorized text to the Windows console.
-    def convert_and_write(self, message):
+    def convert_and_write(self, message) -> None:
         """Convert the message to a Windows console colorized message and write it to
         the stream."""
         nt_color_map = {
@@ -200,7 +202,7 @@ class ColorizingStreamHandler(StreamHandler):
                     ctypes.windll.kernel32.SetConsoleTextAttribute(win_handle, color)
 
     # Writes the message to the console.
-    def write(self, message):
+    def write(self, message) -> None:
         """Write the message to the stream."""
         self.stream.write(message)
         self.flush()

@@ -1,4 +1,4 @@
-# log21.Levels.py
+# log21.levels.py
 # CodeWriter21
 
 import logging as _logging

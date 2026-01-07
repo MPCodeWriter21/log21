@@ -1,5 +1,7 @@
-# log21.LoggingWindow.py
+# log21.logging_window.py
 # CodeWriter2
+
+# yapf: disable
 
 from __future__ import annotations
 
@@ -10,14 +12,20 @@ from enum import Enum as _Enum
 from time import sleep as _sleep
 from uuid import uuid4 as _uuid4
 from string import printable as _printable
-from typing import Union as _Union
+from typing import (TYPE_CHECKING as _TYPE_CHECKING, Union as _Union,
+                    Optional as _Optional)
 from logging import FileHandler as _FileHandler
 from argparse import Namespace as _Namespace
 
-from log21.Colors import hex_escape as _hex_escape, ansi_escape as _ansi_escape
-from log21.Levels import NOTSET as _NOTSET
-from log21.Logger import Logger as _Logger
-from log21.StreamHandler import StreamHandler as _StreamHandler
+from log21.colors import hex_escape as _hex_escape, ansi_escape as _ansi_escape
+from log21.levels import NOTSET as _NOTSET
+from log21.logger import Logger as _Logger
+from log21.stream_handler import StreamHandler as _StreamHandler
+
+if _TYPE_CHECKING:
+    import log21 as _log21
+
+# yapf: enable
 
 __all__ = ['LoggingWindow', 'LoggingWindowHandler']
 
@@ -84,12 +92,11 @@ class LoggingWindowHandler(_StreamHandler):
         logging_window: LoggingWindow,
         handle_carriage_return: bool = True,
         handle_new_line: bool = True
-    ):
+    ) -> None:
         """Initialize the LoggingWindowHandler.
 
         :param logging_window: The LoggingWindow to log to.
-        :param handle_carriage_return: Whether to handle carriage
-            returns.
+        :param handle_carriage_return: Whether to handle carriage returns.
         :param handle_new_line: Whether to handle new lines.
         """
         self.HandleCR = handle_carriage_return
@@ -98,7 +105,7 @@ class LoggingWindowHandler(_StreamHandler):
         self.LoggingWindow = logging_window  # pylint: disable=invalid-name
         super().__init__(stream=None)
 
-    def emit(self, record):
+    def emit(self, record) -> None:  # noqa: ANN001
         try:
             if self.HandleCR:
                 self.check_cr(record)
@@ -110,7 +117,7 @@ class LoggingWindowHandler(_StreamHandler):
         except Exception:  # pylint: disable=broad-except
             self.handleError(record)
 
-    def write(self, message):  # pylint: disable=too-many-branches
+    def write(self, message: str) -> None:  # pylint: disable=too-many-branches
         """Write a message to the LoggingWindow.
 
         :param message: The message to write.
@@ -125,15 +132,14 @@ class LoggingWindowHandler(_StreamHandler):
             while parts:
                 part = parts.pop(0)
 
-                if self.__carriage_return:
-                    # Checks if the part is printable
-                    if any((char in _printable[:-6])
-                           for char in _hex_escape.sub('', _ansi_escape.sub('', part))):
-                        # Removes the last line
-                        self.LoggingWindow.logs.delete('end - 1 lines', _tkinter.END)
-                        if self.LoggingWindow.logs.count('0.0', 'end')[0] != 1:
-                            self.LoggingWindow.logs.insert('end', '\n')
-                        self.__carriage_return = False
+                if self.__carriage_return and any(
+                    (char in _printable[:-6])
+                        for char in _hex_escape.sub('', _ansi_escape.sub('', part))):
+                    # Removes the last line
+                    self.LoggingWindow.logs.delete('end - 1 lines', _tkinter.END)
+                    if self.LoggingWindow.logs.count('0.0', 'end')[0] != 1:
+                        self.LoggingWindow.logs.insert('end', '\n')
+                    self.__carriage_return = False
 
                 tags = []
                 # Handles ANSI color codes
@@ -259,29 +265,29 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
 
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0915
         self,
-        name,
-        level=_NOTSET,
+        name: str,
+        level: _Union[int, str] = _NOTSET,
         width: int = 80,
         height: int = 20,
-        default_foreground_color='white',
-        default_background_color='black',
-        font=('Courier', 10),
+        default_foreground_color: str = 'white',
+        default_background_color: str = 'black',
+        font: tuple = ('Courier', 10),
         allow_python: bool = False,
         allow_shell: bool = False,
         command_history_buffer_size: int = 100
-    ):  # pylint: disable=too-many-statements
+    ) -> None:  # pylint: disable=too-many-statements
         """Creates a new LoggingWindow object.
 
         :param name: The name of the logger.
         :param level: The level of the logger.
         :param width: The width of the LoggingWindow.
         :param height: The height of the LoggingWindow.
-        :param default_foreground_color: The default foreground color of
-            the LoggingWindow.
-        :param default_background_color: The default background color of
-            the LoggingWindow.
+        :param default_foreground_color: The default foreground color of the
+            LoggingWindow.
+        :param default_background_color: The default background color of the
+            LoggingWindow.
         :param font: The font of the LoggingWindow.
         """
         super().__init__(name, level)
@@ -365,23 +371,23 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.window.bind('<<SetWidth>>', self.__set_width)
         self.window.bind('<<SetHeight>>', self.__set_height)
 
-    def addHandler(self, hdlr: _Union[_FileHandler, LoggingWindowHandler]):
-        if not isinstance(hdlr, LoggingWindowHandler, _FileHandler):
+    def addHandler(self, hdlr: _Union[_FileHandler, LoggingWindowHandler]) -> None:
+        if not isinstance(hdlr, (LoggingWindowHandler, _FileHandler)):
             raise TypeError("Handler must be a FileHandler or LoggingWindowHandler")
         super().addHandler(hdlr)
 
-    def __hide(self, _):
+    def __hide(self, _) -> None:  # noqa: ANN001
         self.window.withdraw()
 
-    def __show(self, _):
+    def __show(self, _) -> None:  # noqa: ANN001
         self.window.deiconify()
 
-    def __clear(self, _):
+    def __clear(self, _) -> None:  # noqa: ANN001
         self.logs.config(state=_tkinter.NORMAL)
         self.logs.delete('1.0', _tkinter.END)
         self.logs.config(state=_tkinter.DISABLED)
 
-    def __log(self, event):
+    def __log(self, event) -> None:  # noqa: ANN001
         data = event.data
         if self.getting_input_status == GettingInputStatus.GETTING_INPUT:
             raise RuntimeError(
@@ -393,7 +399,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             data.stacklevel
         )
 
-    def __input(self, event):
+    def __input(self, event) -> None:  # noqa: ANN001
         data = event.data
         msg = ' '.join([str(m) for m in data.msg]) + data.end
         self._log(
@@ -420,7 +426,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 raise CancelledInputError('Input cancelled!')
             data.output = ''
 
-    def __type_input(self, event):
+    def __type_input(self, event) -> None:  # noqa: ANN001
         data = event.data
         if (self.getting_input_status
                 != GettingInputStatus.GETTING_INPUT) and data.wait <= 0:
@@ -438,7 +444,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.logs.config(state=_tkinter.DISABLED)
         self.cursor_position = len(self.input_text) - 1
 
-    def __getpass(self, event):
+    def __getpass(self, event) -> None:  # noqa: ANN001
         data = event.data
         msg = ' '.join([str(m) for m in data.msg]) + data.end
         self._log(
@@ -459,21 +465,21 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             self.getting_pass = False
         data.output = self.input_text
 
-    def hide(self):
+    def hide(self) -> None:
         """Hides the LoggingWindow.
 
         :return:
         """
         self.window.event_generate('<<hide>>')
 
-    def show(self):
+    def show(self) -> None:
         """Shows the LoggingWindow.
 
         :return:
         """
         self.window.event_generate('<<show>>')
 
-    def clear(self):
+    def clear(self) -> None:
         """Clears the LoggingWindow.
 
         :return:
@@ -482,14 +488,14 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
 
     def _log(
         self,
-        level,
-        msg,
-        args,
-        exc_info=None,
-        extra=None,
-        stack_info=False,
-        stacklevel=1
-    ):
+        level: int,
+        msg: str,
+        args: tuple,
+        exc_info: _Optional[bool] = None,
+        extra=None,  # noqa: ANN001
+        stack_info: bool = False,
+        stacklevel: int = 1
+    ) -> None:
         _lock.acquire()
         self.window.event_generate(
             '<<log>>',
@@ -510,7 +516,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self,
         *msg,
         args: tuple = (),
-        end='',
+        end: str = '',
         raise_error: str = False,
         **kwargs
     ) -> str:
@@ -519,8 +525,8 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         :param msg: The message to print.
         :param args: The arguments to pass to the message.
         :param end: The end of the message.
-        :param raise_error: If True, raises an error instead of
-            returning an empty string.
+        :param raise_error: If True, raises an error instead of returning an empty
+            string.
         :param kwargs:
         :return: The input.
         """
@@ -545,20 +551,18 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         self.getting_input_status = GettingInputStatus.CANCELLED
         return self.input_text
 
-    def type_input(self, text: str, wait: _Union[int, float, bool] = False):
-        """Types some text as a part of the input that the user can edit and
-        enter.
+    def type_input(self, text: str, wait: _Union[int, float, bool] = False) -> None:
+        """Types some text as a part of the input that the user can edit and enter.
 
         :param text: The text to type for the user
-        :param wait: Wait until the input function is called and then
-            type the text
+        :param wait: Wait until the input function is called and then type the text
         :return:
         """
         self.window.event_generate(
             '<<type input>>', when='tail', data=_Namespace(text=text, wait=wait)
         )
 
-    def getpass(self, *msg, args: tuple = (), end='', **kwargs) -> str:
+    def getpass(self, *msg, args: tuple = (), end: str = '', **kwargs) -> str:
         """Prints a message and waits for input.
 
         :param msg: The message to print.
@@ -573,7 +577,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         _lock.release()
         return data.output
 
-    def key_press(self, event):  # pylint: disable=too-many-branches
+    def key_press(self, event) -> None:  # pylint: disable=too-many-branches  # noqa: ANN001
         """KeyPress event callback for self.logs."""
         if (self.getting_input_status == GettingInputStatus.GETTING_INPUT
                 or self.getting_pass):
@@ -623,7 +627,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 self.logs.config(state=_tkinter.DISABLED)
                 self.cursor_position += 1
 
-    def execute_command(self, _):
+    def execute_command(self, _) -> None:  # noqa: ANN001
         """Executes the command in self.command_entry."""
         command = self.command_entry.get()
         self.command_entry.delete(0, _tkinter.END)
@@ -671,7 +675,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 self.error(ex)
         self.command_history_index = len(self.command_history)
 
-    def history_up(self, _):
+    def history_up(self, _) -> None:  # noqa: ANN001
         """Moves up the command history."""
         _lock.acquire()
         if self.command_history_index > 0:
@@ -682,7 +686,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             )
         _lock.release()
 
-    def history_down(self, _):
+    def history_down(self, _) -> None:  # noqa: ANN001
         """Moves down the command history."""
         _lock.acquire()
         if self.command_history_index < len(self.command_history) - 1:
@@ -695,7 +699,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
             self.command_entry.delete(0, _tkinter.END)
         _lock.release()
 
-    def __set_allow_python(self, event):
+    def __set_allow_python(self, event) -> None:  # noqa: ANN001
         """Sets the allow_python attribute."""
         self.__allow_python = event.data
         # Hides the command entry if allow_python and allow_shell are False
@@ -705,7 +709,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         else:
             self.command_entry.grid(row=1, column=0, sticky='nsew')
 
-    def __set_allow_shell(self, event):
+    def __set_allow_shell(self, event) -> None:  # noqa: ANN001
         """Sets the allow_shell attribute."""
         self.__allow_shell = event.data
         # Hides the command entry if allow_python and allow_shell are False
@@ -715,7 +719,7 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
         else:
             self.command_entry.grid(row=1, column=0, sticky='nsew')
 
-    def __set_cursor_position(self, event):
+    def __set_cursor_position(self, event) -> None:  # noqa: ANN001
         """Sets the cursor_position attribute."""
         new_value = self.cursor_position != event.data
 
@@ -752,108 +756,108 @@ class LoggingWindow(_Logger):  # pylint: disable=too-many-instance-attributes
                 foreground=self.default_background_color
             )
 
-    def __set_default_foreground_color(self, event):
+    def __set_default_foreground_color(self, event) -> None:  # noqa: ANN001
         """Sets the default_foreground_color attribute."""
         self._default_foreground_color = event.data
         self.logs.config(foreground=event.data)
 
-    def __set_default_background_color(self, event):
+    def __set_default_background_color(self, event) -> None:  # noqa: ANN001
         """Sets the default_background_color attribute."""
         self._default_background_color = event.data
         self.logs.config(background=event.data)
 
-    def __set_font(self, event):
+    def __set_font(self, event) -> None:  # noqa: ANN001
         """Sets the font attribute."""
         self.logs.config(font=event.data)
 
-    def __set_width(self, event):
+    def __set_width(self, event) -> None:  # noqa: ANN001
         """Sets the width attribute."""
         self.logs.config(width=event.data)
 
-    def __set_height(self, event):
+    def __set_height(self, event) -> None:  # noqa: ANN001
         """Sets the height attribute."""
         self.logs.config(height=event.data)
 
     @property
-    def allow_python(self):
+    def allow_python(self) -> bool:
         return self.__allow_python
 
     @allow_python.setter
-    def allow_python(self, value):
+    def allow_python(self, value: bool) -> None:
         raise NotImplementedError('Python commands are not supported yet!')
         self.window.event_generate('<<SetAllowPython>>', when='tail', data=value)
 
     @property
-    def allow_shell(self):
+    def allow_shell(self) -> bool:
         return self.__allow_shell
 
     @allow_shell.setter
-    def allow_shell(self, value):
+    def allow_shell(self, value: bool) -> None:
         self.window.event_generate('<<SetAllowShell>>', when='tail', data=value)
 
     @property
-    def cursor_position(self):
+    def cursor_position(self) -> _Optional[int]:
         return self._cursor_position
 
     @cursor_position.setter
-    def cursor_position(self, value):
+    def cursor_position(self, value: int) -> None:
         self.window.event_generate('<<SetCursorPosition>>', when='tail', data=value)
 
     @property
-    def default_foreground_color(self):
+    def default_foreground_color(self):  # noqa: ANN201
         return self._default_foreground_color
 
     @default_foreground_color.setter
-    def default_foreground_color(self, value):
+    def default_foreground_color(self, value) -> None:  # noqa: ANN001
         self.window.event_generate(
             '<<SetDefaultForegroundColor>>', when='tail', data=value
         )
 
     @property
-    def default_background_color(self):
+    def default_background_color(self):  # noqa: ANN201
         return self._default_background_color
 
     @default_background_color.setter
-    def default_background_color(self, value):
+    def default_background_color(self, value) -> None:  # noqa: ANN001
         self.window.event_generate(
             '<<SetDefaultBackgroundColor>>', when='tail', data=value
         )
 
     @property
-    def font(self):
+    def font(self):  # noqa: ANN201
         return self.logs.config()['font']
 
     @font.setter
-    def font(self, value):
+    def font(self, value) -> None:  # noqa: ANN001
         self.window.event_generate('<<SetFont>>', when='tail', data=value)
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self.logs.config()['width'][-1]
 
     @width.setter
-    def width(self, value):
+    def width(self, value: int) -> None:
         self.window.event_generate('<<SetWidth>>', when='tail', data=value)
 
     @property
-    def height(self):
+    def height(self) -> int:
         return self.logs.config()['height'][-1]
 
     @height.setter
-    def height(self, value):
+    def height(self, value: int) -> None:
         self.window.event_generate('<<SetHeight>>', when='tail', data=value)
 
     @property
-    def progress_bar(self):
+    def progress_bar(self) -> '_log21.ProgressBar':
         if not self._progress_bar:
             # Import here to avoid circular import
             # pylint: disable=import-outside-toplevel
-            from log21.ProgressBar import ProgressBar
+            from log21.progressbar import ProgressBar  # noqa: PLC0415
             self._progress_bar = ProgressBar(logger=self, width=self.width)
         self.window.update()
         return self._progress_bar
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.window.withdraw()
         self.window.destroy()
         del self.window
@@ -864,11 +868,11 @@ if not _tkinter:
     class LoggingWindow:  # pylint: disable=function-redefined
         """LoggingWindow requires tkinter to be installed."""
 
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args, **kwargs) -> None:
             raise ImportError('LoggingWindow requires tkinter to be installed.')
 
     class LoggingWindowHandler:  # pylint: disable=function-redefined
         """LoggingWindow requires tkinter to be installed."""
 
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args, **kwargs) -> None:
             raise ImportError('LoggingWindow requires tkinter to be installed.')

@@ -1,4 +1,4 @@
-# log21.CrashReporter.Reporters.py
+# log21.crash_reporter.reporters.py
 # CodeWriter21
 
 # yapf: disable
@@ -16,7 +16,7 @@ from email.mime.multipart import MIMEMultipart as _MIMEMultipart
 
 import log21 as _log21
 
-from .Formatters import (FILE_REPORTER_FORMAT as _FILE_REPORTER_FORMAT,
+from .formatters import (FILE_REPORTER_FORMAT as _FILE_REPORTER_FORMAT,
                          EMAIL_REPORTER_FORMAT as _EMAIL_REPORTER_FORMAT,
                          CONSOLE_REPORTER_FORMAT as _CONSOLE_REPORTER_FORMAT)
 
@@ -83,7 +83,7 @@ class Reporter:
         self,
         report_function: _Optional[_Callable[[BaseException], _Any]],
         raise_after_report: bool = False,
-        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        formatter: _Optional[_log21.crash_reporter.Formatter] = None,
         exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
         exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
     ) -> None:
@@ -102,7 +102,7 @@ class Reporter:
             exceptions_to_ignore
         ) if exceptions_to_ignore else None
 
-    def reporter(self, func):
+    def reporter(self, func: _Callable) -> _Callable:
         """It will wrap the function and call the report_function when an exception is
         raised.
 
@@ -114,10 +114,10 @@ class Reporter:
             self._exceptions_to_catch
         ) if self._exceptions_to_catch else BaseException
         exceptions_to_ignore = tuple(self._exceptions_to_ignore
-                                     ) if self._exceptions_to_ignore else tuple()
+                                     ) if self._exceptions_to_ignore else ()
 
         @_wraps(func)
-        def wrap(*args, **kwargs):
+        def wrap(*args, **kwargs) -> _Any:
             try:
                 return func(*args, **kwargs)
             except BaseException as e:
@@ -131,7 +131,7 @@ class Reporter:
 
         return wrap
 
-    def catch(self, exception: _Type[BaseException]):
+    def catch(self, exception: _Type[BaseException]) -> None:
         """Add an exception to the list of exceptions to catch.
 
         :param exception: Exception to catch.
@@ -145,7 +145,7 @@ class Reporter:
         else:
             raise ValueError('exception is already in the list of exceptions to catch')
 
-    def ignore(self, exception: _Type[BaseException]):
+    def ignore(self, exception: _Type[BaseException]) -> None:
         """Add an exception to the list of exceptions to ignore.
 
         :param exception: Exception to ignore.
@@ -159,7 +159,7 @@ class Reporter:
         else:
             raise ValueError('exception is already in the list of exceptions to ignore')
 
-    def __call__(self, func):
+    def __call__(self, func: _Callable) -> _Callable:
         return self.reporter(func)
 
 
@@ -190,13 +190,13 @@ class ConsoleReporter(Reporter):
         >>> RED = log21.get_color('Light Red')
         >>> YELLOW = log21.get_color('LIGHT YELLOW')
         >>> RESET = log21.get_color('reset')
-        >>> formatter = log21.CrashReporter.Formatter(
+        >>> formatter = log21.crash_reporter.Formatter(
         ...     format_='[' + BLUE + '%(asctime)s' + RESET + '] ' +
         ...             YELLOW + '%(function)s' + RED + ': ' +
         ...             RESET + 'Line ' + RED + '%(lineno)d: %(name)s:' +
         ...             RESET + ' %(message)s'
         ... )
-        >>> console_reporter = log21.CrashReporter.ConsoleReporter(formatter=formatter)
+        >>> console_reporter = log21.crash_reporter.ConsoleReporter(formatter=formatter)
         >>>
         >>> @console_reporter.reporter
         ... def divide(a, b):
@@ -213,11 +213,11 @@ class ConsoleReporter(Reporter):
     def __init__(
         self,
         raise_after_report: bool = False,
-        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        formatter: _Optional[_log21.crash_reporter.Formatter] = None,
         print_function: _Optional[_Callable] = print,
         exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
         exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
-    ):
+    ) -> None:
         """
         :param raise_after_report: If True, the exception will be raised after the
             report_function is called.
@@ -229,18 +229,18 @@ class ConsoleReporter(Reporter):
         )
 
         if formatter:
-            if isinstance(formatter, _log21.CrashReporter.Formatter):
+            if isinstance(formatter, _log21.crash_reporter.Formatter):
                 self.formatter = formatter
             else:
-                raise ValueError('formatter must be a log21.CrashReporter.Formatter')
+                raise ValueError('formatter must be a log21.crash_reporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+            self.formatter = _log21.crash_reporter.formatters.Formatter(
                 **_CONSOLE_REPORTER_FORMAT
             )
 
         self.print = print_function
 
-    def _report(self, exception: BaseException):
+    def _report(self, exception: BaseException) -> None:
         """Prints the exception to the console.
 
         :param exception: Exception to print.
@@ -259,17 +259,17 @@ class FileReporter(Reporter):
         file: _Union[str, _PathLike, _IO],
         encoding: str = 'utf-8',
         raise_after_report: bool = True,
-        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        formatter: _Optional[_log21.crash_reporter.Formatter] = None,
         exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
         exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
-    ):
+    ) -> None:
         super().__init__(
             self._report, raise_after_report, formatter, exceptions_to_catch,
             exceptions_to_ignore
         )
         # pylint: disable=consider-using-with
-        if isinstance(file, str) or isinstance(file, _PathLike):
-            self.file = open(file, 'a', encoding=encoding)
+        if isinstance(file, (str, _PathLike)):
+            self.file = open(file, 'a', encoding=encoding)  # noqa: SIM115
         elif isinstance(file, _IO):
             if file.writable():
                 self.file = file
@@ -279,16 +279,16 @@ class FileReporter(Reporter):
             raise ValueError('file must be a string, PathLike, or IO object')
 
         if formatter:
-            if isinstance(formatter, _log21.CrashReporter.Formatter):
+            if isinstance(formatter, _log21.crash_reporter.Formatter):
                 self.formatter = formatter
             else:
-                raise ValueError('formatter must be a log21.CrashReporter.Formatter')
+                raise ValueError('formatter must be a log21.crash_reporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+            self.formatter = _log21.crash_reporter.formatters.Formatter(
                 **_FILE_REPORTER_FORMAT
             )
 
-    def _report(self, exception: BaseException):
+    def _report(self, exception: BaseException) -> None:
         """Writes the exception to the file.
 
         :param exception: Exception to write.
@@ -324,10 +324,10 @@ class EmailReporter(Reporter):  # pylint: disable=too-many-instance-attributes
         >>> divide(10, 0)
         Traceback (most recent call last):
           File "<stdin>", line 1, in <module>
-          File ".../site-packages/log21/CrashReporter/Reporters.py",
+          File ".../site-packages/log21/crash_reporter/reporters.py",
            line 81, in wrap
             raise e
-          File ".../site-packages/log21/CrashReporter/Reporters.py",
+          File ".../site-packages/log21/crash_reporter/reporters.py",
            line 77, in wrap
             return func(*args, **kwargs)
           File "<stdin>", line 3, in divide
@@ -346,10 +346,10 @@ class EmailReporter(Reporter):  # pylint: disable=too-many-instance-attributes
         username: str = '',
         tls: bool = True,
         raise_after_report: bool = True,
-        formatter: _Optional[_log21.CrashReporter.Formatter] = None,
+        formatter: _Optional[_log21.crash_reporter.Formatter] = None,
         exceptions_to_catch: _Optional[_Iterable[BaseException]] = None,
         exceptions_to_ignore: _Optional[_Iterable[BaseException]] = None
-    ):
+    ) -> None:
         super().__init__(
             self._report, raise_after_report, formatter, exceptions_to_catch,
             exceptions_to_ignore
@@ -381,16 +381,16 @@ class EmailReporter(Reporter):  # pylint: disable=too-many-instance-attributes
             raise ex
 
         if formatter:
-            if isinstance(formatter, _log21.CrashReporter.Formatter):
+            if isinstance(formatter, _log21.crash_reporter.Formatter):
                 self.formatter = formatter
             else:
-                raise ValueError('formatter must be a log21.CrashReporter.Formatter')
+                raise ValueError('formatter must be a log21.crash_reporter.Formatter')
         else:
-            self.formatter = _log21.CrashReporter.Formatters.Formatter(
+            self.formatter = _log21.crash_reporter.Formatters.Formatter(
                 **_EMAIL_REPORTER_FORMAT
             )
 
-    def _report(self, exception: BaseException):
+    def _report(self, exception: BaseException) -> None:
         """Sends an email with the exception.
 
         :param exception: Exception to send.

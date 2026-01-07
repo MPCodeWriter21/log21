@@ -8,28 +8,28 @@ import logging as _logging
 from typing import (Type as _Type, Union as _Union, Literal as _Literal,
                     Mapping as _Mapping, Iterable as _Iterable, Optional as _Optional)
 
-from . import CrashReporter
-from .Colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
+from . import crash_reporter
+from .colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
                      get_color_name)
-from .Levels import INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING, CRITICAL
-from .Logger import Logger
-from .PPrint import PrettyPrinter, pformat
-from .Manager import Manager
-from .Argparse import ColorizingArgumentParser
-from .TreePrint import TreePrint, tree_format
-from .Formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
-from .Argumentify import (ArgumentError, TooFewArguments, RequiredArgument,
-                          IncompatibleArguments, argumentify)
-from .FileHandler import FileHandler, DecolorizingFileHandler
-from .ProgressBar import ProgressBar
-from .LoggingWindow import LoggingWindow, LoggingWindowHandler
-from .StreamHandler import StreamHandler, ColorizingStreamHandler
+from .levels import INFO, WARN, DEBUG, ERROR, FATAL, INPUT, NOTSET, WARNING, CRITICAL
+from .logger import Logger
+from .pprint import PrettyPrinter, pformat
+from .manager import Manager
+from .argparse import ColorizingArgumentParser
+from .formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
+from .tree_print import TreePrint, tree_format
+from .argumentify import (ArgumentError, TooFewArgumentsError, RequiredArgumentError,
+                          IncompatibleArgumentsError, argumentify)
+from .progressbar import ProgressBar
+from .file_handler import FileHandler, DecolorizingFileHandler
+from .logging_window import LoggingWindow, LoggingWindowHandler
+from .stream_handler import StreamHandler, ColorizingStreamHandler
 
 # yapf: enable
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
 __version__ = '3.0.0a1'
-__github__ = 'Https://GitHub.com/MPCodeWriter21/log21'
+__github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
     'DecolorizingFormatter', 'get_logger', 'Logger', 'Colors', 'get_color',
@@ -39,9 +39,9 @@ __all__ = [
     'get_color_name', 'closest_color', 'ansi_escape', '__author__', '__github__',
     'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal', 'exception',
     'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
-    'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'CrashReporter',
+    'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'crash_reporter',
     'console_reporter', 'file_reporter', 'argumentify', 'ArgumentError',
-    'IncompatibleArguments', 'RequiredArgument', 'TooFewArguments'
+    'IncompatibleArgumentsError', 'RequiredArgumentError', 'TooFewArgumentsError'
 ]
 
 _manager = Manager()
@@ -50,7 +50,7 @@ _logging.setLoggerClass(Logger)
 
 def _prepare_formatter(
     fmt: _Optional[str] = None,
-    style: str = '%',
+    style: _Literal["%", "{", "$"] = "%",
     datefmt: str = '%H:%M:%S',
     show_level: bool = True,
     show_time: bool = True,
@@ -107,7 +107,7 @@ def get_logger(
     colorize_time_and_level: bool = True,
     fmt: _Optional[str] = None,
     datefmt: str = '%H:%M:%S',
-    style: str = '%',
+    style: _Literal["%", "{", "$"] = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
     override: bool = False,
@@ -220,7 +220,7 @@ def get_logger(
             file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
 
-    return logger
+    return logger  # ty: ignore[invalid-return-type]
 
 
 def get_logging_window(
@@ -231,7 +231,7 @@ def get_logging_window(
     colorize_time_and_level: bool = True,
     fmt: _Optional[str] = None,
     datefmt: str = '%H:%M:%S',
-    style: str = '%',
+    style: _Literal["%", "{", "$"] = '%',
     handle_carriage_return: bool = True,
     handle_new_line: bool = True,
     override: bool = False,
@@ -320,7 +320,7 @@ def get_logging_window(
         handler.setFormatter(formatter)
         logging_window.addHandler(handler)
         _manager.addLogger(name, logging_window)
-    return logging_window
+    return logging_window  # ty: ignore[invalid-return-type]
 
 
 getLogger = get_logger
@@ -619,7 +619,7 @@ def debug(*msg, args: tuple = (), **kwargs) -> None:
     root.debug(*msg, args=args, **kwargs)
 
 
-def log(level: _Union[str, int], *msg, args: tuple = (), **kwargs) -> None:
+def log(level: int, *msg, args: tuple = (), **kwargs) -> None:
     """Log 'msg % args' with the integer severity 'level' on the root logger.
 
     If the logger has no handlers, call basicConfig() to add a console handler with a
@@ -649,6 +649,6 @@ def progress_bar(
 
 endl = '\n'
 
-console_reporter = CrashReporter.ConsoleReporter()
+console_reporter = crash_reporter.ConsoleReporter()
 
-file_reporter = CrashReporter.FileReporter(file='.crash_report.log')
+file_reporter = crash_reporter.FileReporter(file='.crash_report.log')

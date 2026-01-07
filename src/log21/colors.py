@@ -1,4 +1,4 @@
-# log21.Colors.py
+# log21.colors.py
 # CodeWriter21
 
 import re as _re
@@ -195,10 +195,9 @@ class Colors:
     }
 
 
-def closest_color(requested_color: _Sequence[int]):
-    """
-    Takes a color in RGB and returns the name of the closest color to the value.
-    Uses the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
+def closest_color(requested_color: _Sequence[int]) -> str:
+    """Takes a color in RGB and returns the name of the closest color to the value. Uses
+    the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
 
     :param requested_color: Sequence[int, int, int]: The input color in RGB.
     :return: str: The name of the closest color.

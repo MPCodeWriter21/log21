@@ -1,4 +1,4 @@
-# log21.PPrint.py
+# log21.pprint.py
 # CodeWriter21
 
 # yapf: disable
@@ -13,7 +13,7 @@ from typing import (Any as _Any, Dict as _Dict, Mapping as _Mapping,
                     Optional as _Optional, Sequence as _Sequence,
                     Generator as _Generator)
 
-from log21.Colors import get_colors as _gc
+from log21.colors import get_colors as _gc
 
 # yapf: enable
 
@@ -545,7 +545,7 @@ class PrettyPrinter(_PrettyPrinter):
         level  # noqa: ANN001
     ) -> None:
         write = stream.write
-        if len(obj) <= 4:  # noqa: PLR2004
+        if len(obj) <= 4:
             write(repr(obj))
             return
         parens = level == 1
