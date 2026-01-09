@@ -332,11 +332,11 @@ def _eval(node: ast.AST):
     :raises SyntaxError: on invalid syntax
     :return: result of the evaluation
     """
-    if isinstance(node, ast.Num):  # <number>
-        return node.n
-    if isinstance(node, ast.BinOp):  # <left> <operator> <right>
+    if isinstance(node, ast.Constant):  # <number>
+        return node.value
+    if isinstance(node, ast.BinOp):     # <left> <operator> <right>
         return operators[type(node.op)](_eval(node.left), _eval(node.right))
-    if isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+    if isinstance(node, ast.UnaryOp):   # <operator> <operand> e.g., -1
         return operators[type(node.op)](_eval(node.operand))
     raise TypeError(node)
 
