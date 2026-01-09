@@ -39,5 +39,6 @@ repos:
 
 exclude: |
   (?x)^(
-      src/log21/_argparse.py
+      src/log21/_argparse.py|
+      examples/.*.py
   )$
