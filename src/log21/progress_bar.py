@@ -1,10 +1,11 @@
-# log21.progressbar.py
+# log21.progress_bar.py
 # CodeWriter21
 
 # yapf: disable
 
 from __future__ import annotations
 
+import sys as _sys
 import shutil as _shutil
 from typing import (TYPE_CHECKING as _TYPE_CHECKING, Any as _Any, Mapping as _Mapping,
                     Optional as _Optional)
@@ -13,7 +14,11 @@ from log21.colors import get_colors as _gc
 from log21.logger import Logger as _Logger
 from log21.stream_handler import ColorizingStreamHandler as _ColorizingStreamHandler
 
+from ._module_helper import FakeModule as _FakeModule
+
 if _TYPE_CHECKING:
+    from types import ModuleType as _ModuleType
+
     import log21 as _log21
 
 # yapf: enable
@@ -395,3 +400,37 @@ class ProgressBar:  # pylint: disable=too-many-instance-attributes, line-too-lon
         :raises ValueError: If the style is not `%` or `{`.
         """
         self(progress, total, logger, **kwargs)
+
+
+class _Module(_FakeModule):
+
+    def __init__(self, real_module: _ModuleType) -> None:
+        super().__init__(real_module, lambda: None)
+        self.__progress_bar: _Optional[ProgressBar] = None
+
+    def __call__(
+        self,
+        progress: float,
+        total: float,
+        width: _Optional[int] = None,
+        prefix: str = '|',
+        suffix: str = '|',
+        show_percentage: bool = True
+    ) -> None:
+        """Print a progress bar to the console."""
+        if (not self.__progress_bar
+                or (self.__progress_bar.width != width and width is not None)
+                or self.__progress_bar.prefix != prefix
+                or self.__progress_bar.suffix != suffix
+                or self.__progress_bar.style != ('%' if show_percentage else '')):
+            self.__progress_bar = ProgressBar(
+                width=width,
+                prefix=prefix,
+                suffix=suffix,
+                show_percentage=show_percentage
+            )
+
+        self.__progress_bar(progress, total)
+
+
+_sys.modules[__name__] = _Module(_sys.modules[__name__])

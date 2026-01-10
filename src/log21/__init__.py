@@ -22,8 +22,8 @@ from .formatters import ColorizingFormatter, DecolorizingFormatter, _Formatter
 from .tree_print import TreePrint, tree_format
 from .argumentify import (ArgumentError, TooFewArgumentsError, RequiredArgumentError,
                           IncompatibleArgumentsError, argumentify)
-from .progressbar import ProgressBar
 from .file_handler import FileHandler, DecolorizingFileHandler
+from .progress_bar import ProgressBar
 from ._module_helper import FakeModule as _FakeModule
 from .logging_window import LoggingWindow, LoggingWindowHandler
 from .stream_handler import StreamHandler, ColorizingStreamHandler
@@ -41,10 +41,10 @@ __all__ = [
     'pformat', 'pprint', 'pretty_print', 'tree_format', 'TreePrint', 'Manager',
     'get_color_name', 'closest_color', 'ansi_escape', '__author__', '__github__',
     'debug', 'info', 'warning', 'warn', 'error', 'critical', 'fatal', 'exception',
-    'log', 'basic_config', 'basicConfig', 'ProgressBar', 'progress_bar',
-    'LoggingWindow', 'LoggingWindowHandler', 'get_logging_window', 'crash_reporter',
-    'console_reporter', 'file_reporter', 'argumentify', 'ArgumentError',
-    'IncompatibleArgumentsError', 'RequiredArgumentError', 'TooFewArgumentsError'
+    'log', 'basic_config', 'basicConfig', 'ProgressBar', 'LoggingWindow',
+    'LoggingWindowHandler', 'get_logging_window', 'crash_reporter', 'console_reporter',
+    'file_reporter', 'argumentify', 'ArgumentError', 'IncompatibleArgumentsError',
+    'RequiredArgumentError', 'TooFewArgumentsError'
 ]
 
 _manager = Manager()
@@ -631,23 +631,6 @@ def log(level: int, *msg, args: tuple = (), **kwargs) -> None:
     if len(root.handlers) == 0:
         basic_config()
     root.log(level, *msg, args=args, **kwargs)
-
-
-def progress_bar(
-    progress: float,
-    total: float,
-    width: _Optional[int] = None,
-    prefix: str = '|',
-    suffix: str = '|',
-    show_percentage: bool = True
-) -> None:
-    """Print a progress bar to the console."""
-
-    progress_bar_ = ProgressBar(
-        width=width, prefix=prefix, suffix=suffix, show_percentage=show_percentage
-    )
-
-    print(progress_bar_.get_bar(progress, total))
 
 
 endl = '\n'
