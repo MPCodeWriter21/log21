@@ -4,7 +4,9 @@
 # yapf: disable
 
 import os as _os
+import sys as _sys
 import logging as _logging
+from types import ModuleType as _ModuleType
 from typing import (Type as _Type, Union as _Union, Literal as _Literal,
                     Mapping as _Mapping, Iterable as _Iterable, Optional as _Optional)
 
@@ -22,13 +24,14 @@ from .argumentify import (ArgumentError, TooFewArgumentsError, RequiredArgumentE
                           IncompatibleArgumentsError, argumentify)
 from .progressbar import ProgressBar
 from .file_handler import FileHandler, DecolorizingFileHandler
+from ._module_helper import FakeModule as _FakeModule
 from .logging_window import LoggingWindow, LoggingWindowHandler
 from .stream_handler import StreamHandler, ColorizingStreamHandler
 
 # yapf: enable
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '3.0.0a1'
+__version__ = '3.0.0a2'
 __github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
@@ -651,4 +654,18 @@ endl = '\n'
 
 console_reporter = crash_reporter.ConsoleReporter()
 
-file_reporter = crash_reporter.FileReporter(file='.crash_report.log')
+
+class _Module(_FakeModule):
+
+    def __init__(self, real_module: _ModuleType) -> None:
+        super().__init__(real_module, lambda: None)
+        self.__file_reporter: _Optional[crash_reporter.FileReporter] = None
+
+    @property
+    def file_reporter(self) -> crash_reporter.FileReporter:
+        if self.__file_reporter is None:
+            self.__file_reporter = crash_reporter.FileReporter(file='.crash_report.log')
+        return self.__file_reporter
+
+
+_sys.modules[__name__] = _Module(_sys.modules[__name__])
