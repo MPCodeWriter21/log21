@@ -1,23 +1,20 @@
-[build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "log21"
 authors = [
     {name = "CodeWriter21(Mehrad Pooryoussof)", email = "CodeWriter21@gmail.com"}
 ]
-description = "A simple logging package that helps you log colorized messages in Windows console."
+description = "A simple logging package"
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ['python', 'log', 'colorize', 'color', 'logging', 'Python3', 'CodeWriter21']
 license = {text = "Apache License 2.0"}
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: Unix",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS :: MacOS X"
@@ -26,46 +23,41 @@ dependencies = [
     "webcolors",
     "docstring-parser"
 ]
-version = "2.10.2"
+version = "3.0.0a2"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
 
 [project.urls]
 Homepage = "https://github.com/MPCodeWriter21/log21"
 Donations = "https://github.com/MPCodeWriter21/log21/blob/master/DONATE.md"
 Source = "https://github.com/MPCodeWriter21/log21"
 
-[project.optional-dependencies]
-dev = ["yapf", "isort", "docformatter", "pylint", "json5", "pytest"]
-
-[tool.pylint.messages_control]
-max-line-length = 88
-
-disable = [
-    "too-few-public-methods",
-    "too-many-arguments",
-    "protected-access",
-    "too-many-locals",
-    "fixme",
-]
-
-[tool.pylint.design]
-max-returns = 8
-
 [tool.yapf]
 column_limit = 88
 split_before_dot = true
-split_before_first_argument = true
 dedent_closing_brackets = true
+split_before_first_argument = true
 
 [tool.isort]
 line_length = 88
-combine_as_imports = true
-length_sort = true
 order_by_type = true
+length_sort = true
+combine_as_imports = true
 
 [tool.docformatter]
 recursive = true
 wrap-summaries = 88
 wrap-descriptions = 88
+
+[tool.ruff]
+show-fixes = true
+exclude = ["migrations"]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+extend-select = ["C4", "SIM", "TCH", "PL", "ANN", "N", "B"]
+ignore = ["PLR0911", "PLR0912", "PLR0913", "PLR0914", "ANN101", "B008", "N816",
+          "ANN002", "ANN003", "ANN401", "N802", "PLR2004"]

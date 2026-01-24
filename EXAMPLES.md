@@ -1,15 +1,22 @@
-Usage Examples of log21
-=======================
+log21
+=====
+
+Basic Usage Examples
+--------------------
 
 ### Basic Logging
 
 ```python
 import log21
 
-log21.print(log21.get_color('#FF0000') + 'This' + log21.get_color((0, 255, 0)) + ' is' + log21.get_color('Blue') +
-            ' Blue' + log21.get_colors('BackgroundWhite', 'Black') + ' 8)')
+log21.print(log21.get_color('#FF0000') + 'This' + log21.get_color((0, 255, 0)) + ' is' +
+            log21.get_color('Blue') + ' Blue' +
+            log21.get_colors('BackgroundWhite', 'Black') + ' 8)')
 
-logger = log21.get_logger('My Logger', level_names={21: 'SpecialInfo', log21.WARNING: ' ! ', log21.ERROR: '!!!'})
+logger = log21.get_logger(
+    'My Logger',
+    level_names={21: 'SpecialInfo', log21.WARNING: ' ! ', log21.ERROR: '!!!'}
+)
 logger.info('You are reading the README.md file...')
 
 logger.log(21, 'Here', '%s', 'GO!', args=('we',))
@@ -33,16 +40,22 @@ logger.error(log21.get_colors('LightRed') + "I'm still here ;1")
 import log21
 from log21 import ColorizingArgumentParser, get_logger, get_colors as gc
 
-parser = ColorizingArgumentParser(description="This is a simple example of a ColorizingArgumentParser.",
-                                  colors={'help': 'LightCyan'})
+parser = ColorizingArgumentParser(
+    description="This is a simple example of a ColorizingArgumentParser.",
+    colors={'help': 'LightCyan'}
+)
 parser.add_argument('test1', action='store', help='Test 1')
 parser.add_argument('test2', action='store', help='Test 2')
-parser.add_argument('--optional-arg', '-o', action='store', type=int, help='An optional integer')
+parser.add_argument(
+    '--optional-arg', '-o', action='store', type=int, help='An optional integer'
+)
 parser.add_argument('--verbose', '-v', action='store_true', help='Increase verbosity.')
 
 args = parser.parse_args()
 
-logger = get_logger('My Logger', level_names={log21.DEBUG: ' ? ', log21.INFO: ' + ', log21.WARNING: ' ! ',
+logger = get_logger('My Logger', level_names={log21.DEBUG: ' ? ',
+                                              log21.INFO: ' + ',
+                                              log21.WARNING: ' ! ',
                                               log21.ERROR: '!!!'})
 
 if args.verbose:
@@ -168,11 +181,16 @@ progress_bar = ProgressBar(
     empty='-',
     prefix='[',
     suffix=']',
-    colors={'progress in-progress': gc('Bright Red'), 'progress complete': gc('Bright Cyan'),
-            'percentage in-progress': gc('Green'), 'percentage complete': gc('Bright Cyan'),
-            'prefix-color in-progress': gc('Bright White'), 'prefix-color complete': gc('Bright White'),
-            'prefix-color failed': gc('Bright White'), 'suffix-color in-progress': gc('Bright White'),
-            'suffix-color complete': gc('Bright White'), 'suffix-color failed': gc('Bright White')})
+    colors={'progress in-progress': gc('Bright Red'),
+            'progress complete': gc('Bright Cyan'),
+            'percentage in-progress': gc('Green'),
+            'percentage complete': gc('Bright Cyan'),
+            'prefix-color in-progress': gc('Bright White'),
+            'prefix-color complete': gc('Bright White'),
+            'prefix-color failed': gc('Bright White'),
+            'suffix-color in-progress': gc('Bright White'),
+            'suffix-color complete': gc('Bright White'),
+            'suffix-color failed': gc('Bright White')})
 
 for i in range(84):
     progress_bar(i + 1, 84)
@@ -314,11 +332,11 @@ def _eval(node: ast.AST):
     :raises SyntaxError: on invalid syntax
     :return: result of the evaluation
     """
-    if isinstance(node, ast.Num):  # <number>
-        return node.n
-    if isinstance(node, ast.BinOp):  # <left> <operator> <right>
+    if isinstance(node, ast.Constant):  # <number>
+        return node.value
+    if isinstance(node, ast.BinOp):     # <left> <operator> <right>
         return operators[type(node.op)](_eval(node.left), _eval(node.right))
-    if isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+    if isinstance(node, ast.UnaryOp):   # <operator> <operand> e.g., -1
         return operators[type(node.op)](_eval(node.operand))
     raise TypeError(node)
 
@@ -375,7 +393,6 @@ if __name__ == "__main__":
 
 ![multi-entry](https://github.com/MPCodeWriter21/log21/raw/master/screen-shots/example-6.3.png)
 
-
 Example with parser errors:
 
 ```python
@@ -407,7 +424,7 @@ def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: i
     :param quiet: Make the script quiet
     """
     if verbose and quiet:
-        raise log21.IncompatibleArguments(
+        raise log21.IncompatibleArgumentsError(
             '--verbose',
             '--quiet',
             message="You can not make the script quiet and except it to be more verbose!"

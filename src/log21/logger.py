@@ -1,17 +1,24 @@
-# log21.Logger.py
+# log21.logger.py
 # CodeWriter21
+
+# yapf: disable
 
 import re as _re
 import sys as _sys
 import logging as _logging
 from types import MethodType as _MethodType
-from typing import (Any, List, Union as _Union, Literal as _Literal, Mapping,
-                    Callable as _Callable, Optional as _Optional, Sequence as _Sequence)
+from typing import (TYPE_CHECKING as _TYPE_CHECKING, Any as _Any, List, Union as _Union,
+                    Literal as _Literal, Mapping, Callable as _Callable,
+                    Optional as _Optional, Sequence as _Sequence)
 from getpass import getpass as _getpass
 from logging import raiseExceptions as _raiseExceptions
 
-import log21 as _log21
-from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, NOTSET, WARNING, CRITICAL
+from log21.levels import INFO, DEBUG, ERROR, INPUT, PRINT, NOTSET, WARNING, CRITICAL
+
+if _TYPE_CHECKING:
+    import log21 as _log21
+
+# yapf: enable
 
 __all__ = ['Logger']
 
@@ -21,11 +28,11 @@ class Logger(_logging.Logger):
 
     def __init__(
         self,
-        name,
+        name: str,
         level: _Union[int, str] = NOTSET,
         handlers: _Optional[_Union[_Sequence[_logging.Handler],
                                    _logging.Handler]] = None
-    ):
+    ) -> None:
         """Initialize a Logger object.
 
         :param name: The name of the logger.
@@ -44,14 +51,20 @@ class Logger(_logging.Logger):
                         'handlers must be a list of logging.Handler objects'
                     )
             for handler in handlers:
+                if not isinstance(handler, _logging.Handler):
+                    raise TypeError(
+                        'handlers must be a list of logging.Handler objects'
+                    )
                 self.addHandler(handler)
 
-    def isEnabledFor(self, level):
+    def isEnabledFor(self, level: int) -> bool:
         """Is this logger enabled for level 'level'?"""
 
         return (self.level <= level) or (level in (PRINT, INPUT))
 
-    def log(self, level: int, *msg, args: tuple = (), end='\n', **kwargs):
+    def log(
+        self, level: int, *msg, args: tuple = (), end: str = '\n', **kwargs
+    ) -> None:
         """Log 'msg % args' with the integer severity 'level'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -67,7 +80,7 @@ class Logger(_logging.Logger):
         if self.isEnabledFor(level):
             self._log(level, msg, args, **kwargs)
 
-    def debug(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def debug(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args' with severity 'DEBUG'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -79,7 +92,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(DEBUG, msg, args, **kwargs)
 
-    def info(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def info(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args' with severity 'INFO'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -91,7 +104,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(INFO, msg, args, **kwargs)
 
-    def warning(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def warning(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args' with severity 'WARNING'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -105,7 +118,7 @@ class Logger(_logging.Logger):
 
     warn = warning
 
-    def write(self, *msg, args: tuple = (), end='', **kwargs):
+    def write(self, *msg, args: tuple = (), end: str = '', **kwargs) -> None:
         """Log 'msg % args' with severity 'WARNING'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -117,7 +130,7 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(WARNING, msg, args, **kwargs)
 
-    def error(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def error(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args' with severity 'ERROR'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -129,11 +142,13 @@ class Logger(_logging.Logger):
             msg = ' '.join([str(m) for m in msg]) + end
             self._log(ERROR, msg, args, **kwargs)
 
-    def exception(self, *msg, args: tuple = (), exc_info=True, **kwargs):
+    def exception(  # ty: ignore[invalid-method-override]
+        self, *msg, args: tuple = (), exc_info: bool = True, **kwargs
+    ) -> None:
         """Convenience method for logging an ERROR with exception information."""
         self.error(*msg, args=args, exc_info=exc_info, **kwargs)
 
-    def critical(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def critical(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args' with severity 'CRITICAL'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -147,7 +162,7 @@ class Logger(_logging.Logger):
 
     fatal = critical
 
-    def print(self, *msg, args: tuple = (), end='\n', **kwargs):
+    def print(self, *msg, args: tuple = (), end: str = '\n', **kwargs) -> None:
         """Log 'msg % args'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -158,7 +173,7 @@ class Logger(_logging.Logger):
         msg = ' '.join([str(m) for m in msg]) + end
         self._log(PRINT, msg, args, **kwargs)
 
-    def input(self, *msg, args: tuple = (), end='', **kwargs):
+    def input(self, *msg, args: tuple = (), end: str = '', **kwargs) -> str:
         """Log 'msg % args'.
 
         To pass exception information, use the keyword argument exc_info with a true
@@ -171,7 +186,7 @@ class Logger(_logging.Logger):
         self._log(INPUT, msg, args, **kwargs)
         return input()
 
-    def getpass(self, *msg, args: tuple = (), end='', **kwargs):
+    def getpass(self, *msg, args: tuple = (), end: str = '', **kwargs) -> str:
         """Takes a password input from the user.
 
         :param msg: The message to display to the user.
@@ -183,27 +198,27 @@ class Logger(_logging.Logger):
         self._log(self.level if self.level >= NOTSET else NOTSET, msg, args, **kwargs)
         return _getpass('')
 
-    def print_progress(self, progress: float, total: float, **kwargs):
+    def print_progress(self, progress: float, total: float, **kwargs) -> None:
         """Log progress."""
         self.progress_bar(progress, total, **kwargs)
 
     @property
-    def progress_bar(self):
+    def progress_bar(self) -> '_log21.ProgressBar':
         """Return a progress bar instance.
 
         If not exists, create a new one.
         """
         if not self._progress_bar:
             # avoid circular import; pylint: disable=import-outside-toplevel
-            from log21.ProgressBar import ProgressBar
+            from log21.progress_bar import ProgressBar  # noqa: PLC0415
             self._progress_bar = ProgressBar(logger=self)
         return self._progress_bar
 
     @progress_bar.setter
-    def progress_bar(self, value: '_log21.ProgressBar'):
+    def progress_bar(self, value: '_log21.ProgressBar') -> None:
         self._progress_bar = value
 
-    def clear_line(self, length: _Optional[int] = None):
+    def clear_line(self, length: _Optional[int] = None) -> None:
         """Clear the current line.
 
         :param length: The length of the line to clear.
@@ -241,7 +256,7 @@ class Logger(_logging.Logger):
         :return: The name of the new method.
         """
 
-        def raise_(error: BaseException):
+        def raise_(error: BaseException) -> _Optional[BaseException]:
             if errors == 'ignore':
                 return
             raise error
@@ -271,7 +286,9 @@ class Logger(_logging.Logger):
             if errors == 'handle':
                 return self.add_level(level, _add_one(name), errors)
 
-        def log_for_level(self, *msg, args: tuple = (), end='\n', **kwargs):
+        def log_for_level(
+            self: Logger, *msg, args: tuple = (), end: str = '\n', **kwargs
+        ) -> None:
             self.log(level, *msg, args=args, end=end, **kwargs)
 
         setattr(self, name, _MethodType(log_for_level, self))
@@ -291,7 +308,7 @@ class Logger(_logging.Logger):
         for level, name in level_names.items():
             self.add_level(level, name, errors)
 
-    def __lshift__(self, obj):
+    def __lshift__(self, obj: _Any) -> "Logger":
         """Prints the object to the output stream.
         This operator is meant to make the Logger object be usable in a
         std::cout-like way.
@@ -307,8 +324,8 @@ class Logger(_logging.Logger):
                         and hasattr(handler.stream, 'write')
                         and hasattr(handler.stream, 'flush')):
                     found = found + 1
-                    handler.stream.write(str(obj))
-                    handler.stream.flush()
+                    handler.stream.write(str(obj))  # ty: ignore[call-non-callable]
+                    handler.stream.flush()  # ty: ignore[call-non-callable]
             if not logger.propagate:
                 break
             logger = logger.parent
@@ -318,7 +335,7 @@ class Logger(_logging.Logger):
             )
         return self
 
-    def __rshift__(self, obj: List[Any]):
+    def __rshift__(self, obj: List[type]) -> 'Logger':
         """A way of receiving input from the stdin.
         This operator is meant to make a std::cin-like operation possible in Python.
 
@@ -330,7 +347,7 @@ class Logger(_logging.Logger):
         >>> # Get three inputs of type: str, str or None, and float
         >>> data = [str, None, float]  # first name, last name and age
         >>> cout << "Please enter a first name, last name and age(separated by space): "
-        Please enter a first name, last name and age(separated by space): 
+        Please enter a first name, last name and age(separated by space):
         >>> cin >> data;
         M  21
         >>> name = data[0] + (data[1] if data[1] is not None else '')
@@ -342,7 +359,7 @@ class Logger(_logging.Logger):
         >>> # Get any number of inputs
         >>> data = []
         >>> cout << "Enter something: ";
-        Enter something: 
+        Enter something:
         >>> cin >> data;
         What ever man 1 2 3 !
         >>> cout << "Here are the items you chose: " << data << log21.endl;
@@ -352,7 +369,7 @@ class Logger(_logging.Logger):
         >>> # Get two inputs of type int with defaults: 1280 and 720
         >>> data = [1280, 720]
         >>> cout << "Enter the width and the height: ";
-        Enter the width and the height: 
+        Enter the width and the height:
         >>> cin >> data;
         500
 
@@ -389,7 +406,8 @@ class Logger(_logging.Logger):
                         tmp.append(obj[i])
             obj[:] = tmp
         else:
-            obj[:] = _sys.stdin.readline()[:-1].split()
+            obj[:] = _sys.stdin.readline()[:-1].split(
+            )  # ty: ignore[invalid-assignment]
 
         return self
 
@@ -403,4 +421,4 @@ def _add_one(name: str) -> str:
     match = _re.match(r'([\S]+)_([0-9]+)', name)
     if not match:
         return name + '_1'
-    return f'{match.group(1)}{int(match.group(2)) + 1}'
+    return f'{match.group(1)}_{int(match.group(2)) + 1}'

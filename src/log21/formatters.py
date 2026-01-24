@@ -1,13 +1,17 @@
-# log21.Formatters.py
+# log21.formatters.py
 # CodeWriter21
 
+# yapf: disable
+
 import time as _time
-from typing import (Dict as _Dict, Tuple as _Tuple, Mapping as _Mapping,
-                    Optional as _Optional)
+from typing import (Dict as _Dict, Tuple as _Tuple, Literal as _Literal,
+                    Mapping as _Mapping, Optional as _Optional)
 from logging import Formatter as __Formatter
 
-from log21.Colors import get_colors as _gc, ansi_escape
-from log21.Levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
+from log21.colors import get_colors as _gc, ansi_escape
+from log21.levels import INFO, DEBUG, ERROR, INPUT, PRINT, WARNING, CRITICAL
+
+# yapf: enable
 
 __all__ = ['ColorizingFormatter', 'DecolorizingFormatter']
 
@@ -18,11 +22,11 @@ class _Formatter(__Formatter):
         self,
         fmt: _Optional[str] = None,
         datefmt: _Optional[str] = None,
-        style: str = '%',
+        style: _Literal["%", "{", "$"] = '%',
         level_names: _Optional[_Mapping[int, str]] = None
-    ):
-        """
-        `level_names` usage:
+    ) -> None:
+        """`level_names` usage:
+
         >>> import log21
         >>> logger = log21.Logger('MyLogger', log21.DEBUG)
         >>> stream_handler = log21.ColorizingStreamHandler()
@@ -69,12 +73,12 @@ class _Formatter(__Formatter):
                 self.level_names[level] = name
 
     @property
-    def level_names(self):
+    def level_names(self) -> _Dict[int, str]:
         """Get the level names mapping."""
         return self._level_names
 
     @level_names.setter
-    def level_names(self, level_names: _Mapping[int, str]):
+    def level_names(self, level_names: _Mapping[int, str]) -> None:
         if level_names:
             if not isinstance(level_names, _Mapping):
                 raise TypeError(
@@ -84,7 +88,7 @@ class _Formatter(__Formatter):
         else:
             self._level_names = {}
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         record.message = record.getMessage()
         if self.usesTime():
             record.asctime = self.formatTime(record, self.datefmt)
@@ -92,9 +96,8 @@ class _Formatter(__Formatter):
         record.levelname = self.level_names.get(record.levelno, 'NOTSET')
 
         s = self.formatMessage(record)  # pylint: disable=invalid-name
-        if record.exc_info:
-            if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
             if s[-1:] != "\n":
                 s = s + "\n"
@@ -110,7 +113,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
     """A formatter that helps adding colors to the log records."""
     time_color: _Tuple[str, ...] = ('lightblue', )
     name_color = pathname_color = filename_color = module_color = func_name_color = \
-        thread_name_color = message_color = tuple()
+        thread_name_color = message_color = ()
 
     def __init__(
         self,
@@ -127,31 +130,25 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
         func_name_color: _Optional[_Tuple[str, ...]] = None,
         thread_name_color: _Optional[_Tuple[str, ...]] = None,
         message_color: _Optional[_Tuple[str, ...]] = None
-    ):  # pylint: disable=too-many-branches
+    ) -> None:  # pylint: disable=too-many-branches
         """Initialize the formatter.
 
         :param fmt: The format string to use for the message.
-        :param datefmt: The format string to use for the date/time
-            portion of the message.
+        :param datefmt: The format string to use for the date/time portion of the
+            message.
         :param style: The format style to use.
         :param level_names: A mapping of level numbers to level names.
         :param level_colors: A mapping of level numbers to level colors.
-        :param time_color: The color to use for the time portion of the
+        :param time_color: The color to use for the time portion of the message.
+        :param name_color: The color to use for the logger name portion of the message.
+        :param pathname_color: The color to use for the pathname portion of the message.
+        :param filename_color: The color to use for the filename portion of the message.
+        :param module_color: The color to use for the module portion of the message.
+        :param func_name_color: The color to use for the function name portion of the
             message.
-        :param name_color: The color to use for the logger name portion
-            of the message.
-        :param pathname_color: The color to use for the pathname portion
-            of the message.
-        :param filename_color: The color to use for the filename portion
-            of the message.
-        :param module_color: The color to use for the module portion of
-            the message.
-        :param func_name_color: The color to use for the function name
-            portion of the message.
-        :param thread_name_color: The color to use for the thread name
-            portion of the message.
-        :param message_color: The color to use for the message portion
-            of the message.
+        :param thread_name_color: The color to use for the thread name portion of the
+            message.
+        :param message_color: The color to use for the message portion of the message.
         """
         super().__init__(fmt=fmt, datefmt=datefmt, style=style, level_names=level_names)
         self.level_colors: _Dict[int, _Tuple[str, ...]] = {
@@ -202,7 +199,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
                 raise TypeError('`message_color` must be a tuple!')
             self.message_color = message_color
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         """Colorizes the record and returns the formatted message."""
         record.message = record.getMessage()
         if self.usesTime():
@@ -213,11 +210,10 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
         record = self.colorize(record)
 
         s = self.formatMessage(record)  # pylint: disable=invalid-name
-        if record.exc_info:
-            # Cache the traceback text to avoid converting it multiple times
-            # (it's constant anyway)
-            if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
+        # Cache the traceback text to avoid converting it multiple times
+        # (it's constant anyway)
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
             if s[-1:] != "\n":
                 s = s + "\n"
@@ -228,7 +224,7 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
             s = s + self.formatStack(record.stack_info)
         return s
 
-    def colorize(self, record):
+    def colorize(self, record):  # noqa: ANN001, ANN201
         """Colorizes the record attributes.
 
         :param record:
@@ -263,9 +259,8 @@ class ColorizingFormatter(_Formatter):  # pylint: disable=too-many-instance-attr
 class DecolorizingFormatter(_Formatter):
     """Formatter that removes color codes from the log records."""
 
-    def formatTime(self, record, datefmt=None):
-        """Returns the creation time of the specified LogRecord as formatted
-        text."""
+    def formatTime(self, record, datefmt=None) -> str:  # noqa: ANN001
+        """Returns the creation time of the specified LogRecord as formatted text."""
         ct = self.converter(int(record.created))
         if datefmt:
             s = _time.strftime(datefmt, ct)
@@ -274,7 +269,7 @@ class DecolorizingFormatter(_Formatter):
             s = self.default_msec_format % (t, record.msecs)
         return s
 
-    def format(self, record) -> str:
+    def format(self, record) -> str:  # noqa: ANN001
         """Decolorizes the record and returns the formatted message.
 
         :param record:
@@ -283,7 +278,7 @@ class DecolorizingFormatter(_Formatter):
         return self.decolorize(super().format(record))
 
     @staticmethod
-    def decolorize(text: str):
+    def decolorize(text: str) -> str:
         """Removes all ansi colors in the text.
 
         :param text: str: Input text

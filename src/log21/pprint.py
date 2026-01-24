@@ -1,5 +1,7 @@
-# log21.PPrint.py
+# log21.pprint.py
 # CodeWriter21
+
+# yapf: disable
 
 import re as _re
 import sys as _sys
@@ -7,23 +9,28 @@ import types as _types
 import collections as _collections
 import dataclasses as _dataclasses
 from pprint import PrettyPrinter as _PrettyPrinter
-from typing import Dict as _Dict, Mapping as _Mapping, Optional as _Optional
+from typing import (Any as _Any, Dict as _Dict, Mapping as _Mapping,
+                    Optional as _Optional, Sequence as _Sequence,
+                    Generator as _Generator)
 
-from log21.Colors import get_colors as _gc
+from log21.colors import get_colors as _gc
+
+# yapf: enable
 
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 
 
-def _recursion(obj):
+def _recursion(obj: _Any) -> str:
     return f"<Recursion on {type(obj).__name__} with id={id(obj)}>"
 
 
-def _safe_tuple(t):
+def _safe_tuple(t: tuple) -> tuple["_SafeKey", "_SafeKey"]:
     """Helper function for comparing 2-tuples."""
     return _SafeKey(t[0]), _SafeKey(t[1])
 
 
-def _wrap_bytes_repr(obj, width, allowance):
+def _wrap_bytes_repr(obj: _Any, width: int,
+                     allowance: int) -> _Generator[str, None, None]:
     current = b''
     last = len(obj) // 4 * 4
     for i in range(0, len(obj), 4):
@@ -52,10 +59,10 @@ class _SafeKey:
 
     __slots__ = ['obj']
 
-    def __init__(self, obj):
+    def __init__(self, obj: _Any) -> None:
         self.obj = obj
 
-    def __lt__(self, other):
+    def __lt__(self, other: "_SafeKey") -> bool:
         try:
             return self.obj < other.obj
         except TypeError:
@@ -67,17 +74,17 @@ class PrettyPrinter(_PrettyPrinter):
 
     def __init__(
         self,
-        indent=1,
-        width=80,
-        depth=None,
-        stream=None,
+        indent: int = 1,
+        width: int = 80,
+        depth: _Optional[int] = None,
+        stream=None,  # noqa: ANN001
         sign_colors: _Optional[_Mapping[str, str]] = None,
         *,
-        compact=False,
-        sort_dicts=True,
-        underscore_numbers=False,
+        compact: bool = False,
+        sort_dicts: bool = True,
+        underscore_numbers: bool = False,
         **kwargs
-    ):
+    ) -> None:
         super().__init__(
             indent=indent,
             width=width,
@@ -110,7 +117,15 @@ class PrettyPrinter(_PrettyPrinter):
             for sign, color in sign_colors.items():
                 self.sign_colors[sign.lower()] = _gc(color)
 
-    def _format(self, obj, stream, indent, allowance, context, level):
+    def _format(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         objid = id(obj)
         if objid in context:
             stream.write(_recursion(obj))
@@ -139,7 +154,15 @@ class PrettyPrinter(_PrettyPrinter):
                 return
         stream.write(rep)
 
-    def _pprint_dataclass(self, obj, stream, indent, allowance, context, level):
+    def _pprint_dataclass(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         cls_name = obj.__class__.__name__
         indent += len(cls_name) + 1
         items = [
@@ -149,15 +172,31 @@ class PrettyPrinter(_PrettyPrinter):
         self._format_namespace_items(items, stream, indent, allowance, context, level)
         stream.write(')')
 
-    def _repr(self, obj, context, level):
-        repr, readable, recursive = self.format(obj, context.copy(), self._depth, level)
+    def _repr(
+        self,
+        obj: _Any,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> str:  # ty: ignore[invalid-method-override]
+        repr, readable, recursive = self.format(
+            obj,
+            context.copy(),
+            self._depth,  # ty: ignore[invalid-argument-type]
+            level
+        )
         if not readable:
             self._readable = False
         if recursive:
             self._recursive = True
         return repr
 
-    def _safe_repr(self, object_, context, max_levels, level):
+    def _safe_repr(  # noqa: PLR0915
+        self,
+        object_: _Any,
+        context,  # noqa: ANN001
+        max_levels,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> tuple[str, bool, bool]:
         # Return triple (repr_string, isreadable, isrecursive).
         type_ = type(object_)
         if type_ in _builtin_scalars:
@@ -277,11 +316,19 @@ class PrettyPrinter(_PrettyPrinter):
             )
 
         rep = repr(object_)
-        return rep, (rep and not rep.startswith('<')), False
+        return rep, bool(rep and not rep.startswith('<')), False
 
     _dispatch = {}
 
-    def _pprint_dict(self, obj, stream, indent, allowance, context, level):
+    def _pprint_dict(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         write = stream.write
         write(
             self.sign_colors.get('curly-braces', '') + '{' +
@@ -305,7 +352,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[dict.__repr__] = _pprint_dict
 
-    def _pprint_ordered_dict(self, obj, stream, indent, allowance, context, level):
+    def _pprint_ordered_dict(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         if not len(obj):
             stream.write(repr(obj))
             return
@@ -325,7 +380,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_collections.OrderedDict.__repr__] = _pprint_ordered_dict
 
-    def _pprint_list(self, obj, stream, indent, allowance, context, level):
+    def _pprint_list(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         stream.write(
             self.sign_colors.get('square-brackets', '') + '[' +
             self.sign_colors.get('data', '')
@@ -338,7 +401,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[list.__repr__] = _pprint_list
 
-    def _pprint_tuple(self, obj, stream, indent, allowance, context, level):
+    def _pprint_tuple(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         stream.write(
             self.sign_colors.get('parenthesis', '') + '(' +
             self.sign_colors.get('data', '')
@@ -357,7 +428,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[tuple.__repr__] = _pprint_tuple
 
-    def _pprint_set(self, obj, stream, indent, allowance, context, level):
+    def _pprint_set(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         if not len(obj):
             stream.write(repr(obj))
             return
@@ -390,7 +469,15 @@ class PrettyPrinter(_PrettyPrinter):
     _dispatch[set.__repr__] = _pprint_set
     _dispatch[frozenset.__repr__] = _pprint_set
 
-    def _pprint_str(self, object_, stream, indent, allowance, context, level):
+    def _pprint_str(
+        self,
+        object_: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         write = stream.write
         if not len(object_):
             write(repr(object_))
@@ -448,7 +535,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[str.__repr__] = _pprint_str
 
-    def _pprint_bytes(self, obj, stream, indent, allowance, context, level):
+    def _pprint_bytes(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         write = stream.write
         if len(obj) <= 4:
             write(repr(obj))
@@ -475,7 +570,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[bytes.__repr__] = _pprint_bytes
 
-    def _pprint_bytearray(self, obj, stream, indent, allowance, context, level):
+    def _pprint_bytearray(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         write = stream.write
         write(
             'bytearray' + self.sign_colors.get('parenthesis', '') + '(' +
@@ -491,7 +594,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[bytearray.__repr__] = _pprint_bytearray
 
-    def _pprint_mappingproxy(self, obj, stream, indent, allowance, context, level):
+    def _pprint_mappingproxy(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         stream.write(
             'mappingproxy' + self.sign_colors.get('parenthesis', '') + '(' +
             self.sign_colors.get('data', '')
@@ -504,7 +615,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_types.MappingProxyType.__repr__] = _pprint_mappingproxy
 
-    def _pprint_simplenamespace(self, obj, stream, indent, allowance, context, level):
+    def _pprint_simplenamespace(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         if isinstance(obj, _types.SimpleNamespace):
             # The SimpleNamespace repr is "namespace" instead of the class
             # name, so we do the same here. For subclasses; use the class name.
@@ -525,7 +644,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_types.SimpleNamespace.__repr__] = _pprint_simplenamespace
 
-    def _format_dict_items(self, items, stream, indent, allowance, context, level):
+    def _format_dict_items(
+        self,
+        items: _Sequence[tuple[_Any, _Any]],
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         write = stream.write
         indent += self._indent_per_level
         delimnl = self.sign_colors.get('comma', '') + ',\n' + self.sign_colors.get(
@@ -547,7 +674,15 @@ class PrettyPrinter(_PrettyPrinter):
             if not last:
                 write(delimnl)
 
-    def _format_namespace_items(self, items, stream, indent, allowance, context, level):
+    def _format_namespace_items(
+        self,
+        items: _Sequence[tuple[_Any, _Any]],
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         write = stream.write
         delimnl = self.sign_colors.get('comma', '') + ',\n' + self.sign_colors.get(
             'data', ''
@@ -572,7 +707,15 @@ class PrettyPrinter(_PrettyPrinter):
             if not last:
                 write(delimnl)
 
-    def _format_items(self, items, stream, indent, allowance, context, level):
+    def _format_items(
+        self,
+        items: _Sequence[tuple[_Any, _Any]],
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         write = stream.write
         indent += self._indent_per_level
         if self._indent_per_level > 1:
@@ -615,7 +758,15 @@ class PrettyPrinter(_PrettyPrinter):
             delim = delimnl
             self._format(ent, stream, indent, allowance if last else 1, context, level)
 
-    def _pprint_default_dict(self, obj, stream, indent, allowance, context, level):
+    def _pprint_default_dict(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         if not len(obj):
             stream.write(repr(obj))
             return
@@ -635,7 +786,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_collections.defaultdict.__repr__] = _pprint_default_dict
 
-    def _pprint_counter(self, obj, stream, indent, allowance, context, level):
+    def _pprint_counter(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         if not len(obj):
             stream.write(repr(obj))
             return
@@ -658,7 +817,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_collections.Counter.__repr__] = _pprint_counter
 
-    def _pprint_chain_map(self, obj, stream, indent, allowance, context, level):
+    def _pprint_chain_map(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         if not len(obj.maps):
             stream.write(repr(obj))
             return
@@ -684,7 +851,15 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_collections.ChainMap.__repr__] = _pprint_chain_map
 
-    def _pprint_deque(self, obj, stream, indent, allowance, context, level):
+    def _pprint_deque(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:  # ty: ignore[invalid-method-override]
         if not len(obj):
             stream.write(repr(obj))
             return
@@ -717,34 +892,59 @@ class PrettyPrinter(_PrettyPrinter):
 
     _dispatch[_collections.deque.__repr__] = _pprint_deque
 
-    def _pprint_user_dict(self, obj, stream, indent, allowance, context, level):
+    def _pprint_user_dict(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
     _dispatch[_collections.UserDict.__repr__] = _pprint_user_dict
 
-    def _pprint_user_list(self, obj, stream, indent, allowance, context, level):
+    def _pprint_user_list(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
     _dispatch[_collections.UserList.__repr__] = _pprint_user_list
 
-    def _pprint_user_string(self, obj, stream, indent, allowance, context, level):
+    def _pprint_user_string(
+        self,
+        obj: _Any,
+        stream,  # noqa: ANN001
+        indent: int,
+        allowance: int,
+        context,  # noqa: ANN001
+        level  # noqa: ANN001
+    ) -> None:
         self._format(obj.data, stream, indent, allowance, context, level - 1)
 
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 
+# novm
 def pformat(
-    obj,
-    indent=1,
-    width=80,
-    depth=None,
+    obj: _Any,
+    indent: int = 1,
+    width: int = 80,
+    depth: _Optional[int] = None,
     signs_colors: _Optional[_Mapping[str, str]] = None,
     *,
-    compact=False,
-    sort_dicts=True,
-    underscore_numbers=False,
+    compact: bool = False,
+    sort_dicts: bool = True,
+    underscore_numbers: bool = False,
     **kwargs
-):
+) -> str:
     """Format a Python object into a pretty-printed representation.
 
     :param obj: the object to format.

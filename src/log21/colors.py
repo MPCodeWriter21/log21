@@ -1,4 +1,4 @@
-# log21.Colors.py
+# log21.colors.py
 # CodeWriter21
 
 import re as _re
@@ -8,13 +8,13 @@ import webcolors as _webcolors
 
 __all__ = [
     'Colors', 'get_color', 'get_colors', 'ansi_escape', 'get_color_name',
-    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW',
-    'BLUE', 'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN',
-    'BACK_YELLOW', 'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE',
-    'GREY', 'LIGHT_RED', 'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE',
-    'LIGHT_MAGENTA', 'LIGHT_CYAN', 'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED',
-    'BACK_LIGHT_GREEN', 'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE',
-    'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN', 'BACK_LIGHT_WHITE'
+    'closest_color', 'hex_escape', 'RESET', 'BLACK', 'RED', 'GREEN', 'YELLOW', 'BLUE',
+    'MAGENTA', 'CYAN', 'WHITE', 'BACK_BLACK', 'BACK_RED', 'BACK_GREEN', 'BACK_YELLOW',
+    'BACK_BLUE', 'BACK_MAGENTA', 'BACK_CYAN', 'BACK_WHITE', 'GREY', 'LIGHT_RED',
+    'LIGHT_GREEN', 'LIGHT_YELLOW', 'LIGHT_BLUE', 'LIGHT_MAGENTA', 'LIGHT_CYAN',
+    'LIGHT_WHITE', 'BACK_GREY', 'BACK_LIGHT_RED', 'BACK_LIGHT_GREEN',
+    'BACK_LIGHT_YELLOW', 'BACK_LIGHT_BLUE', 'BACK_LIGHT_MAGENTA', 'BACK_LIGHT_CYAN',
+    'BACK_LIGHT_WHITE'
 ]
 
 # Regex pattern to find ansi colors in message
@@ -195,10 +195,9 @@ class Colors:
     }
 
 
-def closest_color(requested_color: _Sequence[int]):
-    """
-    Takes a color in RGB and returns the name of the closest color to the value.
-    Uses the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
+def closest_color(requested_color: _Sequence[int]) -> str:
+    """Takes a color in RGB and returns the name of the closest color to the value. Uses
+    the `webcolors.CSS2_HEX_TO_NAMES` dictionary to find the closest color.
 
     :param requested_color: Sequence[int, int, int]: The input color in RGB.
     :return: str: The name of the closest color.

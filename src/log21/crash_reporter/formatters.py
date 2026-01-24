@@ -1,10 +1,14 @@
-# log21.CrashReporter.Formatters.py
+# log21.crash_reporter.formatters.py
 # CodeWriter21
+
+# yapf: disable
 
 import traceback
 from typing import (Any as _Any, Union as _Union, Mapping as _Mapping,
                     Callable as _Callable, Optional as _Optional)
 from datetime import datetime as _datetime
+
+# yapf: enable
 
 __all__ = [
     'Formatter', 'CONSOLE_REPORTER_FORMAT', 'FILE_REPORTER_FORMAT',
@@ -26,7 +30,7 @@ class Formatter:
         style: str = '%',
         datefmt: str = '%Y-%m-%d %H:%M:%S',
         extra_values: _Optional[_Mapping[str, _Union[str, _Callable, _Any]]] = None
-    ):
+    ) -> None:
         """Initialize the formatter.
 
         :param format_: The format string.

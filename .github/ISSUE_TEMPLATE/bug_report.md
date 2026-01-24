@@ -20,13 +20,15 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. Windows]
- - Version [e.g. 2.0.0]
+
+- OS: [e.g. Windows]
+- Version [e.g. 2.0.0]
 
 **Smartphone (please complete the following information):**
- - Device: [e.g. Samsung Galaxy A52s]
- - OS: [e.g. Android 10]
- - Version [e.g. 2.0.0]
+
+- Device: [e.g. Samsung Galaxy A52s]
+- OS: [e.g. Android 10]
+- Version [e.g. 2.0.0]
 
 **Additional context**
 Add any other context about the problem here.

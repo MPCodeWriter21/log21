@@ -1,5 +1,7 @@
-# log21.Argparse.py
+# log21.argparse.py
 # CodeWriter21
+
+# yapf: disable
 
 from __future__ import annotations
 
@@ -7,41 +9,48 @@ import re as _re
 import sys as _sys
 import types as _types
 import typing as _typing
-import argparse as _argparse
+import contextlib
 import collections.abc
 from enum import Enum as _Enum
-from typing import (Tuple as _Tuple, Mapping as _Mapping, NoReturn,
-                    Optional as _Optional, Sequence as _Sequence)
+from typing import (Any as _Any, Tuple as _Tuple, Mapping as _Mapping,
+                    Callable as _Callable, NoReturn, Optional as _Optional,
+                    Sequence as _Sequence)
 from gettext import gettext as _gettext
 from textwrap import TextWrapper as _TextWrapper
 from collections import OrderedDict as _OrderedDict
 
 import log21 as _log21
-from log21.Colors import get_colors as _gc
-from log21.Formatters import DecolorizingFormatter as _Formatter
+from log21.colors import get_colors as _gc
+from log21.formatters import DecolorizingFormatter as _Formatter
+
+from . import _argparse
+
+# yapf: enable
 
 __all__ = [
     'ColorizingArgumentParser', 'ColorizingHelpFormatter', 'ColorizingTextWrapper',
     'Literal'
 ]
 
+# ruff: noqa: ANN001
+
 
 class Literal:
     """A class for representing literals in argparse arguments."""
 
-    def __init__(self, literal: _typing._LiteralGenericAlias):
+    def __init__(self, literal: _typing._LiteralGenericAlias) -> None:
         self.literal = literal
         # Only str arguments are allowed
-        if not all(map(lambda x: isinstance(x, str), self.literal.__args__)):
+        if not all(isinstance(x, str) for x in self.literal.__args__):
             raise TypeError('Only str arguments are allowed for Literal.')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Literal[{", ".join(map(str, self.literal.__args__))}]'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def __call__(self, value):
+    def __call__(self, value: _Any) -> _Any:
         if value not in self.literal.__args__:
             raise ValueError(
                 f'Value must be one of [{", ".join(map(str, self.literal.__args__))}]'
@@ -54,12 +63,12 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
 
     def __init__(
         self,
-        prog,
-        indent_increment=2,
-        max_help_position=24,
-        width=None,
+        prog: str,
+        indent_increment: int = 2,
+        max_help_position: int = 24,
+        width: _Optional[int] = None,
         colors: _Optional[_Mapping[str, str]] = None
-    ):
+    ) -> None:
         super().__init__(prog, indent_increment, max_help_position, width)
 
         self.colors = {
@@ -81,13 +90,13 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
 
     class _Section:
 
-        def __init__(self, formatter, parent, heading=None):
+        def __init__(self, formatter, parent, heading=None) -> None:
             self.formatter = formatter
             self.parent = parent
             self.heading = heading
             self.items = []
 
-        def format_help(self):
+        def format_help(self) -> str:
             # format the indented section
             if self.parent is not None:
                 self.formatter._indent()
@@ -116,20 +125,20 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                  _gc(self.formatter.colors['help']), item_help, '\n']
             )
 
-    def _add_item(self, func, args):
+    def _add_item(self, func, args) -> None:
         self._current_section.items.append((func, args))
 
-    def _fill_text(self, text, width, indent):
+    def _fill_text(self, text, width, indent) -> ColorizingTextWrapper:
         text = self._whitespace_matcher.sub(' ', text).strip()
         return ColorizingTextWrapper(
             width=width, initial_indent=indent, subsequent_indent=indent
         ).fill(text)
 
-    def _split_lines(self, text, width):
+    def _split_lines(self, text, width) -> ColorizingTextWrapper:
         text = self._whitespace_matcher.sub(' ', text).strip()
         return ColorizingTextWrapper(width=width).wrap(text)
 
-    def start_section(self, heading):
+    def start_section(self, heading) -> None:
         self._indent()
         section = self._Section(
             self, self._current_section,
@@ -138,7 +147,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         self._add_item(section.format_help, [])
         self._current_section = section
 
-    def _format_action(self, action):
+    def _format_action(self, action) -> str:
         # determine the required width and the entry label
         help_position = min(self._action_max_length + 2, self._max_help_position)
         help_width = max(self._width - help_position, 11)
@@ -182,21 +191,23 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         return self._join_parts(parts)
 
     # modified upstream code, not going to refactor for complexity.
-    def _format_usage(self, usage, actions, groups, prefix):  # noqa: C901
+    def _format_usage(  # noqa: C901, PLR0915
+        self, usage, actions, groups, prefix
+    ) -> str:
         if prefix is None:
             prefix = _gettext('usage: ')
 
         # if usage is specified, use that
         if usage is not None:
-            usage = usage % dict(prog=self._prog)
+            usage = usage % {'prog': self._prog}
 
         # if no optionals or positionals are available, usage is just prog
         elif usage is None and not actions:
-            usage = '%(prog)s' % dict(prog=self._prog)
+            usage = '%(prog)s' % {'prog': self._prog}
 
         # if optionals and positionals are available, calculate usage
         elif usage is None:
-            prog = '%(prog)s' % dict(prog=self._prog)
+            prog = '%(prog)s' % {'prog': self._prog}
 
             # split optionals from positionals
             optionals = []
@@ -225,7 +236,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 assert ' '.join(pos_parts) == pos_usage
 
                 # helper for wrapping lines
-                def get_lines(parts, indent, prefix=None):
+                def get_lines(parts, indent, prefix=None) -> list:
                     lines = []
                     line = []
                     if prefix is not None:
@@ -275,7 +286,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         # prefix with 'usage:'
         return prefix + usage + '\n\n'
 
-    def _format_actions_usage(self, actions: list, groups):
+    def _format_actions_usage(self, actions: list, groups) -> None:  # noqa: PLR0915
         # find group indices and identify actions in groups
         group_actions = set()
         inserts = {}
@@ -342,9 +353,8 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
                 part = self._format_args(action, default)
 
                 # if it's in a group, strip the outer []
-                if action in group_actions:
-                    if part[0] == '[' and part[-1] == ']':
-                        part = part[1:-1]
+                if action in group_actions and part[0] == '[' and part[-1] == ']':
+                    part = part[1:-1]
 
                 # add the action string to the list
                 parts.append(part)
@@ -395,7 +405,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         # return the text
         return text
 
-    def _format_action_invocation(self, action):
+    def _format_action_invocation(self, action) -> str:
         if not action.option_strings:
             default = self._get_default_metavar_for_positional(action)
             metavar, = self._metavar_formatter(action, default)(1)
@@ -423,7 +433,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
 
             return _gc(self.colors['commas']) + ', '.join(parts)
 
-    def _metavar_formatter(self, action, default_metavar):
+    def _metavar_formatter(self, action, default_metavar) -> _Callable:
         if action.metavar is not None:
             result = action.metavar
         elif action.choices is not None:
@@ -438,7 +448,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         else:
             result = default_metavar
 
-        def format(tuple_size):
+        def format(tuple_size) -> tuple:
             if isinstance(result, tuple):
                 return result
             else:
@@ -449,7 +459,7 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
 
 class ColorizingTextWrapper(_TextWrapper):
     # modified upstream code, not going to refactor for complexity.
-    def _wrap_chunks(self, chunks):  # noqa: C901
+    def _wrap_chunks(self, chunks) -> list:  # noqa: C901, PLR0915
         """_wrap_chunks(chunks : [string]) -> [string]
 
         Wrap a sequence of text chunks and return a list of lines of
@@ -485,10 +495,7 @@ class ColorizingTextWrapper(_TextWrapper):
             current_len = 0
 
             # Figure out which static string will prefix this line.
-            if lines:
-                indent = self.subsequent_indent
-            else:
-                indent = self.initial_indent
+            indent = self.subsequent_indent if lines else self.initial_indent
 
             # Maximum width for this line.
             width = self.width - len(indent)
@@ -556,7 +563,7 @@ class ColorizingTextWrapper(_TextWrapper):
         return lines
 
 
-class _ActionsContainer(_argparse._ActionsContainer):
+class _ActionsContainer(_argparse._ActionsContainer):  # novm
     """Container for the actions for a single command line option."""
 
     # pylint: disable=too-many-branches
@@ -592,15 +599,10 @@ class _ActionsContainer(_argparse._ActionsContainer):
         # Handle `List` as a type (e.g. `List[int]`)
         elif (hasattr(_typing, '_GenericAlias')
               and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is list):
-            func_type = func_type.__args__[0]
-            if kwargs.get('nargs') is None:
-                action.nargs = '+'
-
-        # Handle `Sequence` as a type (e.g. `Sequence[int]`)
-        elif (hasattr(_typing, '_GenericAlias')
-              and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is collections.abc.Sequence):
+              and func_type.__origin__ is list) or (
+                  hasattr(_typing, '_GenericAlias')
+                  and isinstance(func_type, _typing._GenericAlias)  # type: ignore
+                  and func_type.__origin__ is collections.abc.Sequence):
             func_type = func_type.__args__[0]
             if kwargs.get('nargs') is None:
                 action.nargs = '+'
@@ -608,31 +610,23 @@ class _ActionsContainer(_argparse._ActionsContainer):
         # Handle `Required` as a type (e.g. `Required[int]`)
         elif (hasattr(_typing, 'Required') and hasattr(_typing, '_GenericAlias')
               and isinstance(func_type, _typing._GenericAlias)  # type: ignore
-              and getattr(func_type, '__origin__') is _typing.Required):
+              and func_type.__origin__ is _typing.Required):
             func_type = func_type.__args__[0]
             action.required = True
 
         # Handle Enum as a type
         elif callable(func_type) and isinstance(func_type, type) and issubclass(
                 func_type, _Enum) and action.choices is None and level == 0:
-            action.choices = tuple(
-                map(lambda x: x.value, func_type.__members__.values())
-            )
+            action.choices = tuple((x.value for x in func_type.__members__.values()))
 
         # Handle SpecialForms
         elif isinstance(func_type, _typing._SpecialForm):
-            if func_type is _typing.Any:
-                func_type = None
-            elif func_type is _typing.ClassVar:
-                func_type = None
-            elif func_type is _typing.Union:
+            if func_type is _typing.Any or func_type is _typing.ClassVar or func_type is _typing.Union:
                 func_type = None
             elif func_type is _typing.Optional:
                 func_type = None
                 action.required = False
-            elif func_type is _typing.Type:
-                func_type = None
-            elif func_type is _typing.TypeVar:
+            elif func_type is _typing.Type or func_type is _typing.TypeVar:
                 func_type = None
             else:
                 raise ValueError(f'Unknown special form {func_type}')
@@ -647,28 +641,25 @@ class _ActionsContainer(_argparse._ActionsContainer):
             for type_ in _OrderedDict(zip(func_type, [0] * len(func_type))):
                 temp.extend(self._validate_func_type(action, type_, kwargs, level + 1))
             func_type = tuple(temp)
+        elif (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
+              and hasattr(_typing, '_UnionGenericAlias')
+              and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
+                  func_type,
+                  (
+                      _typing._GenericAlias,  # type: ignore
+                      _typing._UnionGenericAlias,  # type: ignore
+                      _typing._LiteralGenericAlias,  # type: ignore
+                      _types.UnionType,
+                  ))):
+            func_type = self._validate_func_type(action, func_type, kwargs, level + 1)
         else:
-            if (hasattr(_types, 'UnionType') and hasattr(_typing, '_GenericAlias')
-                    and hasattr(_typing, '_UnionGenericAlias')
-                    and hasattr(_typing, '_LiteralGenericAlias') and isinstance(
-                        func_type,
-                        (
-                            _typing._GenericAlias,  # type: ignore
-                            _typing._UnionGenericAlias,  # type: ignore
-                            _typing._LiteralGenericAlias,  # type: ignore
-                            _types.UnionType,
-                        ))):
-                func_type = self._validate_func_type(
-                    action, func_type, kwargs, level + 1
-                )
-            else:
-                func_type = (func_type, )
+            func_type = (func_type, )
 
         return func_type
 
     # Override the default add_argument method defined in argparse._ActionsContainer
     # to add the support for different type annotations
-    def add_argument(self, *args, **kwargs):
+    def add_argument(self, *args, **kwargs):  # noqa: ANN202
         """Add an argument to the parser.
 
         Signature:
@@ -723,12 +714,12 @@ class _ActionsContainer(_argparse._ActionsContainer):
 
         return self._add_action(action)
 
-    def add_argument_group(self, *args, **kwargs):
+    def add_argument_group(self, *args, **kwargs) -> _ArgumentGroup:
         group = _ArgumentGroup(self, *args, **kwargs)
         self._action_groups.append(group)
         return group
 
-    def add_mutually_exclusive_group(self, **kwargs):
+    def add_mutually_exclusive_group(self, **kwargs) -> _MutuallyExclusiveGroup:
         group = _MutuallyExclusiveGroup(self, **kwargs)
         self._mutually_exclusive_groups.append(group)
         return group
@@ -742,24 +733,24 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         formatter_class=ColorizingHelpFormatter,
         colors: _Optional[_Mapping[str, str]] = None,
         **kwargs
-    ):
+    ) -> None:
         self.logger = _log21.Logger('ArgumentParser')
         self.colors = colors
         super().__init__(formatter_class=formatter_class, **kwargs)
 
-    def _print_message(self, message, file=None):
+    def _print_message(self, message, file=None) -> None:
         if message:
             self.logger.handlers.clear()
             handler = _log21.ColorizingStreamHandler(stream=file)
             self.logger.addHandler(handler)
             self.logger.info(message + _gc('rst'))
 
-    def exit(self, status=0, message=None):
+    def exit(self, status=0, message=None) -> None:
         if message:
             self._print_message(_gc('lr') + message + _gc('rst'), _sys.stderr)
         _sys.exit(status)
 
-    def error(self, message):
+    def error(self, message) -> NoReturn:
         self.print_usage(_sys.stderr)
         args = {'prog': self.prog, 'message': message}
         self.exit(
@@ -770,12 +761,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         )
         return NoReturn
 
-    def _get_formatter(self):
+    def _get_formatter(self):  # noqa: ANN202
         if hasattr(self.formatter_class, 'colors'):
             return self.formatter_class(prog=self.prog, colors=self.colors)
         return self.formatter_class(prog=self.prog)
 
-    def _get_value(self, action, arg_string):
+    def _get_value(self, action, arg_string):  # noqa: ANN202
         """Override _get_value to add support for types such as Union and Literal."""
 
         func_type = self._registry_get('type', action.type, action.type)
@@ -805,7 +796,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # ArgumentTypeErrors indicate errors
         except _argparse.ArgumentTypeError as ex:
             msg = str(ex)
-            raise _argparse.ArgumentError(action, msg)
+            raise _argparse.ArgumentError(action, msg) from None
 
         # TypeErrors or ValueErrors also indicate errors
         except (TypeError, ValueError):
@@ -816,13 +807,11 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # return the converted value
         return result
 
-    def __convert_type(self, func_type, arg_string):
+    def __convert_type(self, func_type, arg_string):  # noqa: ANN202
         result = None
         if callable(func_type):
-            try:
+            with contextlib.suppress(Exception):
                 result = func_type(arg_string)
-            except Exception:
-                pass
         else:
             for type_ in func_type:
                 try:
@@ -833,7 +822,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
 
         return result
 
-    def _check_value(self, action, choice):
+    def _check_value(self, action, choice) -> None:
         # converted value must be one of the choices (if specified)
         if action.choices is not None:
             choices = set(action.choices)
@@ -856,7 +845,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                     )
                 )
 
-    def _read_args_from_files(self, arg_strings):
+    def _read_args_from_files(self, arg_strings) -> list:
         # expand arguments referencing files
         new_arg_strings = []
         for arg_string in arg_strings:
@@ -882,7 +871,9 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # return the modified argument list
         return new_arg_strings
 
-    def _parse_known_args(self, arg_strings, namespace):
+    def _parse_known_args(  # noqa: PLR0915
+        self, arg_strings, namespace, intermixed
+    ) -> tuple:
         # replace arg strings that are file references
         if self.fromfile_prefix_chars is not None:
             arg_strings = self._read_args_from_files(arg_strings)
@@ -908,17 +899,17 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             # all args after -- are non-options
             if arg_string == '--':
                 arg_string_pattern_parts.append('-')
-                for arg_string in arg_strings_iter:
+                for _ in arg_strings_iter:
                     arg_string_pattern_parts.append('A')
 
             # otherwise, add the arg to the arg strings
             # and note the index if it was an option
             else:
-                option_tuple = self._parse_optional(arg_string)
-                if option_tuple is None:
+                option_tuples = self._parse_optional(arg_string)
+                if option_tuples is None:
                     pattern = 'A'
                 else:
-                    option_string_indices[i] = option_tuple
+                    option_string_indices[i] = option_tuples
                     pattern = 'O'
                 arg_string_pattern_parts.append(pattern)
 
@@ -928,15 +919,15 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # converts arg strings to the appropriate and then takes the action
         seen_actions = set()
         seen_non_default_actions = set()
+        warned = set()
 
-        def take_action(action, argument_strings, option_string=None):
+        def take_action(action, argument_strings, option_string=None) -> None:
             seen_actions.add(action)
             argument_values = self._get_values(action, argument_strings)
 
             # error if this argument is not allowed with other previously
-            # seen arguments, assuming that actions that use the default
-            # value don't really count as "present"
-            if argument_values is not action.default:
+            # seen arguments
+            if action.option_strings or argument_strings:
                 seen_non_default_actions.add(action)
                 for conflict_action in action_conflicts.get(action, []):
                     if conflict_action in seen_non_default_actions:
@@ -950,26 +941,23 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                 action(self, namespace, argument_values, option_string)
 
         # function to convert arg_strings into an optional action
-        def consume_optional(start_index):
+        def consume_optional(start_index: int) -> int:  # noqa: PLR0915
 
             # get the optional identified at this index
-            option_tuple = option_string_indices[start_index]
-            if len(option_tuple) == 3:
-                action, option_string, explicit_arg = option_tuple
-                sep = None
-            elif len(option_tuple) == 4:
-                action, option_string, sep, explicit_arg = option_tuple
-            else:
-                # Tell the user that there seem to have been a change in argparse module
-                # and if they see this error they should immediately report it in an
-                # issue at GitHub.com/MPCodeWriter21/log21 with their Python version
-                raise ValueError(
-                    'Unknown option tuple length, please report this issue at: '
-                    'https://GitHub.com/MPCodeWriter21/log21\n'
-                    f'Python version: {_sys.version}'
-                    f'Option tuple: {option_tuple}'
-                    f'log21 version: {_log21.__version__}'
+            option_tuples = option_string_indices[start_index]
+            # if multiple actions match, the option string was ambiguous
+            if len(option_tuples) > 1:
+                options = ', '.join(
+                    [
+                        option_string
+                        for action, option_string, sep, explicit_arg in option_tuples
+                    ]
                 )
+                args = {'option': arg_strings[start_index], 'matches': options}
+                msg = _gettext('ambiguous option: %(option)s could match %(matches)s')
+                raise _argparse.ArgumentError(None, msg % args)
+
+            action, option_string, sep, explicit_arg = option_tuples[0]
 
             # identify additional optionals in the same arg string
             # (e.g. -xyz is the same as -x -y -z if no args are required)
@@ -980,6 +968,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                 # if we found no optional action, skip it
                 if action is None:
                     extras.append(arg_strings[start_index])
+                    extras_pattern.append('O')
                     return start_index + 1
 
                 # if there is an explicit argument, try to match the
@@ -991,7 +980,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                     # arguments, try to parse more single-dash options out
                     # of the tail of the option string
                     chars = self.prefix_chars
-                    if arg_count == 0 and option_string[1] not in chars:
+                    if (arg_count == 0 and option_string[1] not in chars
+                            and explicit_arg != ''):
                         if sep or explicit_arg[0] in chars:
                             msg = _gettext('ignored explicit argument %r')
                             raise _argparse.ArgumentError(action, msg % explicit_arg)
@@ -1011,6 +1001,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
                                 sep = ''
                         else:
                             extras.append(char + explicit_arg)
+                            extras_pattern.append('O')
                             stop = start_index + 1
                             break
                     # if the action expect exactly one argument, we've
@@ -1043,6 +1034,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             # the Optional's string args stopped
             assert action_tuples
             for action, args, option_string in action_tuples:
+                if action.deprecated and option_string not in warned:
+                    self._warning(
+                        _gettext("option '%(option)s' is deprecated") %
+                        {'option': option_string}
+                    )
+                    warned.add(option_string)
                 take_action(action, args, option_string)
             return stop
 
@@ -1051,7 +1048,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         positionals = self._get_positional_actions()
 
         # function to convert arg_strings into positional actions
-        def consume_positionals(start_index):
+        def consume_positionals(start_index: int) -> int:
             # match as many Positionals as possible
             match_partial = self._match_arguments_partial
             selected_pattern = arg_strings_pattern[start_index:]
@@ -1062,6 +1059,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             for action, arg_count in zip(positionals, arg_counts):
                 args = arg_strings[start_index:start_index + arg_count]
                 start_index += arg_count
+                if args and action.deprecated and action.dest not in warned:
+                    self._warning(
+                        _gettext("argument '%(argument_name)s' is deprecated") %
+                        {'argument_name': action.dest}
+                    )
+                    warned.add(action.dest)
                 take_action(action, args)
 
             # slice off the Positionals that we just parsed and return the
@@ -1072,6 +1075,7 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         # consume Positionals and Optionals alternately, until we have
         # passed the last option string
         extras = []
+        extras_pattern = []
         start_index = 0
         if option_string_indices:
             max_option_string_index = max(option_string_indices)
@@ -1080,10 +1084,12 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
         while start_index <= max_option_string_index:
 
             # consume any Positionals preceding the next option
-            next_option_string_index = min(
-                [index for index in option_string_indices if index >= start_index]
-            )
-            if start_index != next_option_string_index:
+            next_option_string_index = start_index
+            while next_option_string_index <= max_option_string_index:
+                if next_option_string_index in option_string_indices:
+                    break
+                next_option_string_index += 1
+            if not intermixed and start_index != next_option_string_index:
                 positionals_end_index = consume_positionals(start_index)
 
                 # only try to parse the next optional if we didn't consume
@@ -1099,16 +1105,37 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             if start_index not in option_string_indices:
                 strings = arg_strings[start_index:next_option_string_index]
                 extras.extend(strings)
+                extras_pattern.extend(
+                    arg_strings_pattern[start_index:next_option_string_index]
+                )
                 start_index = next_option_string_index
 
             # consume the next optional and any arguments for it
             start_index = consume_optional(start_index)
 
-        # consume any positionals following the last Optional
-        stop_index = consume_positionals(start_index)
+        if not intermixed:
+            # consume any positionals following the last Optional
+            stop_index = consume_positionals(start_index)
 
-        # if we didn't consume all the argument strings, there were extras
-        extras.extend(arg_strings[stop_index:])
+            # if we didn't consume all the argument strings, there were extras
+            extras.extend(arg_strings[stop_index:])
+        else:
+            extras.extend(arg_strings[start_index:])
+            extras_pattern.extend(arg_strings_pattern[start_index:])
+            extras_pattern = ''.join(extras_pattern)
+            assert len(extras_pattern) == len(extras)
+            # consume all positionals
+            arg_strings = [s for s, c in zip(extras, extras_pattern) if c != 'O']
+            arg_strings_pattern = extras_pattern.replace('O', '')
+            stop_index = consume_positionals(0)
+            # leave unknown optionals and non-consumed positionals in extras
+            for i, c in enumerate(extras_pattern):
+                if not stop_index:
+                    break
+                if c != 'O':
+                    stop_index -= 1
+                    extras[i] = None
+            extras = [s for s in extras if s is not None]
 
         # make sure all required actions were present and also convert
         # action defaults which were not given as arguments
@@ -1117,18 +1144,16 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             if action not in seen_actions:
                 if action.required:
                     required_actions.append(_argparse._get_action_name(action))
-                else:
-                    # Convert action default now instead of doing it before
-                    # parsing arguments to avoid calling convert functions
-                    # twice (which may fail) if the argument was given, but
-                    # only if it was defined already in the namespace
-                    if (action.default is not None and isinstance(action.default, str)
-                            and hasattr(namespace, action.dest)
-                            and action.default is getattr(namespace, action.dest)):
-                        setattr(
-                            namespace, action.dest,
-                            self._get_value(action, action.default)
-                        )
+                # Convert action default now instead of doing it before
+                # parsing arguments to avoid calling convert functions
+                # twice (which may fail) if the argument was given, but
+                # only if it was defined already in the namespace
+                elif (action.default is not None and isinstance(action.default, str)
+                      and hasattr(namespace, action.dest)
+                      and action.default is getattr(namespace, action.dest)):
+                    setattr(
+                        namespace, action.dest, self._get_value(action, action.default)
+                    )
 
         if required_actions:
             self.error(
@@ -1194,7 +1219,7 @@ class _ArgumentGroup(_argparse._ArgumentGroup, _ActionsContainer):
         description=None,
         required: bool = False,
         **kwargs
-    ):
+    ) -> None:
         super().__init__(container, title=title, description=description, **kwargs)
 
         self.required = required
