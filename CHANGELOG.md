@@ -6,6 +6,76 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.0.0
+
+This release introduces a cleaned-up internal structure, stricter naming conventions,
+and several quality-of-life improvements. While most users will not notice behavioral
+changes, **v3 contains breaking changes for code that relies on internal imports or
+specific exception names**.
+
+#### Breaking Changes
+
++ **Internal module renaming and normalization**
+  + All internal modules were renamed to lowercase and, in some cases, split or
+    reorganized.
+  + Imports such as `log21.Colors`, `log21.Logger`, `log21.ProgressBar`, etc. are no
+    longer valid.
+  + Users importing from internal modules must update their imports to the new module
+    names.
+  + Public imports from `log21` remain supported.
+
++ **Argumentify exception renames**
+  + Several exceptions were renamed to follow a consistent `*Error` naming convention:
+    + `TooFewArguments` → `TooFewArgumentsError`
+    + `RequiredArgument` → `RequiredArgumentError`
+    + `IncompatibleArguments` → `IncompatibleArgumentsError`
+  + Code that explicitly raises or catches these exceptions must be updated.
+
+#### V3 Changes
+
++ **Crash reporter behavior improvement**
+  + Prevented the default file crash reporter from creating `.crash_report` files when it
+    is not actually used.
+  + Implemented using an internal `FakeModule` helper.
+
++ **Argparse compatibility update**
+  + Bundled and used the Python 3.13 `argparse` implementation to ensure consistent
+    behavior across supported Python versions.
+
++ **Progress bar module rename**
+  + Renamed the internal progress bar module to `progress_bar` for consistency with the
+    new naming scheme.
+  + This will not break the usages of `log21.progress_bar(...)` since the call
+    functionality was added to the module using the `FakeModule` helper.
+
++ **Examples added and updated**
+  + Added new example code files.
+  + Updated existing examples to match the v3 API and conventions.
+
+#### Fixes
+
++ Resolved various linting and static-analysis issues across the codebase.
++ Addressed minor compatibility issues uncovered by running linters and pre-commit hooks.
++ Resolved errors occurring in environments with newer versions of argparse.
+
+#### Internal and Maintenance Changes
+
++ Migrated the build system configuration to `uv`.
++ Updated Python version classifiers and set the supported Python version to 3.9+.
++ Added `vermin` to the pre-commit configuration.
++ Updated `.gitignore`, license metadata, and tool configurations.
++ Silenced and resolved a large number of linter warnings.
++ General internal refactoring with no intended user-visible behavioral changes.
+
+#### Notes
+
++ There are **no intentional behavioral changes** in logging output, argument parsing
+  logic, or UI components.
++ Most projects will require **minimal or no changes** unless they depend on internal
+  modules or renamed exceptions.
++ See [MIGRATION-V2-V3.md](https://github.com/MPCodeWriter21/log21/blob/master/MIGRATION-V2-V3.md)
+for detailed upgrade instructions.
+
 ### 2.10.2
 
 + Update README.md and CHANGELOG.md.
