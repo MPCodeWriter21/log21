@@ -210,7 +210,7 @@ class Logger(_logging.Logger):
         """
         if not self._progress_bar:
             # avoid circular import; pylint: disable=import-outside-toplevel
-            from log21.progressbar import ProgressBar  # noqa: PLC0415
+            from log21.progress_bar import ProgressBar  # noqa: PLC0415
             self._progress_bar = ProgressBar(logger=self)
         return self._progress_bar
 
