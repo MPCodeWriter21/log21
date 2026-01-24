@@ -421,4 +421,4 @@ def _add_one(name: str) -> str:
     match = _re.match(r'([\S]+)_([0-9]+)', name)
     if not match:
         return name + '_1'
-    return f'{match.group(1)}{int(match.group(2)) + 1}'
+    return f'{match.group(1)}_{int(match.group(2)) + 1}'
