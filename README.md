@@ -69,12 +69,22 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changelog
 ---------
 
-### v3.0.0
+### v3.0.1
 
-This release introduces a cleaned-up internal structure, stricter naming conventions,
-and several quality-of-life improvements. While most users will not notice behavioral
-changes, **v3 contains breaking changes for code that relies on internal imports or
-specific exception names**.
+Fix the issue with `argumentify` which would result in falsy default values to be
+replaced with None.
+
++ Example:
+
+```python
+def main(offset: int = 0) -> None:
+    ...
+
+argumentify(main)
+```
+
+if no value is provided for `--offset`, the default will be `None` instead of `0` which
+is unexpected and can lead to issues.
 
 #### Breaking Changes
 

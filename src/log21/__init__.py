@@ -31,7 +31,7 @@ from .stream_handler import StreamHandler, ColorizingStreamHandler
 # yapf: enable
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '3.0.0'
+__version__ = '3.0.1'
 __github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',

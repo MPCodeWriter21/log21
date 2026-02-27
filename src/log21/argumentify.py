@@ -359,7 +359,7 @@ def _add_arguments(
             config['required'] = True
         if argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:
             config['nargs'] = '*'
-        if argument.default:
+        if argument.default is not None:
             config['default'] = argument.default
         parser.add_argument(
             *generate_flag(argument, reserved_flags=reserved_flags), **config

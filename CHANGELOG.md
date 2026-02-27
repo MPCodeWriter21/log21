@@ -6,6 +6,23 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.0.1
+
+Fix the issue with `argumentify` which would result in falsy default values to be
+replaced with None.
+
+- Example:
+
+```python
+def main(offset: int = 0) -> None:
+    ...
+
+argumentify(main)
+```
+
+if no value is provided for `--offset`, the default will be `None` instead of `0` which
+is unexpected and can lead to issues.
+
 ### v3.0.0
 
 This release introduces a cleaned-up internal structure, stricter naming conventions,
@@ -15,147 +32,147 @@ specific exception names**.
 
 #### Breaking Changes
 
-+ **Internal module renaming and normalization**
-  + All internal modules were renamed to lowercase and, in some cases, split or
+- **Internal module renaming and normalization**
+  - All internal modules were renamed to lowercase and, in some cases, split or
     reorganized.
-  + Imports such as `log21.Colors`, `log21.Logger`, `log21.ProgressBar`, etc. are no
+  - Imports such as `log21.Colors`, `log21.Logger`, `log21.ProgressBar`, etc. are no
     longer valid.
-  + Users importing from internal modules must update their imports to the new module
+  - Users importing from internal modules must update their imports to the new module
     names.
-  + Public imports from `log21` remain supported.
+  - Public imports from `log21` remain supported.
 
-+ **Argumentify exception renames**
-  + Several exceptions were renamed to follow a consistent `*Error` naming convention:
-    + `TooFewArguments` → `TooFewArgumentsError`
-    + `RequiredArgument` → `RequiredArgumentError`
-    + `IncompatibleArguments` → `IncompatibleArgumentsError`
-  + Code that explicitly raises or catches these exceptions must be updated.
+- **Argumentify exception renames**
+  - Several exceptions were renamed to follow a consistent `*Error` naming convention:
+    - `TooFewArguments` → `TooFewArgumentsError`
+    - `RequiredArgument` → `RequiredArgumentError`
+    - `IncompatibleArguments` → `IncompatibleArgumentsError`
+  - Code that explicitly raises or catches these exceptions must be updated.
 
 #### V3 Changes
 
-+ **Crash reporter behavior improvement**
-  + Prevented the default file crash reporter from creating `.crash_report` files when it
+- **Crash reporter behavior improvement**
+  - Prevented the default file crash reporter from creating `.crash_report` files when it
     is not actually used.
-  + Implemented using an internal `FakeModule` helper.
+  - Implemented using an internal `FakeModule` helper.
 
-+ **Argparse compatibility update**
-  + Bundled and used the Python 3.13 `argparse` implementation to ensure consistent
+- **Argparse compatibility update**
+  - Bundled and used the Python 3.13 `argparse` implementation to ensure consistent
     behavior across supported Python versions.
 
-+ **Progress bar module rename**
-  + Renamed the internal progress bar module to `progress_bar` for consistency with the
+- **Progress bar module rename**
+  - Renamed the internal progress bar module to `progress_bar` for consistency with the
     new naming scheme.
-  + This will not break the usages of `log21.progress_bar(...)` since the call
+  - This will not break the usages of `log21.progress_bar(...)` since the call
     functionality was added to the module using the `FakeModule` helper.
 
-+ **Examples added and updated**
-  + Added new example code files.
-  + Updated existing examples to match the v3 API and conventions.
+- **Examples added and updated**
+  - Added new example code files.
+  - Updated existing examples to match the v3 API and conventions.
 
 #### Fixes
 
-+ Resolved various linting and static-analysis issues across the codebase.
-+ Addressed minor compatibility issues uncovered by running linters and pre-commit hooks.
-+ Resolved errors occurring in environments with newer versions of argparse.
+- Resolved various linting and static-analysis issues across the codebase.
+- Addressed minor compatibility issues uncovered by running linters and pre-commit hooks.
+- Resolved errors occurring in environments with newer versions of argparse.
 
 #### Internal and Maintenance Changes
 
-+ Migrated the build system configuration to `uv`.
-+ Updated Python version classifiers and set the supported Python version to 3.9+.
-+ Added `vermin` to the pre-commit configuration.
-+ Updated `.gitignore`, license metadata, and tool configurations.
-+ Silenced and resolved a large number of linter warnings.
-+ General internal refactoring with no intended user-visible behavioral changes.
+- Migrated the build system configuration to `uv`.
+- Updated Python version classifiers and set the supported Python version to 3.9+.
+- Added `vermin` to the pre-commit configuration.
+- Updated `.gitignore`, license metadata, and tool configurations.
+- Silenced and resolved a large number of linter warnings.
+- General internal refactoring with no intended user-visible behavioral changes.
 
 #### Notes
 
-+ There are **no intentional behavioral changes** in logging output, argument parsing
+- There are **no intentional behavioral changes** in logging output, argument parsing
   logic, or UI components.
-+ Most projects will require **minimal or no changes** unless they depend on internal
+- Most projects will require **minimal or no changes** unless they depend on internal
   modules or renamed exceptions.
-+ See [MIGRATION-V2-V3.md](https://github.com/MPCodeWriter21/log21/blob/master/MIGRATION-V2-V3.md)
+- See [MIGRATION-V2-V3.md](https://github.com/MPCodeWriter21/log21/blob/master/MIGRATION-V2-V3.md)
 for detailed upgrade instructions.
 
 ### 2.10.2
 
-+ Update README.md and CHANGELOG.md.
+- Update README.md and CHANGELOG.md.
 
 ### 2.10.1
 
-+ Updated the Argparse module to be usable with python 3.12.3.
+- Updated the Argparse module to be usable with python 3.12.3.
 
 ### 2.10.0
 
-+ Added some exception classes to raise in the "argumentified" functions to show
+- Added some exception classes to raise in the "argumentified" functions to show
   *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
   `RequiredArgument`, `TooFewArguments`
 
 ### 2.9.2
 
-+ Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.
-+ Bug fixes.
+- Added `Sequence[T]` as a supported type to the ColorizingArgumentParser.
+- Bug fixes.
 
 ### 2.9.1
 
-+ Update `README.md`.
+- Update `README.md`.
 
 ### 2.9.0
 
-+ Added `<<` and `>>` (left shift and right shift operators) to `log21.Logger.Logger`.
+- Added `<<` and `>>` (left shift and right shift operators) to `log21.Logger.Logger`.
 
 ### 2.8.1
 
-+ Fixed Carriage Return Handling.
-+ Fixed setting level using `log21.basic_config`
-+ Added more configuration for developer tools to the `pyproject.toml` file.
-+ Added pre-commit.
+- Fixed Carriage Return Handling.
+- Fixed setting level using `log21.basic_config`
+- Added more configuration for developer tools to the `pyproject.toml` file.
+- Added pre-commit.
 
 ### 2.8.1b0
 
-+ Fixed setting level using `log21.basic_config`
+- Fixed setting level using `log21.basic_config`
 
 ### 2.8.1a0
 
-+ Fixed Carriage Return Handling.
+- Fixed Carriage Return Handling.
 
 ### 2.8.0
 
-+ Update python version
-+ Renamed `crash_report.log` to `.crash_report.log`.
-+ Added "force" error handling method to `Logger.add_level`.
-+ Changed the adding level error handling method to "ignore".
-+ Ability to add new methods to the Logger object for each custom level.
+- Update python version
+- Renamed `crash_report.log` to `.crash_report.log`.
+- Added "force" error handling method to `Logger.add_level`.
+- Changed the adding level error handling method to "ignore".
+- Ability to add new methods to the Logger object for each custom level.
 
 ### 2.8.0b1
 
-+ Renamed `crash_report.log` to `.crash_report.log`.
+- Renamed `crash_report.log` to `.crash_report.log`.
 
 ### 2.8.0b0
 
-+ Changed the adding level error handling method to "ignore".
+- Changed the adding level error handling method to "ignore".
 
 ### 2.8.0a0-2
 
-+ Ability to add new methods to the Logger object for each custom level.
-+ Update python version
-+ Added "force" error handling method to `Logger.add_level`.
+- Ability to add new methods to the Logger object for each custom level.
+- Update python version
+- Added "force" error handling method to `Logger.add_level`.
 
 ### 2.7.1
 
-+ Improved compatibility
+- Improved compatibility
 
 ### 2.7.0
 
-+ Modified `automatic-release.yml` and `pypi.yml` workflows to check the
+- Modified `automatic-release.yml` and `pypi.yml` workflows to check the
   version
-+ Added the support for more `type`s to pass to
+- Added the support for more `type`s to pass to
   `ColorizingArgumentParser().add_argument(...)`: `typing.Union`, `typing.Optional`,
   `typing.Literal`, `enum.Enum`, `tuple` and `typing.Required`.
-+ Modified the way `Enum`s are handled in the Argument Parser.
-+ Handled some `typing._SpecialForm`s.
-+ A normal ArgumentGroup can now be required! (Unlike MutuallyExclusiveGroup it can
+- Modified the way `Enum`s are handled in the Argument Parser.
+- Handled some `typing._SpecialForm`s.
+- A normal ArgumentGroup can now be required! (Unlike MutuallyExclusiveGroup it can
   have more than 1 option used at the same time)
-+ `argumentify` now supports async functions as the entry point.
+- `argumentify` now supports async functions as the entry point.
 
 ### 2.6.2
 
@@ -163,10 +180,10 @@ Change in README.md.
 
 ### 2.6.1
 
-+ Added `encoding` to `log21.crash_reporter.FileReporter`.
-+ Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
-+ Added optional `dev` dependencies to `pyproject.toml`.
-+ Improved overall code quality.
+- Added `encoding` to `log21.crash_reporter.FileReporter`.
+- Added configs for `pylint`, `yapf` and `isort` to `pyproject.toml`.
+- Added optional `dev` dependencies to `pyproject.toml`.
+- Improved overall code quality.
 
 ### 2.6.0
 
@@ -191,11 +208,11 @@ print(GREEN + 'This' + WHITE + ' is' + RED + ' Red')
 
 Moved some dictionaries to `__init__` methods.
 
-+ `colors` in `Argparse.ColorizingHelpFormatter` class.
-+ `_level_name` in `Formatters._Formatter` class and `level_colors` in
+- `colors` in `Argparse.ColorizingHelpFormatter` class.
+- `_level_name` in `Formatters._Formatter` class and `level_colors` in
   `Formatters.ColorizingFormatter` class.
-+ `sign_colors` in `PPrint.PrettyPrinter` class.
-+ `colors` in `TreePrint.TreePrint.Node` class.
+- `sign_colors` in `PPrint.PrettyPrinter` class.
+- `colors` in `TreePrint.TreePrint.Node` class.
 
 ### 2.5.2
 
@@ -269,8 +286,8 @@ Bug fixes and improvements.
 
 ### 2.4.0
 
-+ Made it more compatible with multi-threading.
-+ Fixed some bugs.
+- Made it more compatible with multi-threading.
+- Fixed some bugs.
 
 ### 2.3.10
 
