@@ -384,9 +384,7 @@ def _argumentify_one(func: Callable) -> None:
             )
 
     # Create the parser
-    parser = _argparse.ColorizingArgumentParser(
-        description=info.docstring.short_description
-    )
+    parser = _argparse.ColorizingArgumentParser(description=info.docstring.description)
     # Add the arguments
     _add_arguments(parser, info)
     cli_args = parser.parse_args()
@@ -432,7 +430,7 @@ def _argumentify(functions: _Dict[str, Callable]) -> None:
     parser = _argparse.ColorizingArgumentParser()
     subparsers = parser.add_subparsers(required=True)
     for name, (_, info) in functions_info.items():
-        subparser = subparsers.add_parser(name, help=info.docstring.short_description)
+        subparser = subparsers.add_parser(name, help=info.docstring.description)
         _add_arguments(subparser, info)
         subparser.set_defaults(func=info.function)
     cli_args = parser.parse_args()

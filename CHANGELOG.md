@@ -6,6 +6,57 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.0.2
+
+Change `argumentify` to use the whole function description as the argument-parser
+description instead of the one-line short description.
+
+- Example:
+
+```python
+def main(verbose: bool = False) -> None:
+    """This is a very useful tool and I will describe it thoroughly. It is so good that
+    we have a second line in the first part of the description.
+
+    And now we can talk more about the tool...
+
+    :param verbose: This flag will make the logs more verbose!
+    """
+
+argumentify(main)
+```
+
+The way old versions would look:
+
+```help
+usage: test.py [-h] [--verbose]
+
+This is a very useful tool and I will describe it thoroughly. It is so good that
+
+options:
+  -h, --help
+                        show this help message and exit
+  --verbose, -v
+                        This flag will make the logs more verbose!
+
+```
+
+Now at v3.0.2:
+
+```help
+usage: test.py [-h] [--verbose]
+
+This is a very useful tool and I will describe it thoroughly. It is so good that we have a
+second line in the first part of the description. And now we can talk more about the tool...
+
+options:
+  -h, --help
+                        show this help message and exit
+  --verbose, -v
+                        This flag will make the logs more verbose!
+
+```
+
 ### v3.0.1
 
 Fix the issue with `argumentify` which would result in falsy default values to be
@@ -20,8 +71,8 @@ def main(offset: int = 0) -> None:
 argumentify(main)
 ```
 
-if no value is provided for `--offset`, the default will be `None` instead of `0` which
-is unexpected and can lead to issues.
+if no value was provided for `--offset`, the default would be `None` instead of `0`
+which was unexpected and can lead to issues.
 
 ### v3.0.0
 

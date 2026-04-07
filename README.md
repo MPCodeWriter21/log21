@@ -69,85 +69,56 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changelog
 ---------
 
-### v3.0.1
+### v3.0.2
 
-Fix the issue with `argumentify` which would result in falsy default values to be
-replaced with None.
+Change `argumentify` to use the whole function description as the argument-parser
+description instead of the one-line short description.
 
 + Example:
 
 ```python
-def main(offset: int = 0) -> None:
-    ...
+def main(verbose: bool = False) -> None:
+    """This is a very useful tool and I will describe it thoroughly. It is so good that
+    we have a second line in the first part of the description.
+
+    And now we can talk more about the tool...
+
+    :param verbose: This flag will make the logs more verbose!
+    """
 
 argumentify(main)
 ```
 
-if no value is provided for `--offset`, the default will be `None` instead of `0` which
-is unexpected and can lead to issues.
+The way old versions would look:
 
-#### Breaking Changes
+```help
+usage: test.py [-h] [--verbose]
 
-+ **Internal module renaming and normalization**
-  + All internal modules were renamed to lowercase and, in some cases, split or
-    reorganized.
-  + Imports such as `log21.Colors`, `log21.Logger`, `log21.ProgressBar`, etc. are no
-    longer valid.
-  + Users importing from internal modules must update their imports to the new module
-    names.
-  + Public imports from `log21` remain supported.
+This is a very useful tool and I will describe it thoroughly. It is so good that
 
-+ **Argumentify exception renames**
-  + Several exceptions were renamed to follow a consistent `*Error` naming convention:
-    + `TooFewArguments` → `TooFewArgumentsError`
-    + `RequiredArgument` → `RequiredArgumentError`
-    + `IncompatibleArguments` → `IncompatibleArgumentsError`
-  + Code that explicitly raises or catches these exceptions must be updated.
+options:
+  -h, --help
+                        show this help message and exit
+  --verbose, -v
+                        This flag will make the logs more verbose!
 
-#### Changes
+```
 
-+ **Crash reporter behavior improvement**
-  + Prevented the default file crash reporter from creating `.crash_report` files when it
-    is not actually used.
-  + Implemented using an internal `FakeModule` helper.
+Now at v3.0.2:
 
-+ **Argparse compatibility update**
-  + Bundled and used the Python 3.13 `argparse` implementation to ensure consistent
-    behavior across supported Python versions.
+```help
+usage: test.py [-h] [--verbose]
 
-+ **Progress bar module rename**
-  + Renamed the internal progress bar module to `progress_bar` for consistency with the
-    new naming scheme.
-  + This will not break the usages of `log21.progress_bar(...)` since the call
-    functionality was added to the module using the `FakeModule` helper.
+This is a very useful tool and I will describe it thoroughly. It is so good that we have a
+second line in the first part of the description. And now we can talk more about the tool...
 
-+ **Examples added and updated**
-  + Added new example code files.
-  + Updated existing examples to match the v3 API and conventions.
+options:
+  -h, --help
+                        show this help message and exit
+  --verbose, -v
+                        This flag will make the logs more verbose!
 
-#### Fixes
-
-+ Resolved various linting and static-analysis issues across the codebase.
-+ Addressed minor compatibility issues uncovered by running linters and pre-commit hooks.
-+ Resolved errors occurring in environments with newer versions of argparse.
-
-#### Internal and Maintenance Changes
-
-+ Migrated the build system configuration to `uv`.
-+ Updated Python version classifiers and set the supported Python version to 3.9+.
-+ Added `vermin` to the pre-commit configuration.
-+ Updated `.gitignore`, license metadata, and tool configurations.
-+ Silenced and resolved a large number of linter warnings.
-+ General internal refactoring with no intended user-visible behavioral changes.
-
-#### Notes
-
-+ There are **no intentional behavioral changes** in logging output, argument parsing
-  logic, or UI components.
-+ Most projects will require **minimal or no changes** unless they depend on internal
-  modules or renamed exceptions.
-+ See [MIGRATION-V2-V3.md](https://github.com/MPCodeWriter21/log21/blob/master/MIGRATION-V2-V3.md)
-for detailed upgrade instructions.
+```
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 
