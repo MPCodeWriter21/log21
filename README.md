@@ -69,56 +69,139 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changelog
 ---------
 
-### v3.0.2
+### v3.1.0
 
-Change `argumentify` to use the whole function description as the argument-parser
-description instead of the one-line short description.
+Change the way `argumentify` handles function parameters to argument-parser arguments
+conversion.
 
-+ Example:
++ `POSITIONAL_ONLY` and `VAR_POSITIONAL` parameters will be positional arguments.
++ `POSITIONAL_OR_KEYWORD` and `KEYWORD_ONLY` parameters have flags assigned to them.
++ `POSITIONAL_OR_KEYWORD` parameters will be required if at least one `KEYWORD_ONLY`
+  parameter is there, otherwise they are optional.
++ `VAR_KEYWORD` parameters are still not supported.
+
+#### Example 1
 
 ```python
-def main(verbose: bool = False) -> None:
-    """This is a very useful tool and I will describe it thoroughly. It is so good that
-    we have a second line in the first part of the description.
+def main(path: Path, /, output: Path, *, verbose: bool = False):
+    """Process a file.
 
-    And now we can talk more about the tool...
-
-    :param verbose: This flag will make the logs more verbose!
+    :param path: The input file path
+    :param output: The output file
+    :param verbose: Write more logs to the standard output.
     """
+    ...
 
-argumentify(main)
+
+if __name__ == "__main__":
+    argumentify(main)
 ```
 
-The way old versions would look:
+The help looks like this:
 
 ```help
-usage: test.py [-h] [--verbose]
+usage: test.py [-h] --output OUTPUT [--verbose] path
 
-This is a very useful tool and I will describe it thoroughly. It is so good that
+Process a file.
+
+positional arguments:
+  path              The input file path
 
 options:
   -h, --help
                         show this help message and exit
+  --output OUTPUT, -o OUTPUT
+                        The output file
   --verbose, -v
-                        This flag will make the logs more verbose!
+                        Write more logs to the standard output.
 
 ```
 
-Now at v3.0.2:
+_Note that `path` and `output` are required._
+
+#### Example 2
+
+```python
+def main(output: Path, /, *inputs: Path):
+    """Process multiple files into one.
+
+    :param output: The output file
+    :param inputs: The path to the input files
+    """
+    # Since `inputs` is a VAR_POSITIONAL, while being a positional argument, it can have
+    # zero length which is in many cases not intended.
+    # You might want to add a check for its length and raise an ArgumentError if it does
+    # not match your needs
+
+    # Check if at least one input has been passed and mark the argument as required
+    # if len(inputs) < 1:
+    #     raise RequiredArgumentError("inputs")
+
+    # Raise an error unless at least two inputs are present
+    if len(inputs) < 2:
+        raise ArgumentError(message="You need to pass at least two files as input.")
+    ...
+```
+
+The help looks like this:
 
 ```help
-usage: test.py [-h] [--verbose]
+usage: test.py [-h] output [inputs ...]
 
-This is a very useful tool and I will describe it thoroughly. It is so good that we have a
-second line in the first part of the description. And now we can talk more about the tool...
+Process multiple files into one.
+
+positional arguments:
+  output            The output file
+  inputs            The path to the input files
 
 options:
   -h, --help
                         show this help message and exit
-  --verbose, -v
-                        This flag will make the logs more verbose!
 
 ```
+
+#### Example 3
+
+```python
+def main(first_name: str, last_name: str, output: Path, verbose: bool = False):
+    """Write a greeting message.
+
+    :param first_name: The first name of the user to greet (optional)
+    :param last_name: The last name of the user to greet (optional)
+    :param output: The output file (stdout if none is provided)
+    :param verbose: If provided, will write the debug logs to stdout
+    """
+    ...
+
+
+if __name__ == "__main__":
+    argumentify(main)
+```
+
+The help looks like this:
+
+```help
+usage: test.py [-h] [--first-name FIRST_NAME] [--last-name LAST_NAME] [--output OUTPUT]
+               [--verbose]
+
+Write a greeting message.
+
+options:
+  -h, --help
+                        show this help message and exit
+  --first-name FIRST_NAME, -f FIRST_NAME
+                        The first name of the user to greet (optional)
+  --last-name LAST_NAME, -l LAST_NAME
+                        The last name of the user to greet (optional)
+  --output OUTPUT, -o OUTPUT
+                        The output file (stdout if none is provided)
+  --verbose, -v
+                        If provided, will write the debug logs to stdout
+
+```
+
+_Note that all the options are optional and default to None. `verbose` is False by
+default since a default value is provided for it in function definition._
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)
 

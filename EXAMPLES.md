@@ -211,22 +211,25 @@ import log21
 
 
 class ReversedText:
-    def __init__(self, text: str):
+
+    def __init__(self, text: str) -> None:
         self._text = text[::-1]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._text
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.__class__.__name__}(text='{self._text}') at {hex(id(self))}>"
 
 
 # Old way
 def main():
-    """Here is my main function"""
+    """Here is my main function."""
     parser = log21.ColorizingArgumentParser()
-    parser.add_argument('--positional-arg', '-p', action='store', type=int,
-                        required=True, help="This argument is positional!")
+    parser.add_argument('positional_arg', action='store', type=int,
+                        help="This argument is positional!")
+    parser.add_argument('--required-arg', '-r', action='store', type=float,
+                        help="You have to pass this argument!")
     parser.add_argument('--optional-arg', '-o', action='store', type=ReversedText,
                         help="Whatever you pass here will be REVERSED!")
     parser.add_argument('--arg-with-default', '-a', action='store', default=21,
@@ -241,6 +244,7 @@ def main():
         log21.basic_config(level='DEBUG')
 
     log21.info(f"positional_arg = {args.positional_arg}")
+    log21.info(f"required_arg = {args.required_arg}")
     log21.info(f"optional_arg = {args.optional_arg}")
     log21.debug(f"arg_with_default = {args.arg_with_default}")
     log21.debug(f"additional_arg = {args.additional_arg}")
@@ -251,11 +255,20 @@ if __name__ == '__main__':
 
 
 # New way
-def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: int = 21,
-         additional_arg=None, verbose: bool = False):
-    """Some description
+def main(
+    positional_arg: int,
+    /,
+    required_arg: float,
+    *,
+    optional_arg: ReversedText,
+    arg_with_default: int = 21,
+    additional_arg=None,
+    verbose: bool = False
+):
+    """Some description.
 
     :param positional_arg: This argument is positional!
+    :param required_arg: You have to pass this argument!
     :param optional_arg: Whatever you pass here will be REVERSED!
     :param arg_with_default: The default value is 21
     :param additional_arg: This one is extra.
@@ -265,6 +278,7 @@ def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: i
         log21.basic_config(level='DEBUG')
 
     log21.info(f"{positional_arg = }")
+    log21.info(f"{required_arg = }")
     log21.info(f"{optional_arg = !s}")
     log21.debug(f"{arg_with_default = }")
     log21.debug(f"{additional_arg = !s}")
@@ -282,6 +296,7 @@ Example with multiple functions as entry-point:
 ```python
 import ast
 import operator
+import contextlib
 from functools import reduce
 
 import log21
@@ -349,8 +364,9 @@ def addition(*numbers: float):
         numbers (float): numbers to add
     """
     if len(numbers) < 2:
-        log21.error('At least two numbers are required! Use `-n`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers are required!'
+        )
     log21.info(f'Result: {sum(numbers)}')
 
 
@@ -361,8 +377,9 @@ def multiplication(*numbers: float):
         numbers (float): numbers to multiply
     """
     if len(numbers) < 2:
-        log21.error('At least two numbers are required! Use `-n`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers are required!'
+        )
     log21.info(f'Result: {reduce(lambda x, y: x * y, numbers)}')
 
 
@@ -374,17 +391,16 @@ def calc(*inputs: str, verbose: bool = False):
     expression = ' '.join(inputs)
 
     if len(expression) < 3:
-        log21.error('At least two numbers and one operator are required! Use `-i`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers and one operator are required!'
+        )
 
     if verbose:
         log21.basic_config(level='DEBUG')
 
     log21.debug(f'Expression: {expression}')
-    try:
+    with contextlib.suppress(TypeError, KeyError, SyntaxError):
         log21.info(f'Result: {safe_eval(expression)}')
-    except (TypeError, KeyError, SyntaxError):
-        pass
 
 
 if __name__ == "__main__":
@@ -396,7 +412,6 @@ if __name__ == "__main__":
 Example with parser errors:
 
 ```python
-# Common Section
 import log21
 
 
@@ -411,7 +426,6 @@ class ReversedText:
         return f"<{self.__class__.__name__}(text='{self._text}') at {hex(id(self))}>"
 
 
-# New way
 def main(positional_arg: int, /, optional_arg: ReversedText, arg_with_default: int = 21,
          additional_arg=None, verbose: bool = False, quiet: bool = False):
     """Some description

@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 import ast
 import operator
+import contextlib
 from functools import reduce
 
 import log21
@@ -67,8 +70,9 @@ def addition(*numbers: float):
         numbers (float): numbers to add
     """
     if len(numbers) < 2:
-        log21.error('At least two numbers are required! Use `-n`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers are required!'
+        )
     log21.info(f'Result: {sum(numbers)}')
 
 
@@ -79,8 +83,9 @@ def multiplication(*numbers: float):
         numbers (float): numbers to multiply
     """
     if len(numbers) < 2:
-        log21.error('At least two numbers are required! Use `-n`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers are required!'
+        )
     log21.info(f'Result: {reduce(lambda x, y: x * y, numbers)}')
 
 
@@ -92,17 +97,16 @@ def calc(*inputs: str, verbose: bool = False):
     expression = ' '.join(inputs)
 
     if len(expression) < 3:
-        log21.error('At least two numbers and one operator are required! Use `-i`.')
-        return
+        raise log21.ArgumentError(
+            message='At least two numbers and one operator are required!'
+        )
 
     if verbose:
         log21.basic_config(level='DEBUG')
 
     log21.debug(f'Expression: {expression}')
-    try:
+    with contextlib.suppress(TypeError, KeyError, SyntaxError):
         log21.info(f'Result: {safe_eval(expression)}')
-    except (TypeError, KeyError, SyntaxError):
-        pass
 
 
 if __name__ == "__main__":

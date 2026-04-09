@@ -1,4 +1,5 @@
-# Common Section
+#!/usr/bin/env python3
+
 import log21
 
 
@@ -14,7 +15,6 @@ class ReversedText:
         return f"<{self.__class__.__name__}(text='{self._text}') at {hex(id(self))}>"
 
 
-# New way
 def main(
     positional_arg: int,
     /,

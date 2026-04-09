@@ -344,6 +344,28 @@ def _add_arguments(
     """
     if reserved_flags is None:
         reserved_flags = RESERVED_FLAGS.copy()
+
+    keyword_only_exists = False
+    for argument in info.arguments.values():
+        # Reserve the name of POSITIONAL_ONLY and VAR_POSITIONAL arguments as flags
+        # since their flag name and their dest need to be the same
+        if argument.kind in [_inspect._ParameterKind.POSITIONAL_ONLY,
+                             _inspect._ParameterKind.VAR_POSITIONAL]:
+            reserved_flags.add(argument.name)
+        # If there is at least one KEYWORD_ONLY argument, the parameters of kind
+        # POSITIONAL_OR_KEYWORD will be marked as required
+        if argument.kind == _inspect._ParameterKind.KEYWORD_ONLY:
+            keyword_only_exists = True
+        # Check if the function has a VAR_KEYWORD argument
+        # Raises a ArgumentTypeError if it does
+        # TODO: See if we can find a use-case and a way of supporting these arguments
+        if argument.kind == _inspect._ParameterKind.VAR_KEYWORD:
+            raise ArgumentTypeError(
+                f"The function has a `**{argument.name}` argument, "
+                "which is not supported.",
+                unsupported_arg=argument.name
+            )
+
     # Add the arguments
     for argument in info.arguments.values():
         config: _Dict[str, _Any] = {
@@ -351,19 +373,21 @@ def _add_arguments(
             'dest': argument.name,
             'help': argument.help
         }
+        flags = generate_flag(argument, reserved_flags=reserved_flags)
         if argument.annotation is bool:
             config['action'] = 'store_true'
         elif argument.annotation:
             config['type'] = argument.annotation
         if argument.kind == _inspect._ParameterKind.POSITIONAL_ONLY:
-            config['required'] = True
+            flags = [config.pop('dest')]
         if argument.kind == _inspect._ParameterKind.VAR_POSITIONAL:
             config['nargs'] = '*'
+            flags = [config.pop('dest')]
+        if argument.kind == _inspect._ParameterKind.POSITIONAL_OR_KEYWORD and keyword_only_exists:
+            config['required'] = True
         if argument.default is not None:
             config['default'] = argument.default
-        parser.add_argument(
-            *generate_flag(argument, reserved_flags=reserved_flags), **config
-        )
+        parser.add_argument(*flags, **config)
 
 
 def _argumentify_one(func: Callable) -> None:
@@ -372,16 +396,6 @@ def _argumentify_one(func: Callable) -> None:
     :param function: The function to argumentify.
     """
     info = FunctionInfo(func)
-
-    # Check if the function has a VAR_KEYWORD argument
-    # Raises a ArgumentTypeError if it does
-    for argument in info.arguments.values():
-        if argument.kind == _inspect._ParameterKind.VAR_KEYWORD:
-            raise ArgumentTypeError(
-                f"The function has a `**{argument.name}` argument, "
-                "which is not supported.",
-                unsupported_arg=argument.name
-            )
 
     # Create the parser
     parser = _argparse.ColorizingArgumentParser(description=info.docstring.description)

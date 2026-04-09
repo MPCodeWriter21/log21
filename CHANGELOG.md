@@ -6,6 +6,140 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.1.0
+
+Change the way `argumentify` handles function parameters to argument-parser arguments
+conversion.
+
+- `POSITIONAL_ONLY` and `VAR_POSITIONAL` parameters will be positional arguments.
+- `POSITIONAL_OR_KEYWORD` and `KEYWORD_ONLY` parameters have flags assigned to them.
+- `POSITIONAL_OR_KEYWORD` parameters will be required if at least one `KEYWORD_ONLY`
+  parameter is there, otherwise they are optional.
+- `VAR_KEYWORD` parameters are still not supported.
+
+#### Example 1
+
+```python
+def main(path: Path, /, output: Path, *, verbose: bool = False):
+    """Process a file.
+
+    :param path: The input file path
+    :param output: The output file
+    :param verbose: Write more logs to the standard output.
+    """
+    ...
+
+
+if __name__ == "__main__":
+    argumentify(main)
+```
+
+The help looks like this:
+
+```help
+usage: test.py [-h] --output OUTPUT [--verbose] path
+
+Process a file.
+
+positional arguments:
+  path              The input file path
+
+options:
+  -h, --help
+                        show this help message and exit
+  --output OUTPUT, -o OUTPUT
+                        The output file
+  --verbose, -v
+                        Write more logs to the standard output.
+
+```
+
+_Note that `path` and `output` are required._
+
+#### Example 2
+
+```python
+def main(output: Path, /, *inputs: Path):
+    """Process multiple files into one.
+
+    :param output: The output file
+    :param inputs: The path to the input files
+    """
+    # Since `inputs` is a VAR_POSITIONAL, while being a positional argument, it can have
+    # zero length which is in many cases not intended.
+    # You might want to add a check for its length and raise an ArgumentError if it does
+    # not match your needs
+
+    # Check if at least one input has been passed and mark the argument as required
+    # if len(inputs) < 1:
+    #     raise RequiredArgumentError("inputs")
+
+    # Raise an error unless at least two inputs are present
+    if len(inputs) < 2:
+        raise ArgumentError(message="You need to pass at least two files as input.")
+    ...
+```
+
+The help looks like this:
+
+```help
+usage: test.py [-h] output [inputs ...]
+
+Process multiple files into one.
+
+positional arguments:
+  output            The output file
+  inputs            The path to the input files
+
+options:
+  -h, --help
+                        show this help message and exit
+
+```
+
+#### Example 3
+
+```python
+def main(first_name: str, last_name: str, output: Path, verbose: bool = False):
+    """Write a greeting message.
+
+    :param first_name: The first name of the user to greet (optional)
+    :param last_name: The last name of the user to greet (optional)
+    :param output: The output file (stdout if none is provided)
+    :param verbose: If provided, will write the debug logs to stdout
+    """
+    ...
+
+
+if __name__ == "__main__":
+    argumentify(main)
+```
+
+The help looks like this:
+
+```help
+usage: test.py [-h] [--first-name FIRST_NAME] [--last-name LAST_NAME] [--output OUTPUT]
+               [--verbose]
+
+Write a greeting message.
+
+options:
+  -h, --help
+                        show this help message and exit
+  --first-name FIRST_NAME, -f FIRST_NAME
+                        The first name of the user to greet (optional)
+  --last-name LAST_NAME, -l LAST_NAME
+                        The last name of the user to greet (optional)
+  --output OUTPUT, -o OUTPUT
+                        The output file (stdout if none is provided)
+  --verbose, -v
+                        If provided, will write the debug logs to stdout
+
+```
+
+_Note that all the options are optional and default to None. `verbose` is False by
+default since a default value is provided for it in function definition._
+
 ### v3.0.2
 
 Change `argumentify` to use the whole function description as the argument-parser
@@ -46,7 +180,7 @@ Now at v3.0.2:
 ```help
 usage: test.py [-h] [--verbose]
 
-This is a very useful tool and I will describe it thoroughly. It is so good that we have a
+This is a very useful tool and I will describe it thoroughly. It is so good that we have
 second line in the first part of the description. And now we can talk more about the tool...
 
 options:
@@ -155,7 +289,7 @@ for detailed upgrade instructions.
 ### 2.10.0
 
 - Added some exception classes to raise in the "argumentified" functions to show
-  *parser error* to the user: `ArgumentError`, `IncompatibleArguments`,
+  **parser error** to the user: `ArgumentError`, `IncompatibleArguments`,
   `RequiredArgument`, `TooFewArguments`
 
 ### 2.9.2
@@ -373,7 +507,7 @@ clears the current line in the console and moves the cursor to the beginning of 
 ### 2.3.3
 
 Fixed a bug that would cause an error creating a progress bar with no value set for
-width in systems without support for os.get_terminal_size().
+width in systems without support for `os.get_terminal_size()`.
 
 ### 2.3.2
 
@@ -560,7 +694,7 @@ TypeError: A logger name must be a string
 You can use `Logger.print` to print a message using the current level of the logger
 class.
 
-*It gets printed with any level.*
+_It gets printed with any level._
 
 ### 1.4.6
 
