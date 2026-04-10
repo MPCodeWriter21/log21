@@ -6,6 +6,26 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.2.0
+
+Add `file_mode` and `file_encoding` parameters to `get_logger` for finer control over
+the way a simple logger handles files.
+
+For even more control you can still define Logger, Handlers, and Formatters manually.
+
+#### Example
+
+```python
+import log21
+
+logger = log21.get_logger(
+    "My File Logger", show_level=False, show_time=True, file="myapp.log", file_mode="a",
+    file_encoding="utf-8"
+)
+
+logger.info("Hello World!")
+```
+
 ### v3.1.0
 
 Change the way `argumentify` handles function parameters to argument-parser arguments

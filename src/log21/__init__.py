@@ -31,7 +31,7 @@ from .stream_handler import StreamHandler, ColorizingStreamHandler
 # yapf: enable
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '3.1.0'
+__version__ = '3.2.0'
 __github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
@@ -60,7 +60,8 @@ def _prepare_formatter(
     colorize_time_and_level: bool = True,
     level_names: _Optional[_Mapping[int, str]] = None,
     level_colors: _Optional[_Mapping[int, tuple[str, ...]]] = None,
-    formatter_class: _Type[_logging.Formatter] = ColorizingFormatter
+    formatter_class: _Type[_logging.Formatter] = ColorizingFormatter,
+    prefix_carriage_return: bool = True,
 ) -> _logging.Formatter:
     # Prepares a formatting if the fmt was None
     if not fmt:
@@ -70,7 +71,8 @@ def _prepare_formatter(
             fmt = '[%(levelname)s] ' + fmt
         if show_time:
             fmt = '[%(asctime)s] ' + fmt
-        fmt = '\r' + fmt
+        if prefix_carriage_return:
+            fmt = '\r' + fmt
 
     if level_colors and not issubclass(formatter_class, ColorizingFormatter):
         warning(
@@ -116,7 +118,10 @@ def get_logger(
     override: bool = False,
     level_names: _Optional[_Mapping[int, str]] = None,
     level_colors: _Optional[_Mapping[int, tuple[str, ...]]] = None,
-    file: _Optional[_Union[_os.PathLike, str]] = None
+    # TODO: Rename file to file_path in one future update
+    file: _Optional[_Union[_os.PathLike, str]] = None,
+    file_mode: _Optional[str] = None,
+    file_encoding: _Optional[str] = None,
 ) -> Logger:
     """Returns a logging.Logger with colorizing support.
 
@@ -182,7 +187,9 @@ def get_logger(
     :param level_names: Mapping[int, str] = None: You can specify custom level names.
     :param level_colors: Mapping[int, Tuple[str, ...]] = None: You can specify custom
         level colors.
-    :param file: Union[os.PathLike, str] = None: The file to log to
+    :param file: Union[os.PathLike, str] = None: The file path to log to
+    :param file_mode: str = None: The mode to open file at (Defaults to 'a')
+    :param file_encoding: str = None: The file encoding
     :return: log21.Logger
     """
     if not isinstance(name, str):
@@ -209,7 +216,9 @@ def get_logger(
         _manager.addLogger(name, logger)
 
         if file:
-            file_handler = FileHandler(file)
+            file_handler = DecolorizingFileHandler(
+                file, mode=file_mode or 'a', encoding=file_encoding
+            )
             file_formatter = _prepare_formatter(
                 fmt,
                 style,
@@ -218,7 +227,8 @@ def get_logger(
                 show_time,
                 False,
                 level_names,
-                formatter_class=DecolorizingFormatter
+                formatter_class=DecolorizingFormatter,
+                prefix_carriage_return=False,
             )
             file_handler.setFormatter(file_formatter)
             logger.addHandler(file_handler)
