@@ -6,6 +6,57 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.3.0
+
+Add `log21.helper_types` module.
+
+This module contains a collection of useful types meant for using with argument parser
+to parse CLI arguments to more usable formats.
+
+- `FileSize`: Can take `str` and `int` values. Will convert human inputs such as "121 KB",
+  "21MiB", or "4.56 GB" to bytes. Can also be used to represent bytes value in more
+  human-readable formats.
+
+For even more control you can still define Logger, Handlers, and Formatters manually.
+
+#### Example of `FileSize` usage
+
+```python
+from pathlib import Path
+
+import log21
+from log21.helper_types import FileSize
+
+
+def main(path: Path, min_size: FileSize, max_size: FileSize, /):
+    log21.info(
+        "Files that are smaller than %s or bigger than %s will be ignored.",
+        args=(min_size, max_size),
+    )
+
+    for file in path.iterdir():
+        if not file.is_file():
+            continue
+        if min_size <= (size := file.stat().st_size) <= max_size:
+            log21.print(
+                "`%s` is %s.",
+                args=(file, FileSize(size).humanize(binary=False, fmt="%.4f")),
+            )
+
+
+if __name__ == "__main__":
+    log21.argumentify(main)
+```
+
+Example usage and output:
+
+```shell
+$ uv run test.py . "1.23MiB" "0.5 GB"
+[21:21:21] [INFO] Files that are smaller than 1.23 MiB or bigger than 476.84 MiB will be
+ignored.
+`myfile21.zip` is 35.1856 MB.
+```
+
 ### v3.2.0
 
 Add `file_mode` and `file_encoding` parameters to `get_logger` for finer control over
@@ -13,7 +64,7 @@ the way a simple logger handles files.
 
 For even more control you can still define Logger, Handlers, and Formatters manually.
 
-#### Example
+#### Example of using `get_logger` with a file
 
 ```python
 import log21

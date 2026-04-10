@@ -10,6 +10,8 @@ from types import ModuleType as _ModuleType
 from typing import (Type as _Type, Union as _Union, Literal as _Literal,
                     Mapping as _Mapping, Iterable as _Iterable, Optional as _Optional)
 
+import log21.helper_types
+
 from . import crash_reporter
 from .colors import (Colors, get_color, get_colors, ansi_escape, closest_color,
                      get_color_name)
@@ -31,7 +33,7 @@ from .stream_handler import StreamHandler, ColorizingStreamHandler
 # yapf: enable
 
 __author__ = 'CodeWriter21 (Mehrad Pooryoussof)'
-__version__ = '3.2.0'
+__version__ = '3.3.0'
 __github__ = 'https://GitHub.com/MPCodeWriter21/log21'
 __all__ = [
     'ColorizingStreamHandler', 'DecolorizingFileHandler', 'ColorizingFormatter',
@@ -44,7 +46,7 @@ __all__ = [
     'log', 'basic_config', 'basicConfig', 'ProgressBar', 'LoggingWindow',
     'LoggingWindowHandler', 'get_logging_window', 'crash_reporter', 'console_reporter',
     'file_reporter', 'argumentify', 'ArgumentError', 'IncompatibleArgumentsError',
-    'RequiredArgumentError', 'TooFewArgumentsError'
+    'RequiredArgumentError', 'TooFewArgumentsError', 'FileHandler'
 ]
 
 _manager = Manager()
