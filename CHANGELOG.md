@@ -6,6 +6,47 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.3.1
+
+Get rid of `invalid NoneType value` error message.
+
+In the previous versions, if you used an optional union type such as `int | float | None`
+which ended with `None`, you'd get an error saying `invalid NoneType value` that didn't
+make any sense to the user. The code has been updated to use the name of the last
+non-None type for the error message in these situations.
+
+#### v3.3.1 update demonstration
+
+```python
+import log21
+from log21.helper_types import FileSize
+
+
+def main(min_size: FileSize | None = None, max_size: FileSize | None = None) -> None:
+    log21.info("Min Size: %s, Max Size: %s", args=(min_size, max_size))
+
+if __name__ == "__main__":
+    log21.argumentify(main)
+```
+
+Before v3.3.1:
+
+```shell
+$ python test.py -m Hello
+usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+
+test.py: error: argument --min-size/-m: invalid NoneType value: 'Hello'
+```
+
+With v3.3.1 update:
+
+```shell
+$ python test.py -m Hello
+usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+
+test.py: error: argument --min-size/-m: invalid FileSize value: 'Hello'
+```
+
 ### v3.3.0
 
 Add `log21.helper_types` module.

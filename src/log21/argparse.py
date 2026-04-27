@@ -784,7 +784,8 @@ class ColorizingArgumentParser(_argparse.ArgumentParser, _ActionsContainer):
             else:
                 exception = ValueError()
                 for type_ in func_type:
-                    name = getattr(type_, '__name__', repr(type_))
+                    if type_ is not type(None):
+                        name = getattr(type_, '__name__', repr(type_))
                     try:
                         result = type_(arg_string)
                         break

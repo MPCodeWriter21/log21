@@ -69,55 +69,45 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changelog
 ---------
 
-### v3.3.0
+### v3.3.1
 
-Add `log21.helper_types` module.
+Get rid of `invalid NoneType value` error message.
 
-This module contains a collection of useful types meant for using with argument parser
-to parse CLI arguments to more usable formats.
-
-+ `FileSize`: Can take `str` and `int` values. Will convert human inputs such as "121 KB",
-  "21MiB", or "4.56 GB" to bytes. Can also be used to represent bytes value in more
-  human-readable formats.
-
-For even more control you can still define Logger, Handlers, and Formatters manually.
+In the previous versions, if you used an optional union type such as `int | float | None`
+which ended with `None`, you'd get an error saying `invalid NoneType value` that didn't
+make any sense to the user. The code has been updated to use the name of the last
+non-None type for the error message in these situations.
 
 #### Example
 
 ```python
-from pathlib import Path
-
 import log21
 from log21.helper_types import FileSize
 
 
-def main(path: Path, min_size: FileSize, max_size: FileSize, /):
-    log21.info(
-        "Files that are smaller than %s or bigger than %s will be ignored.",
-        args=(min_size, max_size),
-    )
-
-    for file in path.iterdir():
-        if not file.is_file():
-            continue
-        if min_size <= (size := file.stat().st_size) <= max_size:
-            log21.print(
-                "`%s` is %s.",
-                args=(file, FileSize(size).humanize(binary=False, fmt="%.4f")),
-            )
-
+def main(min_size: FileSize | None = None, max_size: FileSize | None = None) -> None:
+    log21.info("Min Size: %s, Max Size: %s", args=(min_size, max_size))
 
 if __name__ == "__main__":
     log21.argumentify(main)
 ```
 
-Example usage and output:
+Before v3.3.1:
 
 ```shell
-$ uv run test.py . "1.23MiB" "0.5 GB"
-[21:21:21] [INFO] Files that are smaller than 1.23 MiB or bigger than 476.84 MiB will be
-ignored.
-`myfile21.zip` is 35.1856 MB.
+$ python test.py -m Hello
+usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+
+test.py: error: argument --min-size/-m: invalid NoneType value: 'Hello'
+```
+
+With v3.3.1 update:
+
+```shell
+$ python test.py -m Hello
+usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+
+test.py: error: argument --min-size/-m: invalid FileSize value: 'Hello'
 ```
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)

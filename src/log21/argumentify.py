@@ -451,7 +451,7 @@ def _argumentify(functions: _Dict[str, Callable]) -> None:
     args = []
     kwargs = {}
     info = None
-    for name, (function, info) in functions_info.items():  # noqa: B007
+    for _name, (function, info) in functions_info.items():  # noqa: B007
         if function == cli_args.func:
             break
     else:
@@ -475,7 +475,7 @@ def _argumentify(functions: _Dict[str, Callable]) -> None:
 
 def argumentify(
     entry_point: _Union[Callable, _List[Callable], _Dict[str, Callable]]
-) -> _Callable:
+) -> _Union[Callable, _List[Callable], _Dict[str, Callable]]:
     """This function argumentifies one or more functions as the entry point of the
     script.
 
@@ -493,7 +493,7 @@ def argumentify(
     12 if __name__ == '__main__':
     13     argumentify(main)
 
-    $ python argumentified.py Ahmad Ahmadi --age 20
+    $ python argumentified.py Ahmad Mohammadi --age 20
     Ahmad Ahmadi is 20 years old.
     $ python argumentified.py Mehrad Pooryoussof
     Mehrad Pooryoussof is not yet born.
