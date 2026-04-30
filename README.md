@@ -69,45 +69,65 @@ pip install git+https://github.com/MPCodeWriter21/log21
 Changelog
 ---------
 
-### v3.3.1
+### v3.3.2
 
-Get rid of `invalid NoneType value` error message.
+Handle percent signs in arguments' help text.
 
-In the previous versions, if you used an optional union type such as `int | float | None`
-which ended with `None`, you'd get an error saying `invalid NoneType value` that didn't
-make any sense to the user. The code has been updated to use the name of the last
-non-None type for the error message in these situations.
+In the older versions, if you had a percent sign in the help text of an argument, it
+would cause an error when you try to show the help. This is because the argparse
+module uses percent signs for string formatting, and it would try to format the help
+text as a string, which would fail if there are any percent signs in it.
 
-#### Example
+The workaround for this issue was to escape the percent signs by doubling them, but it
+was not a good solution. Now, in v3.3.2, log21 handles percent signs in arguments' help
+text properly, so you can use percent signs without any issues.
+
+#### Example (works before and after v3.3.2)
 
 ```python
 import log21
-from log21.helper_types import FileSize
 
 
-def main(min_size: FileSize | None = None, max_size: FileSize | None = None) -> None:
-    log21.info("Min Size: %s, Max Size: %s", args=(min_size, max_size))
+def show_percentage(a: float, b: float, /) -> None:
+    """Takes two numbers and returns the percentage of a in b. E.g. if a is 50 and b is
+    200, the percentage would be 25.00%.
+
+    :param a: The first number. (a %% b)
+    :param b: The second number. (a %% b)
+    :return: The percentage of a in b.
+    """
+    if b == 0:
+        raise log21.ArgumentError("b cannot be zero.")
+    percentage = (a / b) * 100
+    print(f"{a} is {percentage:.2f}% of {b}.")
+
 
 if __name__ == "__main__":
-    log21.argumentify(main)
+    log21.argumentify(show_percentage)
 ```
 
-Before v3.3.1:
+#### Example (Works only after v3.3.2)
 
-```shell
-$ python test.py -m Hello
-usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+```python
+import log21
 
-test.py: error: argument --min-size/-m: invalid NoneType value: 'Hello'
-```
 
-With v3.3.1 update:
+def show_percentage(a: float, b: float, /) -> None:
+    """Takes two numbers and returns the percentage of a in b. E.g. if a is 50 and b is
+    200, the percentage would be 25.00%.
 
-```shell
-$ python test.py -m Hello
-usage: test.py [-h] [--min-size MIN_SIZE] [--max-size MAX_SIZE]
+    :param a: The first number. (a % b)
+    :param b: The second number. (a % b)
+    :return: The percentage of a in b.
+    """
+    if b == 0:
+        raise log21.ArgumentError("b cannot be zero.")
+    percentage = (a / b) * 100
+    print(f"{a} is {percentage:.2f}% of {b}.")
 
-test.py: error: argument --min-size/-m: invalid FileSize value: 'Hello'
+
+if __name__ == "__main__":
+    log21.argumentify(show_percentage)
 ```
 
 [Full CHANGELOG](https://github.com/MPCodeWriter21/log21/blob/master/CHANGELOG.md)

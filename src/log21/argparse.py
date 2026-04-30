@@ -171,8 +171,10 @@ class ColorizingHelpFormatter(_argparse.HelpFormatter):
         # collect the pieces of the action help
         parts = [action_header]
 
+        percent_pattern = _re.compile(r'([%]{2}|[%])')
         # if there was help for the action, add lines of help text
         if action.help:
+            action.help = percent_pattern.sub("%%", action.help)
             help_text = _gc(self.colors['help']) + self._expand_help(action)
             help_lines = self._split_lines(help_text, help_width)
             parts.append('%*s%s\n' % (indent_first, '', help_lines[0]))

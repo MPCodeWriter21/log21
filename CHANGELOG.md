@@ -6,6 +6,67 @@ Help this project by [Donation](DONATE.md)
 Changes
 -------
 
+### v3.3.2
+
+Handle percent signs in arguments' help text.
+
+In the older versions, if you had a percent sign in the help text of an argument, it
+would cause an error when you try to show the help. This is because the argparse
+module uses percent signs for string formatting, and it would try to format the help
+text as a string, which would fail if there are any percent signs in it.
+
+The workaround for this issue was to escape the percent signs by doubling them, but it
+was not a good solution. Now, in v3.3.2, log21 handles percent signs in arguments' help
+text properly, so you can use percent signs without any issues.
+
+#### Example (works before and after v3.3.2)
+
+```python
+import log21
+
+
+def show_percentage(a: float, b: float, /) -> None:
+    """Takes two numbers and returns the percentage of a in b. E.g. if a is 50 and b is
+    200, the percentage would be 25.00%.
+
+    :param a: The first number. (a %% b)
+    :param b: The second number. (a %% b)
+    :return: The percentage of a in b.
+    """
+    if b == 0:
+        raise log21.ArgumentError("b cannot be zero.")
+    percentage = (a / b) * 100
+    print(f"{a} is {percentage:.2f}% of {b}.")
+
+
+if __name__ == "__main__":
+    log21.argumentify(show_percentage)
+```
+
+#### Example (Works only after v3.3.2)
+
+```python
+import log21
+
+
+def show_percentage(a: float, b: float, /) -> None:
+    """Takes two numbers and returns the percentage of a in b. E.g. if a is 50 and b is
+    200, the percentage would be 25.00%.
+
+    :param a: The first number. (a % b)
+    :param b: The second number. (a % b)
+    :return: The percentage of a in b.
+    """
+    if b == 0:
+        raise log21.ArgumentError("b cannot be zero.")
+    percentage = (a / b) * 100
+    print(f"{a} is {percentage:.2f}% of {b}.")
+
+
+if __name__ == "__main__":
+    log21.argumentify(show_percentage)
+```
+
 ### v3.3.1
 
 Get rid of `invalid NoneType value` error message.
